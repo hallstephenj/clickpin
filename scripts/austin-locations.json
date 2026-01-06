@@ -1,0 +1,242 @@
+[
+  {
+    "name": "Darrell K Royal-Texas Memorial Stadium",
+    "slug": "dkr-stadium",
+    "category": "stadium",
+    "lat": 30.2836,
+    "lng": -97.7325,
+    "radius_m": 300
+  },
+  {
+    "name": "UT Austin Main Mall",
+    "slug": "ut-main-mall",
+    "category": "campus",
+    "lat": 30.2849,
+    "lng": -97.7341,
+    "radius_m": 200
+  },
+  {
+    "name": "UT Tower",
+    "slug": "ut-tower",
+    "category": "landmark",
+    "lat": 30.2861,
+    "lng": -97.7394,
+    "radius_m": 150
+  },
+  {
+    "name": "Zilker Park",
+    "slug": "zilker-park",
+    "category": "park",
+    "lat": 30.2669,
+    "lng": -97.7729,
+    "radius_m": 500
+  },
+  {
+    "name": "Barton Springs Pool",
+    "slug": "barton-springs",
+    "category": "recreation",
+    "lat": 30.2640,
+    "lng": -97.7713,
+    "radius_m": 200
+  },
+  {
+    "name": "South Congress Avenue",
+    "slug": "south-congress",
+    "category": "shopping",
+    "lat": 30.2505,
+    "lng": -97.7494,
+    "radius_m": 300
+  },
+  {
+    "name": "6th Street (Downtown)",
+    "slug": "sixth-street",
+    "category": "entertainment",
+    "lat": 30.2672,
+    "lng": -97.7394,
+    "radius_m": 400
+  },
+  {
+    "name": "Rainey Street",
+    "slug": "rainey-street",
+    "category": "entertainment",
+    "lat": 30.2585,
+    "lng": -97.7389,
+    "radius_m": 200
+  },
+  {
+    "name": "Franklin Barbecue",
+    "slug": "franklin-bbq",
+    "category": "restaurant",
+    "lat": 30.2701,
+    "lng": -97.7312,
+    "radius_m": 100
+  },
+  {
+    "name": "Terry Black's BBQ",
+    "slug": "terry-blacks",
+    "category": "restaurant",
+    "lat": 30.2586,
+    "lng": -97.7501,
+    "radius_m": 100
+  },
+  {
+    "name": "Torchy's Tacos (Original)",
+    "slug": "torchys-original",
+    "category": "restaurant",
+    "lat": 30.2538,
+    "lng": -97.7525,
+    "radius_m": 100
+  },
+  {
+    "name": "The Domain",
+    "slug": "the-domain",
+    "category": "shopping",
+    "lat": 30.4022,
+    "lng": -97.7253,
+    "radius_m": 400
+  },
+  {
+    "name": "Austin-Bergstrom International Airport",
+    "slug": "austin-airport",
+    "category": "transit",
+    "lat": 30.1975,
+    "lng": -97.6664,
+    "radius_m": 500
+  },
+  {
+    "name": "Lady Bird Lake Trail",
+    "slug": "lady-bird-lake",
+    "category": "park",
+    "lat": 30.2615,
+    "lng": -97.7512,
+    "radius_m": 300
+  },
+  {
+    "name": "Congress Avenue Bridge (Bat Bridge)",
+    "slug": "bat-bridge",
+    "category": "landmark",
+    "lat": 30.2619,
+    "lng": -97.7451,
+    "radius_m": 150
+  },
+  {
+    "name": "Alamo Drafthouse South Lamar",
+    "slug": "alamo-south-lamar",
+    "category": "entertainment",
+    "lat": 30.2521,
+    "lng": -97.7641,
+    "radius_m": 150
+  },
+  {
+    "name": "Mueller Lake Park",
+    "slug": "mueller-lake-park",
+    "category": "park",
+    "lat": 30.2987,
+    "lng": -97.7032,
+    "radius_m": 250
+  },
+  {
+    "name": "Austin Central Library",
+    "slug": "central-library",
+    "category": "landmark",
+    "lat": 30.2641,
+    "lng": -97.7514,
+    "radius_m": 150
+  },
+  {
+    "name": "Blanton Museum of Art",
+    "slug": "blanton-museum",
+    "category": "museum",
+    "lat": 30.2808,
+    "lng": -97.7369,
+    "radius_m": 150
+  },
+  {
+    "name": "Texas State Capitol",
+    "slug": "texas-capitol",
+    "category": "landmark",
+    "lat": 30.2747,
+    "lng": -97.7404,
+    "radius_m": 200
+  },
+  {
+    "name": "Bullock Texas State History Museum",
+    "slug": "bullock-museum",
+    "category": "museum",
+    "lat": 30.2803,
+    "lng": -97.7389,
+    "radius_m": 150
+  },
+  {
+    "name": "East Austin Hope Outdoor Gallery",
+    "slug": "hope-gallery",
+    "category": "landmark",
+    "lat": 30.2773,
+    "lng": -97.7217,
+    "radius_m": 150
+  },
+  {
+    "name": "Mount Bonnell",
+    "slug": "mount-bonnell",
+    "category": "park",
+    "lat": 30.3211,
+    "lng": -97.7734,
+    "radius_m": 200
+  },
+  {
+    "name": "Pennybacker Bridge (360 Bridge)",
+    "slug": "pennybacker-bridge",
+    "category": "landmark",
+    "lat": 30.3464,
+    "lng": -97.7928,
+    "radius_m": 200
+  },
+  {
+    "name": "Q2 Stadium",
+    "slug": "q2-stadium",
+    "category": "stadium",
+    "lat": 30.3880,
+    "lng": -97.7196,
+    "radius_m": 300
+  },
+  {
+    "name": "Austin Convention Center",
+    "slug": "convention-center",
+    "category": "venue",
+    "lat": 30.2638,
+    "lng": -97.7396,
+    "radius_m": 250
+  },
+  {
+    "name": "Moody Theater (ACL Live)",
+    "slug": "acl-live",
+    "category": "entertainment",
+    "lat": 30.2651,
+    "lng": -97.7466,
+    "radius_m": 150
+  },
+  {
+    "name": "Circuit of the Americas",
+    "slug": "cota",
+    "category": "stadium",
+    "lat": 30.1327,
+    "lng": -97.6356,
+    "radius_m": 500
+  },
+  {
+    "name": "Long Center for the Performing Arts",
+    "slug": "long-center",
+    "category": "entertainment",
+    "lat": 30.2591,
+    "lng": -97.7518,
+    "radius_m": 150
+  },
+  {
+    "name": "Whole Foods Market HQ",
+    "slug": "whole-foods-hq",
+    "category": "landmark",
+    "lat": 30.2693,
+    "lng": -97.7550,
+    "radius_m": 150
+  }
+]
