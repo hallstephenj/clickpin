@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         location: null,
         presence_token: null,
-        message: 'No Clickpin board here yet',
+        message: "Sorry! This location doesn't have a clickpin (yet!). You can look for nearby boards, refresh your location, or request this location to have its own board.",
       });
     }
 

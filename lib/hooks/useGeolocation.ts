@@ -73,7 +73,7 @@ export function useGeolocation(sessionId: string | null): UseGeolocationResult {
 
       if (!data.location) {
         setState({ status: 'error', position, error: data.message });
-        setError(data.message || 'No Clickpin board here yet');
+        setError(data.message || "Sorry! This location doesn't have a clickpin (yet!).");
         setLocation(null);
         setPresenceToken(null);
         return;
