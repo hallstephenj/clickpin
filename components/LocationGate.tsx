@@ -1,8 +1,30 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { GeolocationState } from '@/types';
 import { RequestLocationModal } from './RequestLocationModal';
+
+function AnimatedProgressBar() {
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setProgress(prev => {
+        const increment = (1 - prev) * 0.08;
+        return Math.min(prev + increment, 0.95);
+      });
+    }, 100);
+    return () => clearInterval(interval);
+  }, []);
+
+  const filled = Math.floor(progress * 12);
+  const empty = 12 - filled;
+  return (
+    <div className="text-faint text-xs font-mono">
+      {'█'.repeat(filled)}{'░'.repeat(empty)}
+    </div>
+  );
+}
 
 interface LocationGateProps {
   state: GeolocationState;
@@ -40,9 +62,7 @@ export function LocationGate({ state, error, onRequestLocation, sessionId }: Loc
               <div className="text-muted mb-2 font-mono text-sm">
                 locating...
               </div>
-              <div className="text-faint text-xs font-mono animate-pulse">
-                ████████░░░░
-              </div>
+              <AnimatedProgressBar />
             </div>
           ) : (
             <div className="p-6">

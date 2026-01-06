@@ -8,6 +8,7 @@ interface UseBoardResult {
   pins: Pin[];
   hiddenPins: Pin[];
   loading: boolean;
+  hasFetched: boolean;
   error: string | null;
   refreshBoard: () => Promise<void>;
 }
@@ -19,6 +20,7 @@ export function useBoard(
   const [pins, setPins] = useState<Pin[]>([]);
   const [hiddenPins, setHiddenPins] = useState<Pin[]>([]);
   const [loading, setLoading] = useState(false);
+  const [hasFetched, setHasFetched] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchBoard = useCallback(async () => {
@@ -45,6 +47,7 @@ export function useBoard(
       setError('Failed to load board. Please try again.');
     } finally {
       setLoading(false);
+      setHasFetched(true);
     }
   }, [slug, sessionId]);
 
@@ -87,6 +90,7 @@ export function useBoard(
     pins,
     hiddenPins,
     loading,
+    hasFetched,
     error,
     refreshBoard: fetchBoard,
   };
