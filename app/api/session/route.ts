@@ -37,12 +37,20 @@ export async function POST(request: NextRequest) {
 
     if (insertError) {
       console.error('Error creating session:', insertError);
-      return NextResponse.json({ error: 'Failed to create session' }, { status: 500 });
+      console.error('Insert error details:', JSON.stringify(insertError, null, 2));
+      return NextResponse.json({
+        error: 'Failed to create session',
+        details: insertError.message || 'Unknown database error'
+      }, { status: 500 });
     }
 
     return NextResponse.json({ session_id: newSessionId });
   } catch (error) {
     console.error('Session error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return NextResponse.json({
+      error: 'Internal server error',
+      details: errorMessage
+    }, { status: 500 });
   }
 }
