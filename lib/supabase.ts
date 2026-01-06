@@ -25,8 +25,11 @@ function getSupabaseClient(): SupabaseClient {
 
 function getSupabaseAdminClient(): SupabaseClient {
   if (!_supabaseAdmin) {
-    if (!supabaseUrl || !supabaseServiceKey) {
-      throw new Error('Supabase URL and Service Role Key must be configured');
+    if (!supabaseUrl) {
+      throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL environment variable');
+    }
+    if (!supabaseServiceKey) {
+      throw new Error('Missing SUPABASE_SERVICE_ROLE_KEY environment variable');
     }
     _supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
   }

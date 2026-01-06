@@ -16,6 +16,10 @@ export const metadata: Metadata = {
   title: "Clickpin - Local Pinboard",
   description: "Anonymous, location-locked pinboards for real places",
   manifest: "/manifest.json",
+  icons: {
+    icon: "/icon.svg",
+    apple: "/icon.svg",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
