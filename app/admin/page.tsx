@@ -39,7 +39,15 @@ interface Pin {
   boost_score: number;
 }
 
-type Tab = 'requests' | 'locations';
+interface FeatureFlag {
+  id: string;
+  key: string;
+  enabled: boolean;
+  description: string | null;
+  updated_at: string;
+}
+
+type Tab = 'requests' | 'locations' | 'flags';
 type View = 'list' | 'pins';
 
 export default function AdminPage() {
@@ -64,6 +72,10 @@ export default function AdminPage() {
   const [showHidden, setShowHidden] = useState(false);
   const [editingLocationId, setEditingLocationId] = useState<string | null>(null);
   const [editLocationName, setEditLocationName] = useState('');
+
+  // Feature flags state
+  const [featureFlags, setFeatureFlags] = useState<FeatureFlag[]>([]);
+  const [flagsLoading, setFlagsLoading] = useState(false);
 
   const fetchRequests = useCallback(async () => {
     setRequestsLoading(true);
@@ -116,15 +128,61 @@ export default function AdminPage() {
     }
   }, [password]);
 
+  const fetchFlags = useCallback(async () => {
+    setFlagsLoading(true);
+    try {
+      const response = await fetch('/api/admin/feature-flags', {
+        headers: { 'X-Admin-Password': password },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setFeatureFlags(data.flags || []);
+      }
+    } catch (err) {
+      console.error('Failed to fetch feature flags:', err);
+    } finally {
+      setFlagsLoading(false);
+    }
+  }, [password]);
+
+  const handleToggleFlag = async (flag: FeatureFlag) => {
+    setActionLoading(flag.id);
+    try {
+      const response = await fetch('/api/admin/feature-flags', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Password': password,
+        },
+        body: JSON.stringify({ key: flag.key, enabled: !flag.enabled }),
+      });
+
+      if (response.ok) {
+        setFeatureFlags((prev) =>
+          prev.map((f) => (f.id === flag.id ? { ...f, enabled: !f.enabled } : f))
+        );
+      } else {
+        const data = await response.json();
+        alert(data.error || 'Failed to toggle flag');
+      }
+    } catch {
+      alert('Failed to toggle flag');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   useEffect(() => {
     if (authenticated && currentView === 'list') {
       if (activeTab === 'requests') {
         fetchRequests();
-      } else {
+      } else if (activeTab === 'locations') {
         fetchLocations();
+      } else if (activeTab === 'flags') {
+        fetchFlags();
       }
     }
-  }, [authenticated, activeTab, currentView, fetchRequests, fetchLocations]);
+  }, [authenticated, activeTab, currentView, fetchRequests, fetchLocations, fetchFlags]);
 
   useEffect(() => {
     if (selectedLocation && currentView === 'pins') {
@@ -573,6 +631,16 @@ export default function AdminPage() {
           >
             requests {groups.length > 0 && `(${groups.length})`}
           </button>
+          <button
+            onClick={() => setActiveTab('flags')}
+            className={`px-4 py-2 font-mono text-sm border-b-2 -mb-px ${
+              activeTab === 'flags'
+                ? 'border-[var(--accent)] text-[var(--accent)]'
+                : 'border-transparent text-muted hover:text-[var(--fg)]'
+            }`}
+          >
+            flags
+          </button>
         </div>
 
         {/* Locations Tab */}
@@ -792,6 +860,122 @@ export default function AdminPage() {
                     </div>
                   );
                 })}
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Flags Tab */}
+        {activeTab === 'flags' && (
+          <>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-mono text-sm text-muted">feature flags</h2>
+              <button
+                onClick={fetchFlags}
+                disabled={flagsLoading}
+                className="btn text-xs"
+              >
+                {flagsLoading ? 'loading...' : 'refresh'}
+              </button>
+            </div>
+
+            {flagsLoading && featureFlags.length === 0 ? (
+              <div className="border border-[var(--border)] p-8 text-center">
+                <p className="text-muted font-mono">loading flags...</p>
+              </div>
+            ) : featureFlags.length === 0 ? (
+              <div className="border border-[var(--border)] p-8 text-center">
+                <p className="text-muted font-mono">no feature flags configured</p>
+                <p className="text-xs text-faint font-mono mt-2">run the database migration first</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {/* Master toggle first */}
+                {featureFlags
+                  .filter((flag) => flag.key === 'fancy_board_enabled')
+                  .map((flag) => (
+                    <div
+                      key={flag.id}
+                      className={`border-2 p-4 ${
+                        flag.enabled
+                          ? 'border-[var(--accent)] bg-[var(--accent)]/10'
+                          : 'border-[var(--border)]'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="font-mono text-sm font-bold flex items-center gap-2">
+                            {flag.enabled ? '🟢' : '⚪'} {flag.key}
+                          </div>
+                          <div className="text-xs text-muted font-mono mt-1">
+                            {flag.description || 'No description'}
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => handleToggleFlag(flag)}
+                          disabled={actionLoading === flag.id}
+                          className={`px-4 py-2 font-mono text-sm ${
+                            flag.enabled
+                              ? 'bg-[var(--accent)] text-black'
+                              : 'bg-[var(--bg-alt)] border border-[var(--border)]'
+                          }`}
+                        >
+                          {actionLoading === flag.id ? '...' : flag.enabled ? 'ON' : 'OFF'}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+
+                {/* Sub-features */}
+                <div className="text-xs text-muted font-mono mt-4 mb-2 pt-4 border-t border-[var(--border)]">
+                  sub-features (require master toggle ON):
+                </div>
+                {featureFlags
+                  .filter((flag) => flag.key !== 'fancy_board_enabled')
+                  .map((flag) => {
+                    const masterEnabled = featureFlags.find(
+                      (f) => f.key === 'fancy_board_enabled'
+                    )?.enabled;
+                    return (
+                      <div
+                        key={flag.id}
+                        className={`border border-[var(--border)] p-4 ${
+                          !masterEnabled ? 'opacity-50' : ''
+                        } ${flag.enabled && masterEnabled ? 'border-l-4 border-l-[var(--accent)]' : ''}`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="font-mono text-sm flex items-center gap-2">
+                              {flag.enabled ? '🟢' : '⚪'} {flag.key.replace('fancy_', '')}
+                            </div>
+                            <div className="text-xs text-muted font-mono mt-1">
+                              {flag.description || 'No description'}
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => handleToggleFlag(flag)}
+                            disabled={actionLoading === flag.id}
+                            className={`px-3 py-1 font-mono text-xs ${
+                              flag.enabled
+                                ? 'bg-[var(--accent)] text-black'
+                                : 'bg-[var(--bg-alt)] border border-[var(--border)]'
+                            }`}
+                          >
+                            {actionLoading === flag.id ? '...' : flag.enabled ? 'ON' : 'OFF'}
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+
+                {/* Warning if sub-features enabled but master off */}
+                {featureFlags.some((f) => f.key !== 'fancy_board_enabled' && f.enabled) &&
+                  !featureFlags.find((f) => f.key === 'fancy_board_enabled')?.enabled && (
+                    <div className="mt-4 p-3 bg-[var(--danger)]/10 border border-[var(--danger)] text-danger text-xs font-mono">
+                      Warning: Sub-features are enabled but master toggle is OFF. Enable
+                      "fancy_board_enabled" to activate these features.
+                    </div>
+                  )}
               </div>
             )}
           </>

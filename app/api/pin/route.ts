@@ -8,7 +8,19 @@ import { v4 as uuidv4 } from 'uuid';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { body: pinBody, doodle_data, presence_token, payment_invoice_id } = body;
+    const {
+      body: pinBody,
+      doodle_data,
+      presence_token,
+      payment_invoice_id,
+      // Fancy board fields (optional)
+      x,
+      y,
+      rotation,
+      template,
+      size,
+      z_seed,
+    } = body;
 
     // Validate presence token
     const tokenResult = verifyPresenceToken(presence_token);
@@ -118,6 +130,13 @@ export async function POST(request: NextRequest) {
         device_session_id,
         body: pinBody.trim(),
         doodle_data: doodle_data || null,
+        // Fancy board fields (all nullable)
+        x: x ?? null,
+        y: y ?? null,
+        rotation: rotation ?? null,
+        template: template ?? null,
+        size: size ?? null,
+        z_seed: z_seed ?? null,
       })
       .select()
       .single();

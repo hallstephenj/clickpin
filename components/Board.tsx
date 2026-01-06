@@ -1,10 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { Pin, Location } from '@/types';
+import { Pin, Location, FancyPin } from '@/types';
 import { PinCard } from './PinCard';
 import { ComposeModal } from './ComposeModal';
 import { PaymentModal } from './PaymentModal';
+import { FancyBoard } from './FancyBoard';
+import { useFeatureFlags } from '@/lib/hooks/useFeatureFlags';
+import { isFancyBoardActive } from '@/lib/featureFlags';
 import { config } from '@/lib/config';
 
 interface BoardProps {
@@ -28,6 +31,7 @@ export function Board({
   onRefreshLocation,
   postsRemaining,
 }: BoardProps) {
+  const { flags, loading: flagsLoading } = useFeatureFlags();
   const [composeOpen, setComposeOpen] = useState(false);
   const [replyToId, setReplyToId] = useState<string | null>(null);
   const [showHidden, setShowHidden] = useState(false);
@@ -238,6 +242,23 @@ export function Board({
     setPaymentModal({ open: false, type: null });
     await onRefreshBoard();
   };
+
+  // Route to FancyBoard if feature flag is enabled
+  if (!flagsLoading && isFancyBoardActive(flags)) {
+    return (
+      <FancyBoard
+        location={location}
+        pins={pins as FancyPin[]}
+        hiddenPins={hiddenPins as FancyPin[]}
+        presenceToken={presenceToken}
+        sessionId={sessionId}
+        flags={flags}
+        onRefreshBoard={onRefreshBoard}
+        onRefreshLocation={onRefreshLocation}
+        postsRemaining={postsRemaining}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#fafafa] dark:bg-[#0a0a0a] pb-20">

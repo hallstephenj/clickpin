@@ -151,3 +151,37 @@ export interface BoardState {
   loading: boolean;
   error: string | null;
 }
+
+// Feature Flags
+export interface FeatureFlag {
+  id: string;
+  key: string;
+  enabled: boolean;
+  description: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface FeatureFlags {
+  fancy_board_enabled: boolean;
+  fancy_tap_to_place: boolean;
+  fancy_templates: boolean;
+  fancy_sizes: boolean;
+  fancy_rotation: boolean;
+  fancy_stacking: boolean;
+  fancy_aging: boolean;
+  fancy_dig_mode: boolean;
+}
+
+// Fancy Board Types
+export type PinTemplate = 'index' | 'sticky' | 'torn' | 'receipt';
+export type PinSize = 'S' | 'M' | 'L';
+
+export interface FancyPin extends Pin {
+  x?: number | null;
+  y?: number | null;
+  rotation?: number | null;
+  template?: PinTemplate | null;
+  size?: PinSize | null;
+  z_seed?: number | null;
+}

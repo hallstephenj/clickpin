@@ -200,3 +200,569 @@ textarea {
     font-size: 16px;
   }
 }
+
+/* =====================================================
+   FANCY BOARD STYLES
+   ===================================================== */
+
+/* Container */
+.fancy-board-container {
+  min-height: 100vh;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.fancy-board-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  padding: 12px 16px;
+}
+
+.fancy-board-header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.fancy-board-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.fancy-board-icon {
+  font-size: 24px;
+}
+
+.fancy-board-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.fancy-board-sponsor {
+  font-size: 11px;
+  color: var(--fg-muted);
+  margin: 0;
+}
+
+.fancy-board-sponsor span {
+  color: var(--accent);
+}
+
+.fancy-board-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.fancy-board-stats {
+  max-width: 1200px;
+  margin: 8px auto 0;
+  font-size: 11px;
+  font-family: "SF Mono", monospace;
+  color: var(--fg-muted);
+  display: flex;
+  gap: 8px;
+}
+
+.fancy-board-hint {
+  color: var(--accent);
+}
+
+/* Error banner */
+.fancy-board-error {
+  max-width: 1200px;
+  margin: 8px auto;
+  padding: 8px 12px;
+  background: rgba(220, 38, 38, 0.1);
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  font-size: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.fancy-board-error button {
+  background: none;
+  border: none;
+  color: var(--danger);
+  cursor: pointer;
+  font-size: 16px;
+}
+
+/* Board surface */
+.fancy-board-surface {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  cursor: crosshair;
+  background-color: #f5f0e6;
+  background-image:
+    linear-gradient(rgba(0,0,0,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.02) 1px, transparent 1px);
+  background-size: 25px 25px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .fancy-board-surface {
+    background-color: #1a1814;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  }
+}
+
+.fancy-board-surface.dig-mode {
+  background-color: #e8e0d0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .fancy-board-surface.dig-mode {
+    background-color: #252018;
+  }
+}
+
+.fancy-board-texture {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+}
+
+/* Empty state */
+.fancy-board-empty {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: var(--fg-muted);
+}
+
+.fancy-board-empty p {
+  margin: 0;
+}
+
+.fancy-board-empty-hint {
+  font-size: 12px;
+  color: var(--fg-faint);
+  margin-top: 4px !important;
+}
+
+/* Footer */
+.fancy-board-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+  z-index: 100;
+}
+
+.fancy-board-footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 12px 16px;
+  text-align: center;
+  font-size: 11px;
+  font-family: "SF Mono", monospace;
+  color: var(--fg-faint);
+}
+
+.fancy-board-footer-content a {
+  color: var(--fg-muted);
+}
+
+.fancy-board-footer-content a:hover {
+  color: var(--accent);
+}
+
+.fancy-board-footer-bitcoin {
+  margin-top: 4px;
+  color: var(--fg-faint);
+}
+
+/* =====================================================
+   FANCY PIN STYLES
+   ===================================================== */
+
+.fancy-pin {
+  position: absolute;
+  padding: 12px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 2px 3px 8px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  font-size: 13px;
+}
+
+.fancy-pin:hover {
+  transform: translate(-50%, 0) scale(1.02) !important;
+  box-shadow: 4px 6px 16px rgba(0, 0, 0, 0.18);
+  z-index: 9000 !important;
+}
+
+.fancy-pin-expanded {
+  transform: translate(-50%, 0) scale(1.05) !important;
+  box-shadow: 6px 10px 24px rgba(0, 0, 0, 0.22) !important;
+}
+
+/* Pushpin decoration */
+.fancy-pin-pushpin {
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 16px;
+  height: 16px;
+  background: var(--accent);
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.fancy-pin-pushpin::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 3px solid transparent;
+  border-right: 3px solid transparent;
+  border-top: 8px solid #b5651d;
+}
+
+/* Template variants */
+.fancy-pin-template-index {
+  background: #fff;
+  border-left: 4px solid var(--accent);
+}
+
+.fancy-pin-template-sticky {
+  background: #ffffa5;
+  box-shadow: 2px 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+.fancy-pin-template-torn {
+  background: #fff8f0;
+  clip-path: polygon(0 0, 100% 3%, 97% 100%, 3% 97%);
+}
+
+.fancy-pin-template-receipt {
+  background: #fafafa;
+  font-family: "SF Mono", monospace;
+  font-size: 11px;
+  border: 1px dashed var(--border);
+  box-shadow: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  .fancy-pin-template-index {
+    background: #1a1a1a;
+  }
+
+  .fancy-pin-template-sticky {
+    background: #3a3a20;
+  }
+
+  .fancy-pin-template-torn {
+    background: #2a2520;
+  }
+
+  .fancy-pin-template-receipt {
+    background: #141414;
+  }
+}
+
+/* Size variants */
+.fancy-pin-size-S {
+  font-size: 11px;
+  padding: 8px;
+}
+
+.fancy-pin-size-M {
+  font-size: 13px;
+}
+
+.fancy-pin-size-L {
+  font-size: 15px;
+  padding: 16px;
+}
+
+/* Aging effects */
+.fancy-pin-age-fresh {
+  opacity: 1;
+}
+
+.fancy-pin-age-recent {
+  opacity: 0.95;
+  filter: sepia(5%);
+}
+
+.fancy-pin-age-aged {
+  opacity: 0.9;
+  filter: sepia(12%);
+}
+
+.fancy-pin-age-vintage {
+  opacity: 0.85;
+  filter: sepia(20%) contrast(95%);
+}
+
+/* Boosted */
+.fancy-pin-boosted {
+  box-shadow: 0 0 0 2px var(--accent), 4px 6px 16px rgba(247, 147, 26, 0.25) !important;
+}
+
+.fancy-pin-boost-indicator {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: rgba(247, 147, 26, 0.15);
+  padding: 2px 4px;
+  border-radius: 2px;
+}
+
+/* Pin content */
+.fancy-pin-content {
+  position: relative;
+}
+
+.fancy-pin-body {
+  margin: 0;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  line-height: 1.4;
+}
+
+.fancy-pin-doodle-wrapper {
+  margin-bottom: 8px;
+}
+
+.fancy-pin-doodle {
+  max-width: 100%;
+  max-height: 120px;
+  object-fit: contain;
+  border: 1px solid var(--border);
+}
+
+/* Pin footer (expanded state) */
+.fancy-pin-footer {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--border);
+  font-size: 10px;
+}
+
+.fancy-pin-meta {
+  display: flex;
+  gap: 8px;
+  color: var(--fg-muted);
+  margin-bottom: 6px;
+}
+
+.fancy-pin-time {
+  font-family: "SF Mono", monospace;
+}
+
+.fancy-pin-mine {
+  color: var(--accent);
+}
+
+.fancy-pin-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.fancy-pin-actions button {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 10px;
+  color: var(--fg-muted);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.fancy-pin-actions button:hover {
+  color: var(--fg);
+}
+
+.fancy-pin-action-flag:hover {
+  color: var(--danger) !important;
+}
+
+.fancy-pin-action-delete:hover {
+  color: var(--danger) !important;
+}
+
+/* Replies count */
+.fancy-pin-replies-count {
+  margin-top: 8px;
+  font-size: 10px;
+  color: var(--fg-faint);
+  font-family: "SF Mono", monospace;
+}
+
+/* =====================================================
+   FANCY COMPOSE OVERLAY
+   ===================================================== */
+
+.fancy-compose-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 200;
+}
+
+.fancy-compose-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  padding: 16px;
+  width: 300px;
+  max-width: 90vw;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.fancy-compose-ghost {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.fancy-compose-ghost-pin {
+  width: 12px;
+  height: 12px;
+  background: var(--accent);
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.fancy-compose-textarea {
+  width: 100%;
+  min-height: 100px;
+  resize: vertical;
+  margin-bottom: 4px;
+}
+
+.fancy-compose-char-count {
+  text-align: right;
+  font-size: 10px;
+  font-family: "SF Mono", monospace;
+  color: var(--fg-faint);
+  margin-bottom: 12px;
+}
+
+.fancy-compose-option-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 11px;
+}
+
+.fancy-compose-option-label {
+  color: var(--fg-muted);
+  min-width: 40px;
+}
+
+.fancy-compose-options {
+  display: flex;
+  gap: 4px;
+}
+
+.fancy-option-btn {
+  padding: 4px 8px;
+  font-size: 10px;
+  font-family: "SF Mono", monospace;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--fg-muted);
+  cursor: pointer;
+}
+
+.fancy-option-btn:hover {
+  border-color: var(--fg-muted);
+}
+
+.fancy-option-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #000;
+}
+
+.fancy-compose-error {
+  padding: 8px;
+  margin-bottom: 8px;
+  background: rgba(220, 38, 38, 0.1);
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  font-size: 11px;
+}
+
+.fancy-compose-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.fancy-compose-remaining {
+  font-size: 10px;
+  font-family: "SF Mono", monospace;
+  color: var(--fg-faint);
+}
+
+.fancy-compose-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.fancy-compose-cancel {
+  padding: 6px 12px;
+  font-size: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--fg-muted);
+  cursor: pointer;
+}
+
+.fancy-compose-cancel:hover {
+  border-color: var(--fg-muted);
+}
+
+.fancy-compose-submit {
+  padding: 6px 12px;
+  font-size: 12px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #000;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.fancy-compose-submit:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.fancy-compose-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
