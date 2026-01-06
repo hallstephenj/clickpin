@@ -23,7 +23,7 @@ export default function AboutPage() {
           <div className="text-6xl mb-4">⚡</div>
           <h1 className="text-3xl font-bold mb-2">clickpin</h1>
           <p className="text-[var(--fg-muted)] font-mono">
-            location-locked posts for real places
+            if you're not there, you can't see it
           </p>
         </div>
 
@@ -36,12 +36,14 @@ export default function AboutPage() {
             <p>
               clickpin is an anonymous, hyperlocal message board. posts are tied to
               physical locations — you can only see and create posts when you're
-              actually there.
+              actually there. no remote viewing. no screenshots that matter. you
+              have to show up.
             </p>
             <p>
-              think of it as a digital bulletin board for stadiums, parks, restaurants,
-              and other public places. no accounts, no followers, no algorithms. just
-              posts from people who are (or were) in the same place as you.
+              think of it as peeking behind the curtain of the local underground.
+              each board is scarce by design — only people physically present can
+              read or write. no accounts, no followers, no algorithms. just
+              posts from people who earned access by being there.
             </p>
           </div>
         </section>
@@ -68,7 +70,7 @@ export default function AboutPage() {
                 <div className="font-medium">find a board</div>
                 <p className="text-sm text-[var(--fg-muted)]">
                   if you're near an active location, you'll see its board. each
-                  location has its own feed of posts.
+                  board is unique to that spot — scarce, local, yours to discover.
                 </p>
               </div>
             </div>
@@ -92,6 +94,41 @@ export default function AboutPage() {
                 </p>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* Scarcity */}
+        <section className="mb-10">
+          <h2 className="font-bold text-lg mb-3 border-b border-[var(--border)] pb-2">
+            scarcity by design
+          </h2>
+          <div className="space-y-3 text-[var(--fg-muted)]">
+            <p>
+              clickpin boards are intentionally scarce. you can't scroll through
+              an infinite feed from your couch — you have to go somewhere to see
+              what's there.
+            </p>
+            <ul className="space-y-2 ml-4">
+              <li className="flex gap-2">
+                <span className="text-[#f7931a]">•</span>
+                <span><strong>location-locked:</strong> content only visible to people physically present</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-[#f7931a]">•</span>
+                <span><strong>limited posts:</strong> 3 free per location per day keeps boards authentic</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-[#f7931a]">•</span>
+                <span><strong>ephemeral:</strong> posts age and eventually fade — nothing lasts forever</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-[#f7931a]">•</span>
+                <span><strong>earned access:</strong> you can't buy your way in, you have to show up</span>
+              </li>
+            </ul>
+            <p className="text-sm font-mono text-[var(--fg-faint)]">
+              scarcity plus locality equals gossip fuel — the oldest viral loop in human history.
+            </p>
           </div>
         </section>
 
@@ -181,7 +218,7 @@ export default function AboutPage() {
       {/* Footer */}
       <footer className="border-t border-[var(--border)] mt-8">
         <div className="max-w-2xl mx-auto px-4 py-6 text-center text-xs text-[var(--fg-faint)] font-mono">
-          <p>clickpin • anonymous • ephemeral • hyperlocal</p>
+          <p>clickpin • scarce • ephemeral • hyperlocal</p>
           <p className="mt-1">powered by bitcoin</p>
         </div>
       </footer>

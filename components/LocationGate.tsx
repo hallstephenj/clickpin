@@ -51,7 +51,7 @@ export function LocationGate({ state, error, onRequestLocation, sessionId }: Loc
             <span className="text-accent">⚡</span> clickpin
           </h1>
           <p className="text-muted text-sm font-mono">
-            location-locked posts
+            if you're not there, you can't see it
           </p>
         </div>
 
@@ -82,15 +82,15 @@ export function LocationGate({ state, error, onRequestLocation, sessionId }: Loc
                 ) : state.status === 'idle' ? (
                   <>
                     <p className="mb-2">
-                      clickpin shows posts for your current location only.
+                      each board is locked to its physical location. only people actually there can read or post. posts fade over time — nothing lasts forever.
                     </p>
                     <p className="text-faint text-xs font-mono">
-                      your position is never stored
+                      your position is verified but never stored
                     </p>
                   </>
                 ) : canRequestLocation ? (
                   <p>
-                    want to start a board here? request this as a new location.
+                    no board here yet. claim this spot and start something.
                   </p>
                 ) : null}
               </div>

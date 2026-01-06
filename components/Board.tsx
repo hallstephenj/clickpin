@@ -296,10 +296,12 @@ export function Board({
           </div>
 
           {/* Stats bar */}
-          <div className="mt-2 flex items-center gap-4 text-xs text-muted font-mono">
-            <span>{pins.length} posts</span>
+          <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted font-mono">
+            <span>{pins.length} {pins.length === 1 ? 'post' : 'posts'} on this board</span>
             <span>•</span>
-            <span>{localPostsRemaining} free posts left today</span>
+            <span>{localPostsRemaining} free {localPostsRemaining === 1 ? 'post' : 'posts'} left today</span>
+            <span>•</span>
+            <span className="text-faint">only visible here • posts fade over time</span>
           </div>
         </div>
       </header>

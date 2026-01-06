@@ -332,13 +332,15 @@ export function FancyBoard({
         </div>
 
         <div className="fancy-board-stats">
-          <span>{pinsWithPositions.length} posts</span>
+          <span>{pinsWithPositions.length} {pinsWithPositions.length === 1 ? 'post' : 'posts'} on this board</span>
           <span>•</span>
-          <span>{localPostsRemaining} free posts left</span>
+          <span>{localPostsRemaining} free left today</span>
+          <span>•</span>
+          <span className="text-faint">only visible here • posts fade over time</span>
           {flags.fancy_tap_to_place && (
             <>
               <span>•</span>
-              <span className="fancy-board-hint">tap anywhere to post</span>
+              <span className="fancy-board-hint">tap to drop a note</span>
             </>
           )}
         </div>

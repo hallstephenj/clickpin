@@ -143,7 +143,8 @@ export async function POST(request: NextRequest) {
 
     if (insertError) {
       console.error('Error creating pin:', insertError);
-      return NextResponse.json({ error: 'Failed to create pin' }, { status: 500 });
+      console.error('Insert data:', { pinId, location_id, device_session_id, body: pinBody.trim(), x, y, rotation, template, size, z_seed });
+      return NextResponse.json({ error: `Failed to create pin: ${insertError.message}` }, { status: 500 });
     }
 
     // Update quota ledger
