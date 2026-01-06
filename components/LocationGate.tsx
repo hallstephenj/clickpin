@@ -38,7 +38,7 @@ export function LocationGate({ state, error, onRequestLocation, sessionId }: Loc
   const isLoading = state.status === 'requesting';
   const isDenied = state.status === 'denied';
   const hasPosition = state.position !== null;
-  const isNoBoard = error && error.toLowerCase().includes('no clickpin board');
+  const isNoBoard = error && (error.toLowerCase().includes('no clickpin board') || error.toLowerCase().includes("doesn't have a clickpin"));
   const isAccuracyError = error && error.toLowerCase().includes('accuracy');
   const canRequestLocation = hasPosition && (isNoBoard || isAccuracyError);
 
@@ -109,12 +109,21 @@ export function LocationGate({ state, error, onRequestLocation, sessionId }: Loc
                       : 'refresh location'}
                 </button>
 
+                {isNoBoard && (
+                  <a
+                    href="/map"
+                    className="btn w-full justify-center text-center"
+                  >
+                    find nearby boards
+                  </a>
+                )}
+
                 {canRequestLocation && (
                   <button
                     onClick={() => setShowRequestModal(true)}
                     className="btn w-full justify-center"
                   >
-                    request as new location
+                    request this location
                   </button>
                 )}
               </div>
@@ -124,9 +133,7 @@ export function LocationGate({ state, error, onRequestLocation, sessionId }: Loc
 
         {/* Footer */}
         <div className="mt-6 text-center text-xs text-faint font-mono">
-          <a href="/map" className="hover:text-[var(--accent)]">find nearby boards</a>
-          {' • '}
-          <a href="/about" className="hover:text-[var(--accent)]">about</a>
+          <a href="/about" className="hover:text-[var(--accent)]">about clickpin</a>
         </div>
       </div>
 
