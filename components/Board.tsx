@@ -240,7 +240,7 @@ export function Board({
   };
 
   return (
-    <div className="min-h-screen bg-[#fafafa] dark:bg-[#0a0a0a]">
+    <div className="min-h-screen bg-[#fafafa] dark:bg-[#0a0a0a] pb-20">
       {/* Header */}
       <header className="border-b border-[var(--border)] bg-[#fafafa] dark:bg-[#0a0a0a]">
         <div className="max-w-2xl mx-auto px-4 py-3">
@@ -359,14 +359,15 @@ export function Board({
         )}
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-[var(--border)] mt-8">
+      {/* Footer - fixed to bottom */}
+      <footer className="fixed bottom-0 left-0 right-0 border-t border-[var(--border)] bg-[#fafafa] dark:bg-[#0a0a0a]">
         <div className="max-w-2xl mx-auto px-4 py-4 text-center text-xs text-faint font-mono">
           <a href="/map" className="hover:text-[var(--accent)]">nearby boards</a>
           {' • '}
           <a href="/about" className="hover:text-[var(--accent)]">about</a>
           {' • '}
           ⚡ lightning payments
+          <div className="mt-1 text-[var(--fg-faint)]">powered by bitcoin</div>
         </div>
       </footer>
 

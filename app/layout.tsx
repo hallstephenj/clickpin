@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Clickpin - Local Pinboard",
-  description: "Anonymous, location-locked pinboards for real places",
+  title: "clickpin",
+  description: "location-locked posts for real places",
   manifest: "/manifest.json",
   icons: {
     icon: "/icon.svg",
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Clickpin",
+    title: "clickpin",
   },
 };
 

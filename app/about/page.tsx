@@ -182,6 +182,7 @@ export default function AboutPage() {
       <footer className="border-t border-[var(--border)] mt-8">
         <div className="max-w-2xl mx-auto px-4 py-6 text-center text-xs text-[var(--fg-faint)] font-mono">
           <p>clickpin • anonymous • ephemeral • hyperlocal</p>
+          <p className="mt-1">powered by bitcoin</p>
         </div>
       </footer>
     </div>

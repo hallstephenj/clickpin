@@ -1,7 +1,7 @@
 {
-  "name": "Clickpin",
-  "short_name": "Clickpin",
-  "description": "Anonymous, location-locked pinboards for real places",
+  "name": "clickpin",
+  "short_name": "clickpin",
+  "description": "location-locked posts for real places",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#92400e",
