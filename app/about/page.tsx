@@ -36,14 +36,12 @@ export default function AboutPage() {
             <p>
               clickpin is an anonymous, hyperlocal message board. posts are tied to
               physical locations — you can only see and create posts when you're
-              actually there. no remote viewing. no screenshots that matter. you
-              have to show up.
+              actually there. 
             </p>
             <p>
-              think of it as peeking behind the curtain of the local underground.
-              each board is scarce by design — only people physically present can
+              think of it as peeking behind the curtain of the local underground. only people physically present can
               read or write. no accounts, no followers, no algorithms. just
-              posts from people who earned access by being there.
+              posts from people who have been where you are.
             </p>
           </div>
         </section>
@@ -97,40 +95,6 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* Scarcity */}
-        <section className="mb-10">
-          <h2 className="font-bold text-lg mb-3 border-b border-[var(--border)] pb-2">
-            scarcity by design
-          </h2>
-          <div className="space-y-3 text-[var(--fg-muted)]">
-            <p>
-              clickpin boards are intentionally scarce. you can't scroll through
-              an infinite feed from your couch — you have to go somewhere to see
-              what's there.
-            </p>
-            <ul className="space-y-2 ml-4">
-              <li className="flex gap-2">
-                <span className="text-[#f7931a]">•</span>
-                <span><strong>location-locked:</strong> content only visible to people physically present</span>
-              </li>
-              <li className="flex gap-2">
-                <span className="text-[#f7931a]">•</span>
-                <span><strong>limited posts:</strong> 3 free per location per day keeps boards authentic</span>
-              </li>
-              <li className="flex gap-2">
-                <span className="text-[#f7931a]">•</span>
-                <span><strong>ephemeral:</strong> posts age and eventually fade — nothing lasts forever</span>
-              </li>
-              <li className="flex gap-2">
-                <span className="text-[#f7931a]">•</span>
-                <span><strong>earned access:</strong> you can't buy your way in, you have to show up</span>
-              </li>
-            </ul>
-            <p className="text-sm font-mono text-[var(--fg-faint)]">
-              scarcity plus locality equals gossip fuel — the oldest viral loop in human history.
-            </p>
-          </div>
-        </section>
 
         {/* Lightning payments */}
         <section className="mb-10">
@@ -201,24 +165,12 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* Technical */}
-        <section className="mb-10">
-          <h2 className="font-bold text-lg mb-3 border-b border-[var(--border)] pb-2">
-            technical
-          </h2>
-          <div className="font-mono text-sm text-[var(--fg-muted)] space-y-1">
-            <p>built with next.js + supabase + postgis</p>
-            <p>payments via bitcoin lightning network</p>
-            <p>location accuracy required: ≤100m</p>
-            <p>board radius: 150-500m per location</p>
-          </div>
-        </section>
+        
       </main>
 
       {/* Footer */}
       <footer className="border-t border-[var(--border)] mt-8">
         <div className="max-w-2xl mx-auto px-4 py-6 text-center text-xs text-[var(--fg-faint)] font-mono">
-          <p>clickpin • scarce • ephemeral • hyperlocal</p>
           <p className="mt-1">powered by bitcoin</p>
         </div>
       </footer>

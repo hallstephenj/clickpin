@@ -6,6 +6,7 @@ import { FancyBoardPin } from './FancyBoardPin';
 import { FancyBoardComposeOverlay } from './FancyBoardComposeOverlay';
 import { ComposeModal } from './ComposeModal';
 import { PaymentModal } from './PaymentModal';
+import { SponsorModal } from './SponsorModal';
 import { config } from '@/lib/config';
 
 interface FancyBoardProps {
@@ -60,6 +61,7 @@ export function FancyBoard({
   }>({ open: false, type: null });
   const [error, setError] = useState<string | null>(null);
   const [localPostsRemaining, setLocalPostsRemaining] = useState(postsRemaining);
+  const [sponsorModalOpen, setSponsorModalOpen] = useState(false);
 
   // Generate random positions for pins without x, y (legacy pins)
   const pinsWithPositions = useMemo(() => {
@@ -398,7 +400,9 @@ export function FancyBoard({
           <span>•</span>
           <a href="/about">about</a>
           <span>•</span>
-          <span>⚡ lightning payments</span>
+          <button onClick={() => setSponsorModalOpen(true)} className="hover:text-[var(--accent)]">
+            sponsor this board
+          </button>
           <div className="fancy-board-footer-bitcoin">powered by bitcoin</div>
         </div>
       </footer>
@@ -450,6 +454,18 @@ export function FancyBoard({
         invoiceId={paymentModal.invoiceId}
         paymentRequest={paymentModal.paymentRequest}
         amountSats={paymentModal.amountSats}
+      />
+
+      {/* Sponsor modal */}
+      <SponsorModal
+        isOpen={sponsorModalOpen}
+        onClose={() => setSponsorModalOpen(false)}
+        onComplete={async () => {
+          setSponsorModalOpen(false);
+          await onRefreshLocation();
+        }}
+        presenceToken={presenceToken}
+        locationName={location.name}
       />
     </div>
   );

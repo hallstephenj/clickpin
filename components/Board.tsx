@@ -5,6 +5,7 @@ import { Pin, Location, FancyPin } from '@/types';
 import { PinCard } from './PinCard';
 import { ComposeModal } from './ComposeModal';
 import { PaymentModal } from './PaymentModal';
+import { SponsorModal } from './SponsorModal';
 import { FancyBoard } from './FancyBoard';
 import { useFeatureFlags } from '@/lib/hooks/useFeatureFlags';
 import { isFancyBoardActive } from '@/lib/featureFlags';
@@ -45,6 +46,7 @@ export function Board({
   }>({ open: false, type: null });
   const [error, setError] = useState<string | null>(null);
   const [localPostsRemaining, setLocalPostsRemaining] = useState(postsRemaining);
+  const [sponsorModalOpen, setSponsorModalOpen] = useState(false);
 
   const handleOpenCompose = (replyId: string | null = null) => {
     setReplyToId(replyId);
@@ -389,7 +391,9 @@ export function Board({
           {' • '}
           <a href="/about" className="hover:text-[var(--accent)]">about</a>
           {' • '}
-          ⚡ lightning payments
+          <button onClick={() => setSponsorModalOpen(true)} className="hover:text-[var(--accent)]">
+            sponsor this board
+          </button>
           <div className="mt-1 text-[var(--fg-faint)]">powered by bitcoin</div>
         </div>
       </footer>
@@ -414,6 +418,17 @@ export function Board({
         invoiceId={paymentModal.invoiceId}
         paymentRequest={paymentModal.paymentRequest}
         amountSats={paymentModal.amountSats}
+      />
+
+      <SponsorModal
+        isOpen={sponsorModalOpen}
+        onClose={() => setSponsorModalOpen(false)}
+        onComplete={async () => {
+          setSponsorModalOpen(false);
+          await onRefreshLocation();
+        }}
+        presenceToken={presenceToken}
+        locationName={location.name}
       />
     </div>
   );
