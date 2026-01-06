@@ -18,12 +18,12 @@ export const config = {
     flagThreshold: parseInt(process.env.FLAG_THRESHOLD || '5', 10),
   },
 
-  // Payment settings
+  // Payment settings (defaults set low for testing)
   payment: {
-    postPriceSats: parseInt(process.env.POST_PRICE_SATS || '100', 10),
-    boostPriceSats: parseInt(process.env.BOOST_PRICE_SATS || '500', 10),
-    deletePriceSats: parseInt(process.env.DELETE_PRICE_SATS || '200', 10),
-    sponsorPriceSats: parseInt(process.env.SPONSOR_PRICE_SATS || '10000', 10),
+    postPriceSats: parseInt(process.env.POST_PRICE_SATS || '5', 10),
+    boostPriceSats: parseInt(process.env.BOOST_PRICE_SATS || '5', 10),
+    deletePriceSats: parseInt(process.env.DELETE_PRICE_SATS || '5', 10),
+    sponsorPriceSats: parseInt(process.env.SPONSOR_PRICE_SATS || '5', 10),
     sponsorDurationDays: parseInt(process.env.SPONSOR_DURATION_DAYS || '30', 10),
     boostDurationHours: parseInt(process.env.BOOST_DURATION_HOURS || '24', 10),
     freeDeleteWindowMs: parseInt(process.env.FREE_DELETE_WINDOW_MS || '600000', 10), // 10 minutes
