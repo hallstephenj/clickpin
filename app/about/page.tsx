@@ -205,7 +205,9 @@ export default function AboutPage() {
       {/* Footer */}
       <footer className="border-t border-[var(--border)] mt-8">
         <div className="max-w-2xl mx-auto px-4 py-6 text-center text-xs text-[var(--fg-faint)] font-mono">
-          <a href="/terms" className="hover:text-[var(--accent)]">terms of service</a>
+          <a href="/terms" className="hover:text-[var(--accent)]">terms</a>
+          {' • '}
+          <a href="/privacy" className="hover:text-[var(--accent)]">privacy</a>
           <p className="mt-2">powered by bitcoin</p>
         </div>
       </footer>

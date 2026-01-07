@@ -393,8 +393,10 @@ export function Board({
           {' • '}
           <a href="/terms" className="hover:text-[var(--accent)]">terms</a>
           {' • '}
+          <a href="/privacy" className="hover:text-[var(--accent)]">privacy</a>
+          {' • '}
           <button onClick={() => setSponsorModalOpen(true)} className="hover:text-[var(--accent)]">
-            sponsor this board
+            sponsor
           </button>
           <div className="mt-1 text-[var(--fg-faint)]">powered by bitcoin</div>
         </div>

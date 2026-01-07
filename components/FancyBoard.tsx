@@ -402,8 +402,10 @@ export function FancyBoard({
           <span>•</span>
           <a href="/terms">terms</a>
           <span>•</span>
+          <a href="/privacy">privacy</a>
+          <span>•</span>
           <button onClick={() => setSponsorModalOpen(true)} className="hover:text-[var(--accent)]">
-            sponsor this board
+            sponsor
           </button>
           <div className="fancy-board-footer-bitcoin">powered by bitcoin</div>
         </div>

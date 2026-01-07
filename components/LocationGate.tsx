@@ -136,6 +136,8 @@ export function LocationGate({ state, error, onRequestLocation, sessionId }: Loc
           <a href="/about" className="hover:text-[var(--accent)]">about</a>
           {' • '}
           <a href="/terms" className="hover:text-[var(--accent)]">terms</a>
+          {' • '}
+          <a href="/privacy" className="hover:text-[var(--accent)]">privacy</a>
         </div>
       </div>
 
