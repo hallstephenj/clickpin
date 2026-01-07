@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     if (isNaN(lat) || isNaN(lng)) {
       const { data: locations, error } = await supabaseAdmin
         .from('locations')
-        .select('id, name, slug, lat, lng')
+        .select('id, name, slug, lat, lng, radius_m')
         .eq('is_active', true)
         .limit(100);
 
@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
 
     const { data: locations, error } = await supabaseAdmin
       .from('locations')
-      .select('id, name, slug, lat, lng')
+      .select('id, name, slug, lat, lng, radius_m')
       .eq('is_active', true)
       .gte('lat', lat - radiusDegrees)
       .lte('lat', lat + radiusDegrees)

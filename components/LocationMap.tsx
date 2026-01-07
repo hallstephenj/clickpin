@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
 import L from 'leaflet';
 
 interface Location {
@@ -10,6 +10,7 @@ interface Location {
   slug: string;
   lat: number;
   lng: number;
+  radius_m: number;
 }
 
 interface LocationMapProps {
@@ -122,6 +123,22 @@ export function LocationMap({ userLat, userLng }: LocationMapProps) {
           </Marker>
         )}
 
+        {/* Location radius circles */}
+        {locations.map((loc) => (
+          <Circle
+            key={`circle-${loc.id}`}
+            center={[loc.lat, loc.lng]}
+            radius={loc.radius_m}
+            pathOptions={{
+              color: '#f7931a',
+              fillColor: '#f7931a',
+              fillOpacity: 0.1,
+              weight: 2,
+              opacity: 0.6,
+            }}
+          />
+        ))}
+
         {/* Location markers */}
         {locations.map((loc) => (
           <Marker
@@ -133,6 +150,9 @@ export function LocationMap({ userLat, userLng }: LocationMapProps) {
               <div className="font-mono text-sm">
                 <strong className="text-[#f7931a]">⚡ {loc.name}</strong>
                 <p className="text-xs text-gray-500 mt-1">
+                  Radius: {loc.radius_m}m
+                </p>
+                <p className="text-xs text-gray-500">
                   Go here to view the board
                 </p>
               </div>
