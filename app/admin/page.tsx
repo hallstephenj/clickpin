@@ -73,6 +73,7 @@ export default function AdminPage() {
   const [showHidden, setShowHidden] = useState(false);
   const [editingLocationId, setEditingLocationId] = useState<string | null>(null);
   const [editLocationName, setEditLocationName] = useState('');
+  const [editLocationRadius, setEditLocationRadius] = useState('');
 
   // Feature flags state
   const [featureFlags, setFeatureFlags] = useState<FeatureFlag[]>([]);
@@ -296,16 +297,24 @@ export default function AdminPage() {
   const handleStartEdit = (location: Location) => {
     setEditingLocationId(location.id);
     setEditLocationName(location.name);
+    setEditLocationRadius(String(location.radius_m));
   };
 
   const handleCancelEdit = () => {
     setEditingLocationId(null);
     setEditLocationName('');
+    setEditLocationRadius('');
   };
 
   const handleSaveEdit = async (locationId: string) => {
     if (!editLocationName.trim()) {
       alert('Please enter a location name');
+      return;
+    }
+
+    const radius = parseInt(editLocationRadius, 10);
+    if (isNaN(radius) || radius < 10 || radius > 5000) {
+      alert('Radius must be between 10 and 5000 meters');
       return;
     }
 
@@ -317,7 +326,7 @@ export default function AdminPage() {
           'Content-Type': 'application/json',
           'X-Admin-Password': password,
         },
-        body: JSON.stringify({ name: editLocationName.trim() }),
+        body: JSON.stringify({ name: editLocationName.trim(), radius_m: radius }),
       });
 
       if (response.ok) {
@@ -325,12 +334,13 @@ export default function AdminPage() {
         setLocations((prev) =>
           prev.map((loc) =>
             loc.id === locationId
-              ? { ...loc, name: data.location.name, slug: data.location.slug }
+              ? { ...loc, name: data.location.name, slug: data.location.slug, radius_m: data.location.radius_m }
               : loc
           )
         );
         setEditingLocationId(null);
         setEditLocationName('');
+        setEditLocationRadius('');
       } else {
         const data = await response.json();
         alert(data.error || 'Failed to update location');
@@ -702,6 +712,7 @@ export default function AdminPage() {
                             type="text"
                             value={editLocationName}
                             onChange={(e) => setEditLocationName(e.target.value)}
+                            placeholder="Location name"
                             className="flex-1 p-2 bg-[var(--bg-alt)] border border-[var(--border)] font-mono text-sm"
                             autoFocus
                             onKeyDown={(e) => {
@@ -709,6 +720,22 @@ export default function AdminPage() {
                               if (e.key === 'Escape') handleCancelEdit();
                             }}
                           />
+                          <div className="flex items-center gap-1">
+                            <input
+                              type="number"
+                              value={editLocationRadius}
+                              onChange={(e) => setEditLocationRadius(e.target.value)}
+                              placeholder="Radius"
+                              min={10}
+                              max={5000}
+                              className="w-20 p-2 bg-[var(--bg-alt)] border border-[var(--border)] font-mono text-sm"
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') handleSaveEdit(loc.id);
+                                if (e.key === 'Escape') handleCancelEdit();
+                              }}
+                            />
+                            <span className="text-xs text-muted font-mono">m</span>
+                          </div>
                         </div>
                         <div className="flex gap-2">
                           <button
@@ -742,6 +769,9 @@ export default function AdminPage() {
                             </div>
                           </div>
                           <div className="flex items-center gap-3">
+                            <span className="text-xs text-muted font-mono">
+                              {loc.radius_m}m
+                            </span>
                             <span className="text-xs text-muted font-mono">
                               {loc.pin_count || 0} pin{loc.pin_count !== 1 ? 's' : ''}
                             </span>

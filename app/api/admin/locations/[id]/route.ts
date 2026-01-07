@@ -13,7 +13,7 @@ function generateSlug(name: string): string {
     .trim();
 }
 
-// PATCH /api/admin/locations/[id] - Update location name
+// PATCH /api/admin/locations/[id] - Update location name and/or radius
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -27,38 +27,61 @@ export async function PATCH(
   try {
     const { id } = await params;
     const body = await request.json();
-    const { name } = body;
+    const { name, radius_m } = body;
 
-    if (!name || typeof name !== 'string' || name.trim().length === 0) {
-      return NextResponse.json({ error: 'Name is required' }, { status: 400 });
+    // Build update object
+    const updates: Record<string, unknown> = {};
+
+    // Handle name update
+    if (name !== undefined) {
+      if (typeof name !== 'string' || name.trim().length === 0) {
+        return NextResponse.json({ error: 'Name cannot be empty' }, { status: 400 });
+      }
+
+      const trimmedName = name.trim();
+      const newSlug = generateSlug(trimmedName);
+
+      if (!newSlug) {
+        return NextResponse.json({ error: 'Invalid name' }, { status: 400 });
+      }
+
+      // Check if slug already exists for another location
+      const { data: existingLocation } = await supabaseAdmin
+        .from('locations')
+        .select('id')
+        .eq('slug', newSlug)
+        .neq('id', id)
+        .single();
+
+      if (existingLocation) {
+        return NextResponse.json(
+          { error: 'A location with this name already exists' },
+          { status: 409 }
+        );
+      }
+
+      updates.name = trimmedName;
+      updates.slug = newSlug;
     }
 
-    const trimmedName = name.trim();
-    const newSlug = generateSlug(trimmedName);
-
-    if (!newSlug) {
-      return NextResponse.json({ error: 'Invalid name' }, { status: 400 });
+    // Handle radius update
+    if (radius_m !== undefined) {
+      const radius = parseInt(radius_m, 10);
+      if (isNaN(radius) || radius < 10 || radius > 5000) {
+        return NextResponse.json({ error: 'Radius must be between 10 and 5000 meters' }, { status: 400 });
+      }
+      updates.radius_m = radius;
     }
 
-    // Check if slug already exists for another location
-    const { data: existingLocation } = await supabaseAdmin
-      .from('locations')
-      .select('id')
-      .eq('slug', newSlug)
-      .neq('id', id)
-      .single();
-
-    if (existingLocation) {
-      return NextResponse.json(
-        { error: 'A location with this name already exists' },
-        { status: 409 }
-      );
+    // Ensure we have something to update
+    if (Object.keys(updates).length === 0) {
+      return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 });
     }
 
     // Update the location
     const { data: updatedLocation, error: updateError } = await supabaseAdmin
       .from('locations')
-      .update({ name: trimmedName, slug: newSlug })
+      .update(updates)
       .eq('id', id)
       .select()
       .single();
