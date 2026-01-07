@@ -25,7 +25,7 @@ async function getCurrentSponsor(locationId: string) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { presence_token, sponsor_label, amount_sats } = body;
+    const { presence_token, sponsor_label, sponsor_url, amount_sats } = body;
 
     // Validate presence token
     const tokenResult = verifyPresenceToken(presence_token);
@@ -82,6 +82,7 @@ export async function POST(request: NextRequest) {
     const { error: insertError } = await supabaseAdmin.from('location_sponsorships').insert({
       location_id,
       sponsor_label: sponsor_label.trim(),
+      sponsor_url: sponsor_url || null,
       amount_sats: amount_sats,
       provider: process.env.LIGHTNING_PROVIDER || 'dev',
       invoice_id: invoice.invoice_id,

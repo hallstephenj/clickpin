@@ -27,6 +27,7 @@ export function SponsorModal({
 }: SponsorModalProps) {
   const [step, setStep] = useState<Step>('label');
   const [sponsorLabel, setSponsorLabel] = useState('');
+  const [sponsorUrl, setSponsorUrl] = useState('');
   const [bidAmount, setBidAmount] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -48,6 +49,7 @@ export function SponsorModal({
     if (isOpen) {
       setStep('label');
       setSponsorLabel('');
+      setSponsorUrl('');
       setBidAmount(minimumBid.toString());
       setError(null);
       setLoading(false);
@@ -103,6 +105,13 @@ export function SponsorModal({
       return;
     }
 
+    // Validate URL if provided
+    const trimmedUrl = sponsorUrl.trim();
+    if (trimmedUrl && !trimmedUrl.match(/^https?:\/\/.+/)) {
+      setError('URL must start with http:// or https://');
+      return;
+    }
+
     const amount = parseInt(bidAmount, 10);
     if (isNaN(amount) || amount < minimumBid) {
       setError(`Amount must be at least ${minimumBid} sats`);
@@ -119,6 +128,7 @@ export function SponsorModal({
         body: JSON.stringify({
           presence_token: presenceToken,
           sponsor_label: sponsorLabel.trim(),
+          sponsor_url: trimmedUrl || null,
           amount_sats: amount,
         }),
       });
@@ -226,6 +236,22 @@ export function SponsorModal({
                 />
                 <div className="text-xs text-faint font-mono mt-1 text-right">
                   {sponsorLabel.length}/50
+                </div>
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-xs text-faint font-mono mb-1">
+                  link (optional)
+                </label>
+                <input
+                  type="url"
+                  value={sponsorUrl}
+                  onChange={(e) => setSponsorUrl(e.target.value)}
+                  placeholder="https://your-website.com"
+                  className="w-full p-2 text-sm bg-[var(--bg-alt)] border border-[var(--border)] focus:border-[var(--accent)] outline-none"
+                />
+                <div className="text-xs text-faint font-mono mt-1">
+                  your name will link here
                 </div>
               </div>
 

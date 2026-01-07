@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     const now = new Date().toISOString();
     const { data: sponsorship } = await supabaseAdmin
       .from('location_sponsorships')
-      .select('sponsor_label, amount_sats')
+      .select('sponsor_label, sponsor_url, amount_sats')
       .eq('location_id', location.id)
       .in('status', ['paid', 'active'])
       .lte('active_at', now)
@@ -119,6 +119,7 @@ export async function GET(request: NextRequest) {
       location: {
         ...location,
         sponsor_label: sponsorship?.sponsor_label || null,
+        sponsor_url: sponsorship?.sponsor_url || null,
         sponsor_amount_sats: sponsorship?.amount_sats || null,
       },
       pins: pinsWithReplies,

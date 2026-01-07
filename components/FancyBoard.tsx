@@ -9,27 +9,16 @@ import { PaymentModal } from './PaymentModal';
 import { SponsorModal } from './SponsorModal';
 import { config } from '@/lib/config';
 
-// Visual post count indicator using dots
+// Stacked notes icon with post count
 function PostCountIndicator({ count }: { count: number }) {
-  const maxDots = 5;
-  const filled = Math.min(count, maxDots);
-  const hasMore = count > maxDots;
-
   return (
-    <div className="flex items-center gap-0.5">
-      {Array.from({ length: maxDots }).map((_, i) => (
-        <span
-          key={i}
-          className={`w-1.5 h-1.5 rounded-full ${
-            i < filled
-              ? 'bg-[var(--fg-muted)]'
-              : 'border border-[var(--border)]'
-          }`}
-        />
-      ))}
-      {hasMore && (
-        <span className="text-xs text-muted ml-1">+{count - maxDots}</span>
-      )}
+    <div className="flex items-center gap-1.5 text-muted" title={`${count} posts`}>
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="opacity-60">
+        <rect x="4" y="2" width="10" height="11" rx="1" stroke="currentColor" strokeWidth="1.2" fill="none" opacity="0.4" />
+        <rect x="2" y="4" width="10" height="11" rx="1" stroke="currentColor" strokeWidth="1.2" fill="var(--bg)" />
+        <circle cx="7" cy="6" r="1" fill="currentColor" />
+      </svg>
+      <span className="text-xs font-mono">{count}</span>
     </div>
   );
 }
@@ -342,22 +331,30 @@ export function FancyBoard({
               )}
 
               {/* Sponsorship row */}
-              <div className="mt-2">
-                {location.sponsor_label ? (
-                  <button
-                    onClick={() => setSponsorModalOpen(true)}
-                    className="text-xs text-muted hover:text-[var(--fg)] transition-colors"
-                  >
-                    sponsored by <span className="text-accent">{location.sponsor_label}</span>
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => setSponsorModalOpen(true)}
-                    className="text-xs text-faint hover:text-accent transition-colors"
-                  >
-                    become the sponsor
-                  </button>
+              <div className="mt-2 text-xs">
+                {location.sponsor_label && (
+                  <div className="text-muted">
+                    sponsored by{' '}
+                    {location.sponsor_url ? (
+                      <a
+                        href={location.sponsor_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-accent hover:underline"
+                      >
+                        {location.sponsor_label}
+                      </a>
+                    ) : (
+                      <span className="text-accent">{location.sponsor_label}</span>
+                    )}
+                  </div>
                 )}
+                <button
+                  onClick={() => setSponsorModalOpen(true)}
+                  className="text-faint hover:text-accent transition-colors mt-0.5"
+                >
+                  sponsor this board →
+                </button>
               </div>
             </div>
           </div>
