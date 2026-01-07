@@ -11,6 +11,7 @@ export interface Location {
   is_active: boolean;
   created_at: string;
   sponsor_label?: string | null;
+  sponsor_amount_sats?: number | null;
 }
 
 export interface DeviceSession {
@@ -64,9 +65,10 @@ export interface LocationSponsorship {
   amount_sats: number;
   provider: string;
   invoice_id: string;
-  status: 'pending' | 'paid' | 'expired';
+  status: 'pending' | 'paid' | 'active' | 'superseded' | 'expired';
   created_at: string;
-  paid_until: string | null;
+  paid_at: string | null;
+  active_at: string | null;
 }
 
 export interface PinDeletionPayment {

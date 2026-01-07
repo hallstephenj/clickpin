@@ -429,6 +429,8 @@ export function Board({
         }}
         presenceToken={presenceToken}
         locationName={location.name}
+        locationId={location.id}
+        currentSponsorAmount={location.sponsor_amount_sats || null}
       />
     </div>
   );

@@ -124,12 +124,46 @@ export default function AboutPage() {
               </li>
               <li className="flex gap-2">
                 <span className="text-[#f7931a]">•</span>
-                <span><strong>sponsor:</strong> put your name on a location</span>
+                <span><strong>sponsor:</strong> put your name on a location (see below)</span>
               </li>
             </ul>
             <p className="text-sm">
               payments are instant, private, and keep the service running without
               ads or data harvesting.
+            </p>
+          </div>
+        </section>
+
+        {/* How sponsorship works */}
+        <section className="mb-10">
+          <h2 className="font-bold text-lg mb-3 border-b border-[var(--border)] pb-2">
+            how sponsorship works
+          </h2>
+          <div className="space-y-3 text-[var(--fg-muted)]">
+            <p>
+              anyone can sponsor a board. your name appears at the top of the
+              board for everyone to see.
+            </p>
+            <ul className="space-y-2 ml-4">
+              <li className="flex gap-2">
+                <span className="text-[#f7931a]">•</span>
+                <span><strong>starting bid:</strong> 5 sats minimum for unsponsored boards</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-[#f7931a]">•</span>
+                <span><strong>outbidding:</strong> to take over, pay at least 1 sat more than the current sponsor</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-[#f7931a]">•</span>
+                <span><strong>24-hour grace:</strong> new sponsorships activate 24 hours after payment</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-[#f7931a]">•</span>
+                <span><strong>indefinite:</strong> your sponsorship lasts until someone outbids you</span>
+              </li>
+            </ul>
+            <p className="text-sm font-mono text-[var(--fg-faint)]">
+              sponsorship is a way to support your favorite spots and get your name out there.
             </p>
           </div>
         </section>

@@ -10,6 +10,8 @@ interface SponsorModalProps {
   onComplete: () => void;
   presenceToken: string | null;
   locationName: string;
+  locationId: string;
+  currentSponsorAmount: number | null;
 }
 
 type Step = 'label' | 'payment' | 'complete';
@@ -20,9 +22,12 @@ export function SponsorModal({
   onComplete,
   presenceToken,
   locationName,
+  locationId,
+  currentSponsorAmount,
 }: SponsorModalProps) {
   const [step, setStep] = useState<Step>('label');
   const [sponsorLabel, setSponsorLabel] = useState('');
+  const [bidAmount, setBidAmount] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -33,11 +38,17 @@ export function SponsorModal({
   const [amountSats, setAmountSats] = useState<number | null>(null);
   const [paymentStatus, setPaymentStatus] = useState<'pending' | 'checking' | 'paid'>('pending');
 
+  // Calculate minimum bid
+  const minimumBid = currentSponsorAmount
+    ? currentSponsorAmount + 1
+    : config.payment.sponsorPriceSats;
+
   // Reset state when modal opens/closes
   useEffect(() => {
     if (isOpen) {
       setStep('label');
       setSponsorLabel('');
+      setBidAmount(minimumBid.toString());
       setError(null);
       setLoading(false);
       setInvoiceId(null);
@@ -46,7 +57,7 @@ export function SponsorModal({
       setPaymentStatus('pending');
       setCopied(false);
     }
-  }, [isOpen]);
+  }, [isOpen, minimumBid]);
 
   // Poll for payment status
   const checkPaymentStatus = useCallback(async () => {
@@ -92,6 +103,12 @@ export function SponsorModal({
       return;
     }
 
+    const amount = parseInt(bidAmount, 10);
+    if (isNaN(amount) || amount < minimumBid) {
+      setError(`Amount must be at least ${minimumBid} sats`);
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -102,6 +119,7 @@ export function SponsorModal({
         body: JSON.stringify({
           presence_token: presenceToken,
           sponsor_label: sponsorLabel.trim(),
+          amount_sats: amount,
         }),
       });
 
@@ -178,9 +196,20 @@ export function SponsorModal({
           {step === 'label' && (
             <>
               <p className="text-sm text-muted mb-4">
-                Put your name on <strong>{locationName}</strong> for {config.payment.sponsorDurationDays} days.
-                Your name will appear at the top of the board.
+                Put your name on <strong>{locationName}</strong>. Sponsorships last indefinitely
+                until someone outbids you.
               </p>
+
+              {/* Current sponsor info */}
+              {currentSponsorAmount && (
+                <div className="mb-4 p-3 bg-[var(--bg-alt)] border border-[var(--border)] text-sm">
+                  <div className="text-faint font-mono text-xs mb-1">current sponsor paid</div>
+                  <div className="text-accent font-bold">{currentSponsorAmount.toLocaleString()} sats</div>
+                  <div className="text-xs text-faint mt-1">
+                    to become the new sponsor, bid at least {minimumBid.toLocaleString()} sats
+                  </div>
+                </div>
+              )}
 
               <div className="mb-4">
                 <label className="block text-xs text-faint font-mono mb-1">
@@ -200,17 +229,43 @@ export function SponsorModal({
                 </div>
               </div>
 
+              <div className="mb-4">
+                <label className="block text-xs text-faint font-mono mb-1">
+                  your bid (minimum {minimumBid.toLocaleString()} sats)
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    value={bidAmount}
+                    onChange={(e) => setBidAmount(e.target.value)}
+                    min={minimumBid}
+                    className="w-full p-2 text-sm bg-[var(--bg-alt)] border border-[var(--border)] focus:border-[var(--accent)] outline-none font-mono"
+                  />
+                  <span className="text-sm text-muted font-mono">sats</span>
+                </div>
+              </div>
+
               {error && (
                 <p className="text-xs text-danger font-mono mb-3">{error}</p>
               )}
 
               <button
                 onClick={handleCreateInvoice}
-                disabled={loading || !sponsorLabel.trim()}
+                disabled={loading || !sponsorLabel.trim() || !bidAmount}
                 className="btn btn-primary w-full justify-center disabled:opacity-50"
               >
-                {loading ? 'creating invoice...' : `continue • ${config.payment.sponsorPriceSats} sats`}
+                {loading ? (
+                  <span className="loading-dots">
+                    <span className="dot" />
+                    <span className="dot" />
+                    <span className="dot" />
+                  </span>
+                ) : `pay ${parseInt(bidAmount || '0', 10).toLocaleString()} sats`}
               </button>
+
+              <p className="text-xs text-faint font-mono mt-3 text-center">
+                sponsorship activates 24 hours after payment
+              </p>
             </>
           )}
 
@@ -303,8 +358,10 @@ export function SponsorModal({
           {step === 'complete' && (
             <div className="py-8 text-center">
               <div className="text-accent text-2xl mb-2">✓</div>
-              <p className="font-mono text-sm">you're now sponsoring this board!</p>
-              <p className="text-xs text-faint mt-2">"{sponsorLabel}" will appear for {config.payment.sponsorDurationDays} days</p>
+              <p className="font-mono text-sm">payment received!</p>
+              <p className="text-xs text-faint mt-2">
+                "{sponsorLabel}" will appear in 24 hours
+              </p>
             </div>
           )}
         </div>

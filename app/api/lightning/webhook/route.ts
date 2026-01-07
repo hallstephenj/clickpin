@@ -84,13 +84,16 @@ export async function applyPaymentEffects(
     .single();
 
   if (sponsorship) {
-    const paidUntil = new Date(
-      Date.now() + config.payment.sponsorDurationDays * 24 * 60 * 60 * 1000
-    ).toISOString();
+    // Sponsorship becomes active 24 hours after payment
+    const activeAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
 
     await supabaseAdmin
       .from('location_sponsorships')
-      .update({ status: 'paid', paid_until: paidUntil })
+      .update({
+        status: 'paid',
+        paid_at: now,
+        active_at: activeAt,
+      })
       .eq('id', sponsorship.id);
 
     return { success: true, type: 'sponsor' };

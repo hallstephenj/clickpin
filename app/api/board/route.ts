@@ -25,14 +25,15 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Location not found' }, { status: 404 });
     }
 
-    // Get active sponsorship
+    // Get active sponsorship (where active_at has passed)
+    const now = new Date().toISOString();
     const { data: sponsorship } = await supabaseAdmin
       .from('location_sponsorships')
-      .select('sponsor_label')
+      .select('sponsor_label, amount_sats')
       .eq('location_id', location.id)
-      .eq('status', 'paid')
-      .gt('paid_until', new Date().toISOString())
-      .order('paid_until', { ascending: false })
+      .in('status', ['paid', 'active'])
+      .lte('active_at', now)
+      .order('active_at', { ascending: false })
       .limit(1)
       .single();
 
@@ -118,6 +119,7 @@ export async function GET(request: NextRequest) {
       location: {
         ...location,
         sponsor_label: sponsorship?.sponsor_label || null,
+        sponsor_amount_sats: sponsorship?.amount_sats || null,
       },
       pins: pinsWithReplies,
       hiddenPins: hiddenPinsWithReplies,
