@@ -203,9 +203,9 @@ export function FancyBoardComposeOverlay({
             <button
               onClick={handleSubmit}
               disabled={submitting || !body.trim()}
-              className="fancy-compose-submit"
+              className="fancy-compose-submit min-w-[70px]"
             >
-              {submitting ? 'pinning...' : 'pin it'}
+              {submitting ? <span className="loading-dots" /> : 'pin it'}
             </button>
           </div>
         </div>

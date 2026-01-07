@@ -130,6 +130,18 @@ a:hover {
   border-color: var(--danger);
 }
 
+/* Loading dots animation */
+.loading-dots::after {
+  content: '...';
+  animation: loading-dots 1.2s infinite;
+}
+
+@keyframes loading-dots {
+  0%, 20% { content: '.'; }
+  40% { content: '..'; }
+  60%, 100% { content: '...'; }
+}
+
 /* Form inputs */
 input, textarea {
   background: var(--bg);

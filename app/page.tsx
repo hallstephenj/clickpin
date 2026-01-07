@@ -105,8 +105,8 @@ export default function Home() {
     );
   }
 
-  // Wait for board content to load before showing
-  if (boardLoading || !hasFetched) {
+  // Wait for initial board content to load before showing (not on refresh)
+  if (!hasFetched) {
     return <LoadingScreen message={loadingMessage} progress={progress} />;
   }
 
