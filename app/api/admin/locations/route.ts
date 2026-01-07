@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     // Fetch all locations with pin counts
     const { data: locations, error } = await supabaseAdmin
       .from('locations')
-      .select('id, slug, name, lat, lng, radius_m, created_at')
+      .select('id, slug, name, city, lat, lng, radius_m, created_at')
       .order('name', { ascending: true });
 
     if (error) {

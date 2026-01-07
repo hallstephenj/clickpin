@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     // Get location by slug
     const { data: location, error: locationError } = await supabaseAdmin
       .from('locations')
-      .select('id, name, slug, category, lat, lng, radius_m')
+      .select('id, name, slug, category, city, lat, lng, radius_m')
       .eq('slug', slug)
       .eq('is_active', true)
       .single();

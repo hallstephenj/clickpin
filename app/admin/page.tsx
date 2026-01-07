@@ -22,6 +22,7 @@ interface Location {
   id: string;
   slug: string;
   name: string;
+  city: string | null;
   lat: number;
   lng: number;
   radius_m: number;
@@ -710,7 +711,10 @@ export default function AdminPage() {
                         <div className="flex items-center justify-between">
                           <div>
                             <div className="font-mono text-sm font-medium">{loc.name}</div>
-                            <div className="text-xs text-muted font-mono">/{loc.slug}</div>
+                            <div className="text-xs text-muted font-mono">
+                              {loc.city && <span className="text-faint">{loc.city} · </span>}
+                              /{loc.slug}
+                            </div>
                           </div>
                           <div className="flex items-center gap-3">
                             <span className="text-xs text-muted font-mono">
