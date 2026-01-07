@@ -7,6 +7,7 @@ import { supabase } from '@/lib/supabase';
 interface UseBoardResult {
   pins: Pin[];
   hiddenPins: Pin[];
+  boardLocation: Location | null;
   loading: boolean;
   hasFetched: boolean;
   error: string | null;
@@ -19,6 +20,7 @@ export function useBoard(
 ): UseBoardResult {
   const [pins, setPins] = useState<Pin[]>([]);
   const [hiddenPins, setHiddenPins] = useState<Pin[]>([]);
+  const [boardLocation, setBoardLocation] = useState<Location | null>(null);
   const [loading, setLoading] = useState(false);
   const [hasFetched, setHasFetched] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -42,6 +44,7 @@ export function useBoard(
 
       setPins(data.pins || []);
       setHiddenPins(data.hiddenPins || []);
+      setBoardLocation(data.location || null);
     } catch (err) {
       console.error('Failed to fetch board:', err);
       setError('Failed to load board. Please try again.');
@@ -89,6 +92,7 @@ export function useBoard(
   return {
     pins,
     hiddenPins,
+    boardLocation,
     loading,
     hasFetched,
     error,

@@ -34,8 +34,11 @@ function LoadingScreen({ message, progress }: { message: string; progress: numbe
 
 export default function Home() {
   const { sessionId, loading: sessionLoading } = useSession();
-  const { state, location, presenceToken, requestLocation, error: geoError } = useGeolocation(sessionId);
-  const { pins, hiddenPins, loading: boardLoading, refreshBoard, hasFetched } = useBoard(location?.slug || null, sessionId);
+  const { state, location: geoLocation, presenceToken, requestLocation, error: geoError } = useGeolocation(sessionId);
+  const { pins, hiddenPins, boardLocation, loading: boardLoading, refreshBoard, hasFetched } = useBoard(geoLocation?.slug || null, sessionId);
+
+  // Use boardLocation for sponsor info (updated on refresh), fallback to geoLocation
+  const location = boardLocation || geoLocation;
   const [postsRemaining, setPostsRemaining] = useState(config.rateLimit.freePostsPerLocationPerDay);
   const [progress, setProgress] = useState(0);
   const [loadingMessage, setLoadingMessage] = useState('initializing...');
@@ -94,7 +97,7 @@ export default function Home() {
   }
 
   // No location resolved - show location gate
-  if (!location) {
+  if (!geoLocation) {
     return (
       <LocationGate
         state={state}
@@ -110,10 +113,14 @@ export default function Home() {
     return <LoadingScreen message={loadingMessage} progress={progress} />;
   }
 
+  // Use boardLocation if available (has latest sponsor info), otherwise geoLocation
+  // geoLocation is guaranteed non-null at this point since we checked above
+  const displayLocation = boardLocation || geoLocation!;
+
   // Show board with content ready
   return (
     <Board
-      location={location}
+      location={displayLocation}
       pins={pins}
       hiddenPins={hiddenPins}
       presenceToken={presenceToken}

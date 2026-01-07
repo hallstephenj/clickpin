@@ -466,7 +466,7 @@ export function FancyBoard({
         onClose={() => setSponsorModalOpen(false)}
         onComplete={async () => {
           setSponsorModalOpen(false);
-          await onRefreshLocation();
+          await onRefreshBoard();
         }}
         presenceToken={presenceToken}
         locationName={location.name}
