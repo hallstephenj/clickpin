@@ -391,6 +391,8 @@ export function Board({
           {' • '}
           <a href="/about" className="hover:text-[var(--accent)]">about</a>
           {' • '}
+          <a href="/terms" className="hover:text-[var(--accent)]">terms</a>
+          {' • '}
           <button onClick={() => setSponsorModalOpen(true)} className="hover:text-[var(--accent)]">
             sponsor this board
           </button>

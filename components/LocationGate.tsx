@@ -133,7 +133,9 @@ export function LocationGate({ state, error, onRequestLocation, sessionId }: Loc
 
         {/* Footer */}
         <div className="mt-6 text-center text-xs text-faint font-mono">
-          <a href="/about" className="hover:text-[var(--accent)]">about clickpin</a>
+          <a href="/about" className="hover:text-[var(--accent)]">about</a>
+          {' • '}
+          <a href="/terms" className="hover:text-[var(--accent)]">terms</a>
         </div>
       </div>
 

@@ -400,6 +400,8 @@ export function FancyBoard({
           <span>•</span>
           <a href="/about">about</a>
           <span>•</span>
+          <a href="/terms">terms</a>
+          <span>•</span>
           <button onClick={() => setSponsorModalOpen(true)} className="hover:text-[var(--accent)]">
             sponsor this board
           </button>
