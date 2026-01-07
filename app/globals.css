@@ -131,15 +131,19 @@ a:hover {
 }
 
 /* Loading dots animation */
-.loading-dots::after {
-  content: '...';
-  animation: loading-dots 1.2s infinite;
+.loading-dots {
+  display: inline-flex;
+  gap: 2px;
 }
 
-@keyframes loading-dots {
-  0%, 20% { content: '.'; }
-  40% { content: '..'; }
-  60%, 100% { content: '...'; }
+.loading-dots::before {
+  content: '...';
+  animation: blink-dots 1s infinite steps(1);
+}
+
+@keyframes blink-dots {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
 }
 
 /* Form inputs */
