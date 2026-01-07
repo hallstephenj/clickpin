@@ -249,9 +249,15 @@ export function ComposeModal({
             <button
               type="submit"
               disabled={submitting || !body.trim() || charCount > maxLength}
-              className="btn btn-primary disabled:opacity-50 min-w-[70px]"
+              className="btn btn-primary disabled:opacity-50"
             >
-              {submitting ? <span className="loading-dots" /> : isReply ? 'reply' : 'post'}
+              {submitting ? (
+                <span className="loading-dots">
+                  <span className="dot" />
+                  <span className="dot" />
+                  <span className="dot" />
+                </span>
+              ) : isReply ? 'reply' : 'post'}
             </button>
           </div>
         </form>

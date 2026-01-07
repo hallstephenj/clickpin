@@ -133,17 +133,25 @@ a:hover {
 /* Loading dots animation */
 .loading-dots {
   display: inline-flex;
-  gap: 2px;
+  align-items: center;
+  gap: 3px;
 }
 
-.loading-dots::before {
-  content: '...';
-  animation: blink-dots 1s infinite steps(1);
+.loading-dots .dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: dot-pulse 1.2s infinite ease-in-out;
 }
 
-@keyframes blink-dots {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 1; }
+.loading-dots .dot:nth-child(1) { animation-delay: 0s; }
+.loading-dots .dot:nth-child(2) { animation-delay: 0.2s; }
+.loading-dots .dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes dot-pulse {
+  0%, 60%, 100% { opacity: 0.3; transform: scale(0.8); }
+  30% { opacity: 1; transform: scale(1); }
 }
 
 /* Form inputs */
