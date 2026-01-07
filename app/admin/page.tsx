@@ -365,6 +365,31 @@ export default function AdminPage() {
     }
   };
 
+  const handleClearPins = async (location: Location) => {
+    if (!confirm(`Delete ALL posts from "${location.name}"? This cannot be undone.`)) return;
+
+    setActionLoading(`clear-${location.id}`);
+    try {
+      const response = await fetch(`/api/admin/locations/${location.id}/clear-pins`, {
+        method: 'DELETE',
+        headers: { 'X-Admin-Password': password },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        alert(`Deleted ${data.deleted_count} posts from ${location.name}`);
+        await fetchLocations();
+      } else {
+        const data = await response.json();
+        alert(data.error || 'Failed to clear posts');
+      }
+    } catch {
+      alert('Failed to clear posts');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   const handleDeletePin = async (pinId: string) => {
     if (!confirm('Delete this pin?')) return;
 
@@ -728,6 +753,16 @@ export default function AdminPage() {
                               className="text-xs text-muted hover:text-[var(--fg)] font-mono"
                             >
                               edit
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleClearPins(loc);
+                              }}
+                              disabled={actionLoading === `clear-${loc.id}` || (loc.pin_count || 0) === 0}
+                              className="text-xs text-danger hover:underline font-mono disabled:opacity-50"
+                            >
+                              {actionLoading === `clear-${loc.id}` ? '...' : 'clear posts'}
                             </button>
                             <button
                               onClick={(e) => {
