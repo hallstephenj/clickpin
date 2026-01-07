@@ -84,8 +84,36 @@ export async function applyPaymentEffects(
     .single();
 
   if (sponsorship) {
-    // Sponsorship becomes active 24 hours after payment
-    const activeAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+    // Find current active sponsor for this location
+    const { data: currentSponsor } = await supabaseAdmin
+      .from('location_sponsorships')
+      .select('active_at')
+      .eq('location_id', sponsorship.location_id)
+      .in('status', ['paid', 'active'])
+      .lte('active_at', now)
+      .order('active_at', { ascending: false })
+      .limit(1)
+      .single();
+
+    let activeAt: string;
+
+    if (currentSponsor?.active_at) {
+      // Current sponsor's guaranteed 24-hour window ends at:
+      const currentSponsorExpiresAt = new Date(
+        new Date(currentSponsor.active_at).getTime() + 24 * 60 * 60 * 1000
+      );
+
+      if (currentSponsorExpiresAt <= new Date()) {
+        // Current sponsor has had 24+ hours, new sponsor activates immediately
+        activeAt = now;
+      } else {
+        // Current sponsor still in their 24-hour window, activate when it ends
+        activeAt = currentSponsorExpiresAt.toISOString();
+      }
+    } else {
+      // No current sponsor, activate immediately
+      activeAt = now;
+    }
 
     await supabaseAdmin
       .from('location_sponsorships')

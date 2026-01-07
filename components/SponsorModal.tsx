@@ -264,7 +264,9 @@ export function SponsorModal({
               </button>
 
               <p className="text-xs text-faint font-mono mt-3 text-center">
-                sponsorship activates 24 hours after payment
+                {currentSponsorAmount
+                  ? "activates after current sponsor's 24-hour window"
+                  : "activates immediately"}
               </p>
             </>
           )}
@@ -360,7 +362,9 @@ export function SponsorModal({
               <div className="text-accent text-2xl mb-2">✓</div>
               <p className="font-mono text-sm">payment received!</p>
               <p className="text-xs text-faint mt-2">
-                "{sponsorLabel}" will appear in 24 hours
+                {currentSponsorAmount
+                  ? `"${sponsorLabel}" will appear after current sponsor's 24hr window`
+                  : `"${sponsorLabel}" is now live!`}
               </p>
             </div>
           )}

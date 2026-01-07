@@ -155,11 +155,11 @@ export default function AboutPage() {
               </li>
               <li className="flex gap-2">
                 <span className="text-[#f7931a]">•</span>
-                <span><strong>24-hour grace:</strong> new sponsorships activate 24 hours after payment</span>
+                <span><strong>24-hour minimum:</strong> every sponsor gets at least 24 hours before they can be replaced</span>
               </li>
               <li className="flex gap-2">
                 <span className="text-[#f7931a]">•</span>
-                <span><strong>indefinite:</strong> your sponsorship lasts until someone outbids you</span>
+                <span><strong>indefinite:</strong> your sponsorship lasts until someone outbids you (after your 24hr window)</span>
               </li>
             </ul>
             <p className="text-sm font-mono text-[var(--fg-faint)]">
