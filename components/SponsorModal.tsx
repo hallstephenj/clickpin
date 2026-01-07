@@ -14,7 +14,24 @@ interface SponsorModalProps {
   currentSponsorAmount: number | null;
 }
 
-type Step = 'label' | 'payment' | 'complete';
+type Step = 'label' | 'payment' | 'complete' | 'queue';
+
+interface QueueItem {
+  id: string;
+  sponsor_label: string;
+  amount_sats: number;
+  is_current: boolean;
+  is_active: boolean;
+  remaining_hours: number;
+  starts_in_hours: number;
+  position: number;
+}
+
+interface QueueData {
+  current: QueueItem | null;
+  pending: QueueItem[];
+  total_in_queue: number;
+}
 
 export function SponsorModal({
   isOpen,
@@ -39,6 +56,10 @@ export function SponsorModal({
   const [amountSats, setAmountSats] = useState<number | null>(null);
   const [paymentStatus, setPaymentStatus] = useState<'pending' | 'checking' | 'paid'>('pending');
 
+  // Queue state
+  const [queueData, setQueueData] = useState<QueueData | null>(null);
+  const [queueLoading, setQueueLoading] = useState(false);
+
   // Calculate minimum bid
   const minimumBid = currentSponsorAmount
     ? currentSponsorAmount + 1
@@ -58,8 +79,35 @@ export function SponsorModal({
       setAmountSats(null);
       setPaymentStatus('pending');
       setCopied(false);
+      setQueueData(null);
     }
   }, [isOpen, minimumBid]);
+
+  // Fetch queue data
+  const fetchQueue = useCallback(async () => {
+    if (!presenceToken) return;
+
+    setQueueLoading(true);
+    try {
+      const response = await fetch(
+        `/api/sponsor/queue?presence_token=${encodeURIComponent(presenceToken)}`
+      );
+      const data = await response.json();
+
+      if (response.ok) {
+        setQueueData(data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch queue:', err);
+    } finally {
+      setQueueLoading(false);
+    }
+  }, [presenceToken]);
+
+  const handleViewQueue = () => {
+    fetchQueue();
+    setStep('queue');
+  };
 
   // Poll for payment status
   const checkPaymentStatus = useCallback(async () => {
@@ -294,7 +342,110 @@ export function SponsorModal({
                   ? "activates after current sponsor's 24-hour window"
                   : "activates immediately"}
               </p>
+
+              <button
+                onClick={handleViewQueue}
+                className="w-full mt-3 text-xs text-faint hover:text-accent font-mono transition-colors"
+              >
+                view queue →
+              </button>
             </>
+          )}
+
+          {step === 'queue' && (
+            <div>
+              <p className="text-sm text-muted mb-4">
+                Sponsorship queue for <strong>{locationName}</strong>
+              </p>
+
+              {queueLoading ? (
+                <div className="py-8 text-center text-muted">
+                  <span className="loading-dots">
+                    <span className="dot" />
+                    <span className="dot" />
+                    <span className="dot" />
+                  </span>
+                </div>
+              ) : queueData ? (
+                <div className="space-y-3">
+                  {/* Current sponsor */}
+                  {queueData.current ? (
+                    <div className="p-3 bg-[var(--bg-alt)] border border-[var(--accent)] text-sm">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs text-accent font-mono">current sponsor</span>
+                        <span className="text-xs text-faint font-mono">
+                          {queueData.current.remaining_hours > 0
+                            ? `${queueData.current.remaining_hours}h left`
+                            : 'can be outbid'}
+                        </span>
+                      </div>
+                      <div className="font-medium">{queueData.current.sponsor_label}</div>
+                      <div className="text-xs text-muted font-mono">
+                        {queueData.current.amount_sats.toLocaleString()} sats
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="p-3 bg-[var(--bg-alt)] border border-[var(--border)] text-sm text-center text-muted">
+                      no current sponsor
+                    </div>
+                  )}
+
+                  {/* Pending sponsors */}
+                  {queueData.pending.length > 0 && (
+                    <div>
+                      <div className="text-xs text-faint font-mono mb-2">waiting in queue</div>
+                      <div className="space-y-2">
+                        {queueData.pending.map((item, index) => (
+                          <div
+                            key={item.id}
+                            className="p-3 bg-[var(--bg-alt)] border border-[var(--border)] text-sm"
+                          >
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-xs text-muted font-mono">#{index + 1} in queue</span>
+                              <span className="text-xs text-faint font-mono">
+                                starts in ~{item.starts_in_hours}h
+                              </span>
+                            </div>
+                            <div className="font-medium">{item.sponsor_label}</div>
+                            <div className="text-xs text-muted font-mono">
+                              {item.amount_sats.toLocaleString()} sats
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Empty queue message */}
+                  {!queueData.current && queueData.pending.length === 0 && (
+                    <p className="text-sm text-muted text-center py-4">
+                      No sponsorships yet. Be the first!
+                    </p>
+                  )}
+
+                  {/* Explanation */}
+                  <div className="text-xs text-faint font-mono mt-4 p-3 bg-[var(--bg-alt)] border border-[var(--border)]">
+                    <p className="mb-1">how it works:</p>
+                    <ul className="space-y-1 ml-2">
+                      <li>• each sponsor gets at least 24 hours</li>
+                      <li>• outbid by paying 1+ sat more</li>
+                      <li>• your turn starts when previous sponsor's 24h ends</li>
+                    </ul>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-sm text-muted text-center py-4">
+                  Failed to load queue
+                </p>
+              )}
+
+              <button
+                onClick={() => setStep('label')}
+                className="btn w-full justify-center mt-4"
+              >
+                ← back
+              </button>
+            </div>
           )}
 
           {step === 'payment' && (
