@@ -5,6 +5,7 @@ export interface Location {
   name: string;
   slug: string;
   category: string | null;
+  city?: string | null;
   lat: number;
   lng: number;
   radius_m: number;

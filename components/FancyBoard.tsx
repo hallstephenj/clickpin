@@ -9,6 +9,31 @@ import { PaymentModal } from './PaymentModal';
 import { SponsorModal } from './SponsorModal';
 import { config } from '@/lib/config';
 
+// Visual post count indicator using dots
+function PostCountIndicator({ count }: { count: number }) {
+  const maxDots = 5;
+  const filled = Math.min(count, maxDots);
+  const hasMore = count > maxDots;
+
+  return (
+    <div className="flex items-center gap-0.5">
+      {Array.from({ length: maxDots }).map((_, i) => (
+        <span
+          key={i}
+          className={`w-1.5 h-1.5 rounded-full ${
+            i < filled
+              ? 'bg-[var(--fg-muted)]'
+              : 'border border-[var(--border)]'
+          }`}
+        />
+      ))}
+      {hasMore && (
+        <span className="text-xs text-muted ml-1">+{count - maxDots}</span>
+      )}
+    </div>
+  );
+}
+
 interface FancyBoardProps {
   location: Location;
   pins: FancyPin[];
@@ -307,18 +332,42 @@ export function FancyBoard({
       <header className="fancy-board-header">
         <div className="fancy-board-header-content">
           <div className="fancy-board-title-group">
-            <span className="fancy-board-icon">📌</span>
             <div>
-              <h1 className="fancy-board-title">{location.name}</h1>
-              {location.sponsor_label && (
-                <p className="fancy-board-sponsor">
-                  sponsored by <span>{location.sponsor_label}</span>
-                </p>
+              <div className="flex items-center gap-2">
+                <h1 className="fancy-board-title">{location.name}</h1>
+                <span className="live-dot" title="Live" />
+              </div>
+              {location.city && (
+                <p className="text-sm text-muted mt-0.5">{location.city}</p>
               )}
+
+              {/* Sponsorship row */}
+              <div className="mt-2">
+                {location.sponsor_label ? (
+                  <button
+                    onClick={() => setSponsorModalOpen(true)}
+                    className="text-xs text-muted hover:text-[var(--fg)] transition-colors"
+                  >
+                    sponsored by <span className="text-accent">{location.sponsor_label}</span>
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setSponsorModalOpen(true)}
+                    className="text-xs text-faint hover:text-accent transition-colors"
+                  >
+                    become the sponsor
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 
           <div className="fancy-board-actions">
+            {/* Post count indicator */}
+            <div className="flex items-center gap-1 mr-2" title={`${pinsWithPositions.length} posts`}>
+              <PostCountIndicator count={pinsWithPositions.length} />
+            </div>
+
             <button onClick={onRefreshLocation} className="btn" title="Refresh location">
               ↻
             </button>
@@ -331,20 +380,6 @@ export function FancyBoard({
               </button>
             )}
           </div>
-        </div>
-
-        <div className="fancy-board-stats">
-          <span>{pinsWithPositions.length} {pinsWithPositions.length === 1 ? 'post' : 'posts'} on this board</span>
-          <span>•</span>
-          <span>{localPostsRemaining} free left today</span>
-          <span>•</span>
-          <span className="text-faint">only visible here • posts fade over time</span>
-          {flags.fancy_tap_to_place && (
-            <>
-              <span>•</span>
-              <span className="fancy-board-hint">tap to drop a note</span>
-            </>
-          )}
         </div>
       </header>
 
@@ -395,19 +430,11 @@ export function FancyBoard({
 
       {/* Footer */}
       <footer className="fancy-board-footer">
-        <div className="fancy-board-footer-content">
-          <a href="/map">nearby boards</a>
-          <span>•</span>
-          <a href="/about">about</a>
-          <span>•</span>
-          <a href="/terms">terms</a>
-          <span>•</span>
-          <a href="/privacy">privacy</a>
-          <span>•</span>
-          <button onClick={() => setSponsorModalOpen(true)} className="hover:text-[var(--accent)]">
-            sponsor
-          </button>
-          <div className="fancy-board-footer-bitcoin">powered by bitcoin</div>
+        <div className="flex justify-center gap-6 text-xs text-faint">
+          <a href="/map" className="hover:text-[var(--fg-muted)] transition-colors">nearby</a>
+          <a href="/about" className="hover:text-[var(--fg-muted)] transition-colors">about</a>
+          <a href="/terms" className="hover:text-[var(--fg-muted)] transition-colors">terms</a>
+          <a href="/privacy" className="hover:text-[var(--fg-muted)] transition-colors">privacy</a>
         </div>
       </footer>
 

@@ -11,6 +11,32 @@ import { useFeatureFlags } from '@/lib/hooks/useFeatureFlags';
 import { isFancyBoardActive } from '@/lib/featureFlags';
 import { config } from '@/lib/config';
 
+// Visual post count indicator using dots
+function PostCountIndicator({ count }: { count: number }) {
+  // Show up to 5 filled dots, with outline for empty slots
+  const maxDots = 5;
+  const filled = Math.min(count, maxDots);
+  const hasMore = count > maxDots;
+
+  return (
+    <div className="flex items-center gap-0.5">
+      {Array.from({ length: maxDots }).map((_, i) => (
+        <span
+          key={i}
+          className={`w-1.5 h-1.5 rounded-full ${
+            i < filled
+              ? 'bg-[var(--fg-muted)]'
+              : 'border border-[var(--border)]'
+          }`}
+        />
+      ))}
+      {hasMore && (
+        <span className="text-xs text-muted ml-1">+{count - maxDots}</span>
+      )}
+    </div>
+  );
+}
+
 interface BoardProps {
   location: Location;
   pins: Pin[];
@@ -263,24 +289,48 @@ export function Board({
   }
 
   return (
-    <div className="min-h-screen bg-[#fafafa] dark:bg-[#0a0a0a] pb-20">
+    <div className="min-h-screen bg-[#fafafa] dark:bg-[#0a0a0a] pb-16">
       {/* Header */}
       <header className="border-b border-[var(--border)] bg-[#fafafa] dark:bg-[#0a0a0a]">
-        <div className="max-w-2xl mx-auto px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span className="text-accent font-bold text-lg">⚡</span>
-              <div>
-                <h1 className="font-bold text-[var(--fg)]">{location.name}</h1>
-                {location.sponsor_label && (
-                  <p className="text-xs text-muted">
+        <div className="max-w-2xl mx-auto px-4 py-4">
+          <div className="flex items-start justify-between">
+            {/* Left: Identity */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <h1 className="font-bold text-lg text-[var(--fg)] truncate">{location.name}</h1>
+                <span className="live-dot" title="Live" />
+              </div>
+              {location.city && (
+                <p className="text-sm text-muted mt-0.5">{location.city}</p>
+              )}
+
+              {/* Sponsorship row */}
+              <div className="mt-2">
+                {location.sponsor_label ? (
+                  <button
+                    onClick={() => setSponsorModalOpen(true)}
+                    className="text-xs text-muted hover:text-[var(--fg)] transition-colors"
+                  >
                     sponsored by <span className="text-accent">{location.sponsor_label}</span>
-                  </p>
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setSponsorModalOpen(true)}
+                    className="text-xs text-faint hover:text-accent transition-colors"
+                  >
+                    become the sponsor
+                  </button>
                 )}
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
+            {/* Right: Actions + post count */}
+            <div className="flex items-center gap-3 ml-4">
+              {/* Post count indicator */}
+              <div className="flex items-center gap-1" title={`${pins.length} posts`}>
+                <PostCountIndicator count={pins.length} />
+              </div>
+
               <button
                 onClick={onRefreshLocation}
                 className="btn"
@@ -295,15 +345,6 @@ export function Board({
                 + post
               </button>
             </div>
-          </div>
-
-          {/* Stats bar */}
-          <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted font-mono">
-            <span>{pins.length} {pins.length === 1 ? 'post' : 'posts'} on this board</span>
-            <span>•</span>
-            <span>{localPostsRemaining} free {localPostsRemaining === 1 ? 'post' : 'posts'} left today</span>
-            <span>•</span>
-            <span className="text-faint">only visible here • posts fade over time</span>
           </div>
         </div>
       </header>
@@ -384,21 +425,13 @@ export function Board({
         )}
       </main>
 
-      {/* Footer - fixed to bottom */}
+      {/* Footer */}
       <footer className="fixed bottom-0 left-0 right-0 border-t border-[var(--border)] bg-[#fafafa] dark:bg-[#0a0a0a]">
-        <div className="max-w-2xl mx-auto px-4 py-4 text-center text-xs text-faint font-mono">
-          <a href="/map" className="hover:text-[var(--accent)]">nearby boards</a>
-          {' • '}
-          <a href="/about" className="hover:text-[var(--accent)]">about</a>
-          {' • '}
-          <a href="/terms" className="hover:text-[var(--accent)]">terms</a>
-          {' • '}
-          <a href="/privacy" className="hover:text-[var(--accent)]">privacy</a>
-          {' • '}
-          <button onClick={() => setSponsorModalOpen(true)} className="hover:text-[var(--accent)]">
-            sponsor
-          </button>
-          <div className="mt-1 text-[var(--fg-faint)]">powered by bitcoin</div>
+        <div className="max-w-2xl mx-auto px-4 py-3 flex justify-center gap-6 text-xs text-faint">
+          <a href="/map" className="hover:text-[var(--fg-muted)] transition-colors">nearby</a>
+          <a href="/about" className="hover:text-[var(--fg-muted)] transition-colors">about</a>
+          <a href="/terms" className="hover:text-[var(--fg-muted)] transition-colors">terms</a>
+          <a href="/privacy" className="hover:text-[var(--fg-muted)] transition-colors">privacy</a>
         </div>
       </footer>
 

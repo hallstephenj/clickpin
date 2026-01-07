@@ -78,6 +78,26 @@ body {
 
 .bg-main { background: var(--bg); }
 .bg-alt { background: var(--bg-alt); }
+
+/* Live activity indicator */
+.live-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--success);
+  animation: live-pulse 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes live-pulse {
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
 .border-main { border-color: var(--border); }
 
 /* Links */
