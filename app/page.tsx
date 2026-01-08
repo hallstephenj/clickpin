@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { Suspense, useEffect, useState, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useSession } from '@/lib/hooks/useSession';
 import { useGeolocation } from '@/lib/hooks/useGeolocation';
 import { useBoard } from '@/lib/hooks/useBoard';
@@ -35,7 +36,10 @@ function LoadingScreen({ message, progress }: { message: string; progress: numbe
   );
 }
 
-export default function Home() {
+function HomeContent() {
+  const searchParams = useSearchParams();
+  const viewNearby = searchParams.get('view') === 'nearby';
+
   const { sessionId, loading: sessionLoading } = useSession();
   const { flags, loading: flagsLoading } = useFeatureFlags();
   const { state, location: geoLocation, presenceToken, requestLocation, error: geoError } = useGeolocation(sessionId);
@@ -115,6 +119,19 @@ export default function Home() {
     return <GhostFeed onRequestLocation={handleRequestLocation} />;
   }
 
+  // If PROXHOME_ADVANCED is enabled and user clicked "nearby", show ProximityHome
+  // even when at a location (pass currentLocation to show "return to board" button)
+  if (flags.PROXHOME && flags.PROXHOME_ADVANCED && viewNearby && state.position) {
+    return (
+      <ProximityHome
+        state={state}
+        onRequestLocation={handleRequestLocation}
+        sessionId={sessionId}
+        currentLocation={geoLocation || undefined}
+      />
+    );
+  }
+
   // No location resolved - show location gate or proximity home
   if (!geoLocation) {
     // Use ProximityHome for discovery-framed experience when PROXHOME is enabled
@@ -160,5 +177,13 @@ export default function Home() {
       onRefreshLocation={handleRequestLocation}
       postsRemaining={postsRemaining}
     />
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<LoadingScreen message="initializing..." progress={0} />}>
+      <HomeContent />
+    </Suspense>
   );
 }

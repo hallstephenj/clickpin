@@ -16,6 +16,7 @@ export const DEFAULT_FLAGS: FeatureFlags = {
   SHARENOTES: false,
   ROTATONATOR: false,
   PROXHOME: true,
+  PROXHOME_ADVANCED: false,
 };
 
 // All feature flag keys
@@ -33,6 +34,7 @@ export const FEATURE_FLAG_KEYS = [
   'SHARENOTES',
   'ROTATONATOR',
   'PROXHOME',
+  'PROXHOME_ADVANCED',
 ] as const;
 
 // Server-side: Fetch all flags from database

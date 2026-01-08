@@ -193,6 +193,7 @@ export interface FeatureFlags {
   SHARENOTES: boolean;
   ROTATONATOR: boolean;
   PROXHOME: boolean;
+  PROXHOME_ADVANCED: boolean;
 }
 
 // Badge types

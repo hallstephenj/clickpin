@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { GeolocationState } from '@/types';
+import { GeolocationState, Location } from '@/types';
 import { RequestLocationModal } from './RequestLocationModal';
 
 // Dynamically import map to avoid SSR issues
@@ -49,6 +49,7 @@ interface ProximityHomeProps {
   state: GeolocationState;
   onRequestLocation: () => void;
   sessionId: string | null;
+  currentLocation?: Location;
 }
 
 function formatDistance(meters: number): string {
@@ -58,7 +59,7 @@ function formatDistance(meters: number): string {
   return `${(meters / 1000).toFixed(1)}km`;
 }
 
-export function ProximityHome({ state, onRequestLocation, sessionId }: ProximityHomeProps) {
+export function ProximityHome({ state, onRequestLocation, sessionId, currentLocation }: ProximityHomeProps) {
   const [stats, setStats] = useState<ProximityStats | null>(null);
   const [loading, setLoading] = useState(false);
   const [showRequestModal, setShowRequestModal] = useState(false);
@@ -66,6 +67,7 @@ export function ProximityHome({ state, onRequestLocation, sessionId }: Proximity
   const hasPosition = state.position !== null;
   const userLat = state.position?.coords.latitude;
   const userLng = state.position?.coords.longitude;
+  const isAtLocation = !!currentLocation;
 
   // Fetch proximity stats when we have a position
   useEffect(() => {
@@ -83,8 +85,12 @@ export function ProximityHome({ state, onRequestLocation, sessionId }: Proximity
       .finally(() => setLoading(false));
   }, [userLat, userLng]);
 
-  const boardsCount = stats?.boards_within_mile || 0;
-  const nearbyBoards = stats?.nearby_boards || [];
+  // Filter out current location from nearby boards if at a location
+  const allNearbyBoards = stats?.nearby_boards || [];
+  const nearbyBoards = isAtLocation
+    ? allNearbyBoards.filter(b => b.id !== currentLocation.id)
+    : allNearbyBoards;
+  const boardsCount = nearbyBoards.length;
 
   return (
     <div className="min-h-screen bg-[#fafafa] dark:bg-[#0a0a0a] flex items-center justify-center p-4">
@@ -101,23 +107,45 @@ export function ProximityHome({ state, onRequestLocation, sessionId }: Proximity
 
         {/* Main content */}
         <div className="border border-[var(--border)] bg-[#fafafa] dark:bg-[#0a0a0a] p-6">
-          {/* Discovery message - NOT red/error style */}
+          {/* Header message - different when at a location vs uncharted */}
           <div className="text-center mb-6">
-            <div className="text-lg font-semibold text-[var(--fg)] mb-1">
-              You're in uncharted territory!
-            </div>
-            {loading ? (
-              <div className="text-muted text-sm font-mono">checking nearby...</div>
-            ) : boardsCount > 0 ? (
-              <div className="text-muted text-sm">
-                but there {boardsCount === 1 ? 'is' : 'are'}{' '}
-                <span className="text-accent font-semibold">{boardsCount} board{boardsCount !== 1 ? 's' : ''}</span>{' '}
-                nearby
-              </div>
+            {isAtLocation ? (
+              <>
+                <div className="text-lg font-semibold text-[var(--fg)] mb-1">
+                  You're at {currentLocation.name}!
+                </div>
+                <Link
+                  href="/"
+                  className="btn btn-primary inline-flex items-center justify-center gap-2 mt-3"
+                >
+                  <span>go to board</span>
+                  <span>→</span>
+                </Link>
+                {boardsCount > 0 && (
+                  <div className="text-muted text-sm mt-4">
+                    {boardsCount} other board{boardsCount !== 1 ? 's' : ''} nearby
+                  </div>
+                )}
+              </>
             ) : (
-              <div className="text-muted text-sm">
-                no boards nearby yet — be the first to start one
-              </div>
+              <>
+                <div className="text-lg font-semibold text-[var(--fg)] mb-1">
+                  You're in uncharted territory!
+                </div>
+                {loading ? (
+                  <div className="text-muted text-sm font-mono">checking nearby...</div>
+                ) : boardsCount > 0 ? (
+                  <div className="text-muted text-sm">
+                    but there {boardsCount === 1 ? 'is' : 'are'}{' '}
+                    <span className="text-accent font-semibold">{boardsCount} board{boardsCount !== 1 ? 's' : ''}</span>{' '}
+                    nearby
+                  </div>
+                ) : (
+                  <div className="text-muted text-sm">
+                    no boards nearby yet — be the first to start one
+                  </div>
+                )}
+              </>
             )}
           </div>
 
@@ -277,7 +305,7 @@ export function ProximityHome({ state, onRequestLocation, sessionId }: Proximity
               refresh location
             </button>
 
-            {hasPosition && (
+            {hasPosition && !isAtLocation && (
               <button
                 onClick={() => setShowRequestModal(true)}
                 className="btn w-full justify-center"
