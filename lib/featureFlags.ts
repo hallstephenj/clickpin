@@ -15,7 +15,7 @@ export const DEFAULT_FLAGS: FeatureFlags = {
   BADGES: false,
   SHARENOTES: false,
   ROTATONATOR: false,
-  PROXHOME: false,
+  PROXHOME: true,
 };
 
 // All feature flag keys
