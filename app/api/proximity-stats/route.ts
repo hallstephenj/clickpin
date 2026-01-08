@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 
 const ONE_MILE_METERS = 1609.34;
+const TEN_KM_METERS = 10000;
 
 // Calculate distance between two points using Haversine formula
 function calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
@@ -38,6 +39,7 @@ export interface ProximityStatsResponse {
   nearby_boards: NearbyBoardStats[];
   user_lat: number;
   user_lng: number;
+  expanded_search: boolean; // true if we expanded to 10km because nothing within 1 mile
 }
 
 // GET /api/proximity-stats?lat=xxx&lng=xxx
@@ -67,13 +69,22 @@ export async function GET(request: NextRequest) {
     const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
     const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-    const nearbyLocations = locations
+    const locationsWithDistance = locations
       .map(loc => ({
         ...loc,
         distance_m: calculateDistance(lat, lng, loc.lat, loc.lng)
       }))
-      .filter(loc => loc.distance_m <= ONE_MILE_METERS)
       .sort((a, b) => a.distance_m - b.distance_m);
+
+    // First try within 1 mile
+    let nearbyLocations = locationsWithDistance.filter(loc => loc.distance_m <= ONE_MILE_METERS);
+    let expandedSearch = false;
+
+    // If nothing within 1 mile, expand to 10km
+    if (nearbyLocations.length === 0) {
+      nearbyLocations = locationsWithDistance.filter(loc => loc.distance_m <= TEN_KM_METERS);
+      expandedSearch = true;
+    }
 
     // Get pin counts and activity for nearby locations
     const nearbyWithStats: NearbyBoardStats[] = await Promise.all(
@@ -143,6 +154,7 @@ export async function GET(request: NextRequest) {
       nearby_boards: nearbyWithStats.slice(0, 5), // Top 5 closest
       user_lat: lat,
       user_lng: lng,
+      expanded_search: expandedSearch,
     };
 
     return NextResponse.json(response);

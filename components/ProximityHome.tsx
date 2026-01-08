@@ -42,6 +42,7 @@ interface ProximityStats {
   nearby_boards: NearbyBoard[];
   user_lat: number;
   user_lng: number;
+  expanded_search: boolean;
 }
 
 interface ProximityHomeProps {
@@ -111,7 +112,7 @@ export function ProximityHome({ state, onRequestLocation, sessionId }: Proximity
               <div className="text-muted text-sm">
                 but there {boardsCount === 1 ? 'is' : 'are'}{' '}
                 <span className="text-accent font-semibold">{boardsCount} board{boardsCount !== 1 ? 's' : ''}</span>{' '}
-                within reach
+                {stats?.expanded_search ? 'within 10km' : 'within reach'}
               </div>
             ) : (
               <div className="text-muted text-sm">
