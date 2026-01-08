@@ -147,16 +147,61 @@ export default async function SharedPinPage({ params }: PageProps) {
 
   if (!data) {
     return (
-      <div className="min-h-screen bg-[#fafafa] dark:bg-[#0a0a0a] flex items-center justify-center p-4">
-        <div className="max-w-md w-full text-center">
-          <h1 className="text-xl font-bold mb-2">pin not found</h1>
-          <p className="text-muted text-sm mb-6">
-            this pin doesn&apos;t exist or sharing is not enabled.
-          </p>
-          <a href="/" className="btn btn-primary">
-            go to clickpin
-          </a>
-        </div>
+      <div className="min-h-screen bg-[#fafafa] dark:bg-[#0a0a0a]">
+        {/* Header */}
+        <header className="border-b border-[var(--border)]">
+          <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
+            <a href="/" className="flex items-center gap-2 hover:opacity-80">
+              <span className="text-[#f7931a] font-bold text-lg">⚡</span>
+              <span className="font-bold">clickpin</span>
+            </a>
+            <a href="/about" className="btn">
+              what is this?
+            </a>
+          </div>
+        </header>
+
+        {/* Content */}
+        <main className="max-w-2xl mx-auto px-4 py-8">
+          <div className="text-center py-12">
+            <div className="text-4xl mb-4">🔍</div>
+            <h1 className="text-xl font-bold mb-2">pin not found</h1>
+            <p className="text-[var(--fg-muted)] text-sm mb-6">
+              this pin doesn&apos;t exist or sharing is not enabled.
+            </p>
+            <a href="/" className="btn btn-primary">
+              go to clickpin
+            </a>
+          </div>
+
+          {/* Still show what clickpin is */}
+          <section className="mt-12">
+            <h2 className="font-bold text-lg mb-3 border-b border-[var(--border)] pb-2">
+              what is clickpin?
+            </h2>
+            <div className="space-y-3 text-[var(--fg-muted)]">
+              <p>
+                clickpin is an anonymous, hyperlocal message board. posts are tied to
+                physical locations — you can only see and create posts when you&apos;re
+                actually there.
+              </p>
+              <p>
+                no accounts, no followers, no algorithms. just posts from people who
+                have been where you are.
+              </p>
+            </div>
+          </section>
+        </main>
+
+        {/* Footer */}
+        <footer className="border-t border-[var(--border)] mt-8">
+          <div className="max-w-2xl mx-auto px-4 py-6 flex justify-center gap-6 text-xs text-faint">
+            <a href="/map" className="hover:text-[var(--fg-muted)] transition-colors">nearby</a>
+            <a href="/about" className="hover:text-[var(--fg-muted)] transition-colors">about</a>
+            <a href="/terms" className="hover:text-[var(--fg-muted)] transition-colors">terms</a>
+            <a href="/privacy" className="hover:text-[var(--fg-muted)] transition-colors">privacy</a>
+          </div>
+        </footer>
       </div>
     );
   }

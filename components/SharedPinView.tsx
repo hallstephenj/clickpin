@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import Link from 'next/link';
 
 interface SharedPinData {
   pin: {
@@ -61,90 +62,152 @@ export function SharedPinView({ data }: { data: SharedPinData }) {
   return (
     <div className="min-h-screen bg-[#fafafa] dark:bg-[#0a0a0a]">
       {/* Header */}
-      <header className="border-b border-[var(--border)] bg-[#fafafa] dark:bg-[#0a0a0a]">
-        <div className="max-w-lg mx-auto px-4 py-4">
-          <a href="/" className="text-lg font-bold text-[var(--fg)]">
-            <span className="text-accent">&#x26A1;</span> clickpin
-          </a>
+      <header className="border-b border-[var(--border)]">
+        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2 hover:opacity-80">
+            <span className="text-[#f7931a] font-bold text-lg">⚡</span>
+            <span className="font-bold">clickpin</span>
+          </Link>
+          <Link href="/about" className="btn">
+            what is this?
+          </Link>
         </div>
       </header>
 
-      <main className="max-w-lg mx-auto px-4 py-6">
-        {/* Pin Card */}
-        <div className="shared-pin-card">
-          {isRemoved ? (
-            <div className="shared-pin-removed">
-              <p className="text-muted text-center py-8">
-                this pin was removed
-              </p>
-            </div>
-          ) : (
-            <>
-              {/* Doodle */}
-              {pin?.doodle_data && (
-                <div className="shared-pin-doodle">
-                  <img src={pin.doodle_data} alt="" />
-                </div>
-              )}
-
-              {/* Body */}
-              <p className="shared-pin-body">
-                {pin?.badge && (
-                  <span className="paperweight-badge">{pin.badge}</span>
-                )}
-                {pin?.body}
-              </p>
-            </>
-          )}
-
-          {/* Location and time */}
-          <div className="shared-pin-meta">
-            <div className="shared-pin-location">{locationText}</div>
-            {!isRemoved && fuzzyTime && (
-              <div className="shared-pin-time">{fuzzyTime}</div>
-            )}
+      {/* Content */}
+      <main className="max-w-2xl mx-auto px-4 py-8">
+        {/* Location header */}
+        <div className="mb-6">
+          <div className="text-xs text-[var(--fg-faint)] font-mono uppercase tracking-wider mb-1">
+            shared from
           </div>
+          <h1 className="text-xl font-bold">{locationText}</h1>
         </div>
 
-        {/* Reply count - only if pin is visible */}
-        {!isRemoved && replyCount > 0 && (
-          <div className="shared-pin-replies">
-            {replyCount} {replyCount === 1 ? 'reply' : 'replies'} &middot;{' '}
-            <span className="text-muted">visit location to see replies</span>
+        {/* The Pin */}
+        {isRemoved ? (
+          <div className="border border-[var(--border)] bg-[var(--bg-alt)] p-6 mb-6">
+            <p className="text-[var(--fg-muted)] text-center italic">
+              this post was removed
+            </p>
+          </div>
+        ) : (
+          <div className="border border-[var(--border)] bg-[var(--bg-alt)] p-5 mb-6">
+            {/* Doodle */}
+            {pin?.doodle_data && (
+              <div className="mb-4">
+                <img
+                  src={pin.doodle_data}
+                  alt=""
+                  className="max-w-full max-h-48 object-contain"
+                />
+              </div>
+            )}
+
+            {/* Badge + Body */}
+            <p className="text-lg leading-relaxed">
+              {pin?.badge && (
+                <span className="inline-block text-[10px] font-medium uppercase tracking-wide text-[#8a7a60] bg-[rgba(100,80,50,0.08)] px-1.5 py-0.5 mr-2 rounded-sm align-middle">
+                  {pin.badge}
+                </span>
+              )}
+              {pin?.body}
+            </p>
+
+            {/* Time */}
+            <div className="mt-4 pt-3 border-t border-[var(--border)]">
+              <span className="text-sm text-[var(--fg-muted)]">{fuzzyTime}</span>
+            </div>
           </div>
         )}
 
-        {/* Explanation box */}
-        <div className="shared-pin-explainer">
-          <p className="shared-pin-explainer-text">
-            <strong>clickpin</strong> is an anonymous, hyperlocal message board.
-            posts are tied to physical locations &mdash; you can only see and
-            create posts when you&apos;re actually there.
-          </p>
+        {/* Reply count */}
+        {!isRemoved && replyCount > 0 && (
+          <div className="text-sm text-[var(--fg-muted)] mb-8 flex items-center gap-2">
+            <span className="text-[#f7931a]">→</span>
+            <span>
+              {replyCount} {replyCount === 1 ? 'reply' : 'replies'} &mdash; visit location to see them
+            </span>
+          </div>
+        )}
 
-          {locationPinCount > 0 && (
-            <p className="shared-pin-explainer-count">
-              {locationPinCount} {locationPinCount === 1 ? 'post' : 'posts'} at
-              this location right now
+        {/* What is clickpin section */}
+        <section className="mb-8">
+          <h2 className="font-bold text-lg mb-3 border-b border-[var(--border)] pb-2">
+            what is clickpin?
+          </h2>
+          <div className="space-y-3 text-[var(--fg-muted)]">
+            <p>
+              clickpin is an anonymous, hyperlocal message board. posts are tied to
+              physical locations — you can only see and create posts when you&apos;re
+              actually there.
             </p>
-          )}
+            <p>
+              think of it as peeking behind the curtain of the local underground. no accounts,
+              no followers, no algorithms. just posts from people who have been where you are.
+            </p>
+          </div>
+        </section>
 
-          <a
-            href={`/map?lat=${location.lat}&lng=${location.lng}`}
-            className="btn btn-primary shared-pin-map-btn"
-          >
-            view on map
-          </a>
-        </div>
+        {/* This location */}
+        <section className="mb-8">
+          <h2 className="font-bold text-lg mb-3 border-b border-[var(--border)] pb-2">
+            about this location
+          </h2>
+          <div className="space-y-4">
+            {locationPinCount > 0 && (
+              <p className="text-[var(--fg-muted)]">
+                there {locationPinCount === 1 ? 'is' : 'are'}{' '}
+                <span className="text-[#f7931a] font-medium">{locationPinCount}</span>{' '}
+                {locationPinCount === 1 ? 'post' : 'posts'} at {location.name} right now.
+              </p>
+            )}
+            <Link
+              href={`/map?lat=${location.lat}&lng=${location.lng}`}
+              className="btn btn-primary inline-flex items-center gap-2"
+            >
+              <span>view on map</span>
+              <span>→</span>
+            </Link>
+          </div>
+        </section>
 
-        {/* Footer links */}
-        <div className="shared-pin-footer">
-          <a href="/">home</a>
-          <a href="/about">about</a>
-          <a href="/terms">terms</a>
-          <a href="/privacy">privacy</a>
-        </div>
+        {/* How it works teaser */}
+        <section className="mb-8">
+          <h2 className="font-bold text-lg mb-3 border-b border-[var(--border)] pb-2">
+            how it works
+          </h2>
+          <div className="space-y-3">
+            <div className="flex gap-3">
+              <span className="text-[#f7931a] font-mono font-bold">1.</span>
+              <span className="text-[var(--fg-muted)]">allow location access</span>
+            </div>
+            <div className="flex gap-3">
+              <span className="text-[#f7931a] font-mono font-bold">2.</span>
+              <span className="text-[var(--fg-muted)]">find a nearby board</span>
+            </div>
+            <div className="flex gap-3">
+              <span className="text-[#f7931a] font-mono font-bold">3.</span>
+              <span className="text-[var(--fg-muted)]">post anonymously</span>
+            </div>
+          </div>
+          <div className="mt-4">
+            <Link href="/about" className="text-sm text-[#f7931a] hover:underline">
+              learn more →
+            </Link>
+          </div>
+        </section>
       </main>
+
+      {/* Footer */}
+      <footer className="border-t border-[var(--border)] mt-8">
+        <div className="max-w-2xl mx-auto px-4 py-6 flex justify-center gap-6 text-xs text-faint">
+          <Link href="/map" className="hover:text-[var(--fg-muted)] transition-colors">nearby</Link>
+          <Link href="/about" className="hover:text-[var(--fg-muted)] transition-colors">about</Link>
+          <Link href="/terms" className="hover:text-[var(--fg-muted)] transition-colors">terms</Link>
+          <Link href="/privacy" className="hover:text-[var(--fg-muted)] transition-colors">privacy</Link>
+        </div>
+      </footer>
     </div>
   );
 }
