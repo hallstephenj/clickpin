@@ -143,10 +143,12 @@ export function ProximityHome({ state, onRequestLocation, sessionId }: Proximity
           {/* Nearby board stats boxes */}
           {nearbyBoards.length > 0 && (
             <div className="space-y-2 mb-6">
-              {nearbyBoards.slice(0, 3).map(board => (
+              {nearbyBoards.slice(0, 3).map(board => {
+                const isTrending = stats?.trending_board?.name === board.name && stats.trending_board.active_users > 1;
+                return (
                 <div
                   key={board.id}
-                  className="p-3 bg-[var(--bg-alt)] border border-[var(--border)] rounded"
+                  className={`p-3 bg-[var(--bg-alt)] border border-[var(--border)] rounded ${isTrending ? 'animate-jiggle' : ''}`}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
@@ -233,7 +235,7 @@ export function ProximityHome({ state, onRequestLocation, sessionId }: Proximity
                     </div>
                   </div>
                 </div>
-              ))}
+              );})}
 
               {/* Legend */}
               {nearbyBoards.slice(0, 3).some(b => b.btcmap_id || b.is_bitcoin_merchant) && (
@@ -251,13 +253,7 @@ export function ProximityHome({ state, onRequestLocation, sessionId }: Proximity
                 </div>
               )}
 
-              {/* Trending board if exists */}
-              {stats?.trending_board && stats.trending_board.active_users > 1 && (
-                <div className="text-center text-xs text-accent font-mono">
-                  Trending: {stats.trending_board.name} ({stats.trending_board.active_users} users)
-                </div>
-              )}
-            </div>
+                          </div>
           )}
 
           {/* See full map link */}
