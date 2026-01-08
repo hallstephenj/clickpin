@@ -3,6 +3,7 @@ import { supabaseAdmin } from '@/lib/supabase';
 import { verifyPresenceToken } from '@/lib/presence';
 import { config } from '@/lib/config';
 import { v4 as uuidv4 } from 'uuid';
+import { logGhostEvent } from '@/lib/ghostEvents';
 
 // POST /api/reply - Create a reply to a pin
 export async function POST(request: NextRequest) {
@@ -94,6 +95,9 @@ export async function POST(request: NextRequest) {
       console.error('Error creating reply:', insertError);
       return NextResponse.json({ error: 'Failed to create reply' }, { status: 500 });
     }
+
+    // Log ghost event (fire-and-forget)
+    logGhostEvent(location_id, 'reply_created');
 
     return NextResponse.json({
       reply: { ...newReply, is_mine: true, flag_count: 0 },

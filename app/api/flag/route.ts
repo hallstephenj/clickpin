@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { verifyPresenceToken } from '@/lib/presence';
 import { config } from '@/lib/config';
+import { logGhostEvent } from '@/lib/ghostEvents';
 
 // POST /api/flag - Flag a pin
 export async function POST(request: NextRequest) {
@@ -70,6 +71,9 @@ export async function POST(request: NextRequest) {
       console.error('Error creating flag:', insertError);
       return NextResponse.json({ error: 'Failed to flag pin' }, { status: 500 });
     }
+
+    // Log ghost event (fire-and-forget)
+    logGhostEvent(pin.location_id, 'pin_flagged');
 
     // Count flags and hide if threshold reached (trigger does this, but we can also check here)
     const { count: flagCount } = await supabaseAdmin

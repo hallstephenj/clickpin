@@ -26,6 +26,7 @@ interface Location {
   lat: number;
   lng: number;
   radius_m: number;
+  ghosts_enabled: boolean;
   created_at: string;
   pin_count?: number;
 }
@@ -395,6 +396,37 @@ export default function AdminPage() {
       }
     } catch {
       alert('Failed to clear posts');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleToggleGhosts = async (location: Location) => {
+    setActionLoading(`ghosts-${location.id}`);
+    try {
+      const response = await fetch(`/api/admin/locations/${location.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Password': password,
+        },
+        body: JSON.stringify({ ghosts_enabled: !location.ghosts_enabled }),
+      });
+
+      if (response.ok) {
+        setLocations((prev) =>
+          prev.map((loc) =>
+            loc.id === location.id
+              ? { ...loc, ghosts_enabled: !loc.ghosts_enabled }
+              : loc
+          )
+        );
+      } else {
+        const data = await response.json();
+        alert(data.error || 'Failed to toggle ghosts');
+      }
+    } catch {
+      alert('Failed to toggle ghosts');
     } finally {
       setActionLoading(null);
     }
@@ -775,6 +807,21 @@ export default function AdminPage() {
                             <span className="text-xs text-muted font-mono">
                               {loc.pin_count || 0} pin{loc.pin_count !== 1 ? 's' : ''}
                             </span>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleToggleGhosts(loc);
+                              }}
+                              disabled={actionLoading === `ghosts-${loc.id}`}
+                              className={`text-xs font-mono ${
+                                loc.ghosts_enabled
+                                  ? 'text-accent'
+                                  : 'text-muted hover:text-[var(--fg)]'
+                              }`}
+                              title={loc.ghosts_enabled ? 'Ghosts enabled' : 'Ghosts disabled'}
+                            >
+                              {actionLoading === `ghosts-${loc.id}` ? '...' : loc.ghosts_enabled ? '👻' : '○'}
+                            </button>
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();

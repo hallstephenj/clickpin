@@ -4,8 +4,10 @@ import { useEffect, useState, useCallback } from 'react';
 import { useSession } from '@/lib/hooks/useSession';
 import { useGeolocation } from '@/lib/hooks/useGeolocation';
 import { useBoard } from '@/lib/hooks/useBoard';
+import { useFeatureFlags } from '@/lib/hooks/useFeatureFlags';
 import { LocationGate } from '@/components/LocationGate';
 import { Board } from '@/components/Board';
+import { GhostFeed } from '@/components/GhostFeed';
 import { config } from '@/lib/config';
 
 function AnimatedProgressBar({ progress }: { progress: number }) {
@@ -34,14 +36,24 @@ function LoadingScreen({ message, progress }: { message: string; progress: numbe
 
 export default function Home() {
   const { sessionId, loading: sessionLoading } = useSession();
+  const { flags, loading: flagsLoading } = useFeatureFlags();
   const { state, location: geoLocation, presenceToken, requestLocation, error: geoError } = useGeolocation(sessionId);
   const { pins, hiddenPins, boardLocation, loading: boardLoading, refreshBoard, hasFetched } = useBoard(geoLocation?.slug || null, sessionId);
+
+  // Track if user explicitly requested location (to bypass ghost feed)
+  const [userRequestedLocation, setUserRequestedLocation] = useState(false);
 
   // Use boardLocation for sponsor info (updated on refresh), fallback to geoLocation
   const location = boardLocation || geoLocation;
   const [postsRemaining, setPostsRemaining] = useState(config.rateLimit.freePostsPerLocationPerDay);
   const [progress, setProgress] = useState(0);
   const [loadingMessage, setLoadingMessage] = useState('initializing...');
+
+  // Wrapper to track user-initiated location requests
+  const handleRequestLocation = useCallback(async () => {
+    setUserRequestedLocation(true);
+    await requestLocation();
+  }, [requestLocation]);
 
   // Animated progress bar
   useEffect(() => {
@@ -75,12 +87,13 @@ export default function Home() {
     }
   }, [location, hasFetched, boardLoading]);
 
-  // Auto-request location on mount if session is ready
+  // Auto-request location on mount if session is ready AND ghosts is disabled
+  // When GHOSTS is enabled, user must explicitly request location
   useEffect(() => {
-    if (sessionId && state.status === 'idle') {
+    if (sessionId && state.status === 'idle' && !flags.GHOSTS && !flagsLoading) {
       requestLocation();
     }
-  }, [sessionId, state.status, requestLocation]);
+  }, [sessionId, state.status, requestLocation, flags.GHOSTS, flagsLoading]);
 
   // Fetch quota when location changes
   useEffect(() => {
@@ -90,10 +103,15 @@ export default function Home() {
   }, [location, sessionId]);
 
   // Show loading screen while checking location
-  const isCheckingLocation = sessionLoading || state.status === 'idle' || state.status === 'requesting';
+  const isCheckingLocation = sessionLoading || flagsLoading || state.status === 'requesting';
 
   if (isCheckingLocation) {
     return <LoadingScreen message={loadingMessage} progress={progress} />;
+  }
+
+  // If GHOSTS is enabled and user hasn't explicitly requested location, show GhostFeed
+  if (flags.GHOSTS && !userRequestedLocation && state.status === 'idle') {
+    return <GhostFeed onRequestLocation={handleRequestLocation} />;
   }
 
   // No location resolved - show location gate
@@ -102,7 +120,7 @@ export default function Home() {
       <LocationGate
         state={state}
         error={geoError}
-        onRequestLocation={requestLocation}
+        onRequestLocation={handleRequestLocation}
         sessionId={sessionId}
       />
     );
@@ -126,7 +144,7 @@ export default function Home() {
       presenceToken={presenceToken}
       sessionId={sessionId}
       onRefreshBoard={refreshBoard}
-      onRefreshLocation={requestLocation}
+      onRefreshLocation={handleRequestLocation}
       postsRemaining={postsRemaining}
     />
   );

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { config } from '@/lib/config';
+import { logGhostEvent } from '@/lib/ghostEvents';
 
 // POST /api/lightning/webhook - Handle payment confirmations from Lightning provider
 export async function POST(request: NextRequest) {
@@ -72,6 +73,17 @@ export async function applyPaymentEffects(
       })
       .eq('id', boost.pin_id);
 
+    // Get location_id for ghost event
+    const { data: pin } = await supabaseAdmin
+      .from('pins')
+      .select('location_id')
+      .eq('id', boost.pin_id)
+      .single();
+
+    if (pin?.location_id) {
+      logGhostEvent(pin.location_id, 'pin_boosted');
+    }
+
     return { success: true, type: 'boost' };
   }
 
@@ -124,6 +136,12 @@ export async function applyPaymentEffects(
       })
       .eq('id', sponsorship.id);
 
+    // Log ghost events
+    logGhostEvent(sponsorship.location_id, 'sponsor_bid_paid');
+    if (activeAt === now) {
+      logGhostEvent(sponsorship.location_id, 'sponsor_activated');
+    }
+
     return { success: true, type: 'sponsor' };
   }
 
@@ -140,6 +158,17 @@ export async function applyPaymentEffects(
       .from('pin_deletion_payments')
       .update({ status: 'paid', paid_at: now })
       .eq('id', deletion.id);
+
+    // Get location_id for ghost event
+    const { data: pin } = await supabaseAdmin
+      .from('pins')
+      .select('location_id')
+      .eq('id', deletion.pin_id)
+      .single();
+
+    if (pin?.location_id) {
+      logGhostEvent(pin.location_id, 'pin_deleted_paid');
+    }
 
     // Note: Deletion is applied when user calls DELETE /api/pin with the invoice_id
     return { success: true, type: 'delete' };

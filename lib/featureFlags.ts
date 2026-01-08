@@ -11,6 +11,7 @@ export const DEFAULT_FLAGS: FeatureFlags = {
   fancy_stacking: false,
   fancy_aging: false,
   fancy_dig_mode: false,
+  GHOSTS: false,
 };
 
 // All feature flag keys
@@ -23,6 +24,7 @@ export const FEATURE_FLAG_KEYS = [
   'fancy_stacking',
   'fancy_aging',
   'fancy_dig_mode',
+  'GHOSTS',
 ] as const;
 
 // Server-side: Fetch all flags from database

@@ -27,7 +27,7 @@ export async function PATCH(
   try {
     const { id } = await params;
     const body = await request.json();
-    const { name, radius_m } = body;
+    const { name, radius_m, ghosts_enabled } = body;
 
     // Build update object
     const updates: Record<string, unknown> = {};
@@ -71,6 +71,11 @@ export async function PATCH(
         return NextResponse.json({ error: 'Radius must be between 10 and 5000 meters' }, { status: 400 });
       }
       updates.radius_m = radius;
+    }
+
+    // Handle ghosts_enabled update
+    if (ghosts_enabled !== undefined) {
+      updates.ghosts_enabled = Boolean(ghosts_enabled);
     }
 
     // Ensure we have something to update
