@@ -183,6 +183,10 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (authenticated && currentView === 'list') {
+      // Always fetch flags so we know which features are enabled
+      if (featureFlags.length === 0) {
+        fetchFlags();
+      }
       if (activeTab === 'requests') {
         fetchRequests();
       } else if (activeTab === 'locations') {
@@ -191,7 +195,13 @@ export default function AdminPage() {
         fetchFlags();
       }
     }
-  }, [authenticated, activeTab, currentView, fetchRequests, fetchLocations, fetchFlags]);
+  }, [authenticated, activeTab, currentView, fetchRequests, fetchLocations, fetchFlags, featureFlags.length]);
+
+  // Helper to check if a feature flag is enabled
+  const isFeatureEnabled = (key: string) => {
+    const flag = featureFlags.find((f) => f.key === key);
+    return flag?.enabled ?? false;
+  };
 
   useEffect(() => {
     if (selectedLocation && currentView === 'pins') {
@@ -868,19 +878,21 @@ export default function AdminPage() {
                             <span className="text-xs text-muted font-mono">
                               {loc.radius_m}m · {loc.pin_count || 0}
                             </span>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleToggleGhosts(loc);
-                              }}
-                              disabled={actionLoading === `ghosts-${loc.id}`}
-                              className={`p-1.5 rounded hover:bg-[var(--bg-alt)] ${
-                                loc.ghosts_enabled ? 'text-accent' : 'text-muted hover:text-[var(--fg)]'
-                              }`}
-                              title={loc.ghosts_enabled ? 'Ghosts enabled - click to disable' : 'Ghosts disabled - click to enable'}
-                            >
-                              <Ghost size={16} weight={loc.ghosts_enabled ? 'fill' : 'regular'} />
-                            </button>
+                            {isFeatureEnabled('GHOSTS') && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleToggleGhosts(loc);
+                                }}
+                                disabled={actionLoading === `ghosts-${loc.id}`}
+                                className={`p-1.5 rounded hover:bg-[var(--bg-alt)] ${
+                                  loc.ghosts_enabled ? 'text-accent' : 'text-muted hover:text-[var(--fg)]'
+                                }`}
+                                title={loc.ghosts_enabled ? 'Ghosts enabled - click to disable' : 'Ghosts disabled - click to enable'}
+                              >
+                                <Ghost size={16} weight={loc.ghosts_enabled ? 'fill' : 'regular'} />
+                              </button>
+                            )}
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
