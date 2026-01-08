@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 
 const PROMPTS = [
   // Original 4
@@ -38,7 +38,8 @@ function shuffleArray<T>(array: T[]): T[] {
 
 export function PromptCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Shuffle prompts on mount
   const prompts = useMemo(() => shuffleArray(PROMPTS), []);
@@ -59,59 +60,55 @@ export function PromptCarousel() {
   useEffect(() => {
     if (prefersReducedMotion) return;
 
-    const interval = setInterval(() => {
-      setIsTransitioning(true);
+    const advance = () => {
+      setIsAnimating(true);
 
-      // After transition completes, update index
-      setTimeout(() => {
+      // Wait for fade out, then change content and fade in
+      timeoutRef.current = setTimeout(() => {
         setCurrentIndex((prev) => (prev + 1) % prompts.length);
-        setIsTransitioning(false);
-      }, 800); // Match CSS transition duration
-    }, 3000); // 3 seconds per prompt
+        setIsAnimating(false);
+      }, 1000); // Half of total transition (fade out)
+    };
 
-    return () => clearInterval(interval);
+    const interval = setInterval(advance, 4000); // Total display time
+
+    return () => {
+      clearInterval(interval);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
   }, [prompts.length, prefersReducedMotion]);
-
-  // Get visible prompts (previous, current, next)
-  const getPromptAt = (offset: number) => {
-    const index = (currentIndex + offset + prompts.length) % prompts.length;
-    return prompts[index];
-  };
 
   // For reduced motion, just show center prompt
   if (prefersReducedMotion) {
     return (
       <div className="prompt-carousel" aria-hidden="true">
-        <div className="prompt-carousel-inner">
-          <div className="prompt-item prompt-center">
-            {prompts[currentIndex]}
-          </div>
+        <div className="prompt-static">
+          {prompts[currentIndex]}
         </div>
       </div>
     );
   }
 
+  const getPrompt = (offset: number) => {
+    const index = (currentIndex + offset + prompts.length) % prompts.length;
+    return prompts[index];
+  };
+
   return (
     <div className="prompt-carousel" aria-hidden="true">
-      <div className={`prompt-carousel-inner ${isTransitioning ? 'transitioning' : ''}`}>
-        {/* Previous prompt (above, fading out when transitioning) */}
-        <div className="prompt-item prompt-top">
-          {getPromptAt(-1)}
-        </div>
+      {/* Ambient glow behind */}
+      <div className="prompt-glow" />
 
-        {/* Current prompt (center) */}
-        <div className="prompt-item prompt-center">
-          {getPromptAt(0)}
+      {/* The rotating prompts */}
+      <div className="prompt-track">
+        <div className={`prompt-slide prompt-prev ${isAnimating ? 'slide-up' : ''}`}>
+          {getPrompt(-1)}
         </div>
-
-        {/* Next prompt (below) */}
-        <div className="prompt-item prompt-bottom">
-          {getPromptAt(1)}
+        <div className={`prompt-slide prompt-current ${isAnimating ? 'fade-out' : 'fade-in'}`}>
+          {getPrompt(0)}
         </div>
-
-        {/* Incoming prompt (hidden below, slides up during transition) */}
-        <div className="prompt-item prompt-incoming">
-          {getPromptAt(2)}
+        <div className={`prompt-slide prompt-next ${isAnimating ? 'slide-up' : ''}`}>
+          {getPrompt(1)}
         </div>
       </div>
     </div>
