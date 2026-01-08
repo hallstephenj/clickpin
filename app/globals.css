@@ -917,6 +917,21 @@ textarea {
   letter-spacing: -0.015em;
 }
 
+/* Badge - small, low-contrast label at start of text */
+.paperweight-badge {
+  display: inline;
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #8a7a60;
+  background: rgba(100, 80, 50, 0.08);
+  padding: 1px 5px;
+  margin-right: 6px;
+  border-radius: 2px;
+  vertical-align: baseline;
+}
+
 /* Short posts feel compact */
 .paperweight-pin.pw-short .paperweight-body {
   max-width: 34ch;

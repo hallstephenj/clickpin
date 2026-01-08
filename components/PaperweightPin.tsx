@@ -142,8 +142,11 @@ export function PaperweightPin({
           </div>
         )}
 
-        {/* Body */}
-        <p className="paperweight-body">{pin.body}</p>
+        {/* Body - with optional badge at start */}
+        <p className="paperweight-body">
+          {pin.badge && <span className="paperweight-badge">{pin.badge}</span>}
+          {pin.body}
+        </p>
 
         {/* Metadata - actions left, timestamp right */}
         <div className="paperweight-meta">

@@ -14,6 +14,7 @@ export async function POST(request: NextRequest) {
       doodle_data,
       presence_token,
       payment_invoice_id,
+      badge,
       // Fancy board fields (optional)
       x,
       y,
@@ -131,6 +132,7 @@ export async function POST(request: NextRequest) {
         device_session_id,
         body: pinBody.trim(),
         doodle_data: doodle_data || null,
+        badge: badge || null,
         // Fancy board fields (all nullable)
         x: x ?? null,
         y: y ?? null,

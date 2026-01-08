@@ -30,6 +30,7 @@ export interface Pin {
   device_session_id: string;
   body: string;
   doodle_data: string | null;
+  badge: string | null;
   created_at: string;
   deleted_at: string | null;
   is_hidden: boolean;
@@ -177,7 +178,21 @@ export interface FeatureFlags {
   fancy_aging: boolean;
   fancy_dig_mode: boolean;
   GHOSTS: boolean;
+  BADGES: boolean;
 }
+
+// Badge types
+export const BADGE_OPTIONS = [
+  'Question',
+  'Announcement',
+  'Offer',
+  'Request',
+  'Lost',
+  'Found',
+  'Event',
+] as const;
+
+export type BadgeType = typeof BADGE_OPTIONS[number];
 
 // Fancy Board Types
 export type PinTemplate = 'index' | 'sticky' | 'torn' | 'receipt';

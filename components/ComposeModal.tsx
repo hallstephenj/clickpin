@@ -2,13 +2,15 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { config } from '@/lib/config';
+import { BADGE_OPTIONS, BadgeType } from '@/types';
 
 interface ComposeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (body: string, doodleData: string | null) => Promise<void>;
+  onSubmit: (body: string, doodleData: string | null, badge: string | null) => Promise<void>;
   replyToId?: string | null;
   postsRemaining?: number;
+  badgesEnabled?: boolean;
 }
 
 export function ComposeModal({
@@ -17,6 +19,7 @@ export function ComposeModal({
   onSubmit,
   replyToId,
   postsRemaining,
+  badgesEnabled = false,
 }: ComposeModalProps) {
   const [body, setBody] = useState('');
   const [doodleData, setDoodleData] = useState<string | null>(null);
@@ -24,6 +27,7 @@ export function ComposeModal({
   const [isDrawing, setIsDrawing] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedBadge, setSelectedBadge] = useState<BadgeType | ''>('');
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const contextRef = useRef<CanvasRenderingContext2D | null>(null);
@@ -57,6 +61,7 @@ export function ComposeModal({
       setDoodleData(null);
       setShowDoodle(false);
       setError(null);
+      setSelectedBadge('');
     }
   }, [isOpen]);
 
@@ -132,7 +137,8 @@ export function ComposeModal({
 
     try {
       const finalDoodle = showDoodle ? canvasRef.current?.toDataURL('image/png', 0.8) || null : null;
-      await onSubmit(body.trim(), finalDoodle);
+      const finalBadge = selectedBadge || null;
+      await onSubmit(body.trim(), finalDoodle, finalBadge);
       onClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'failed to post');
@@ -181,6 +187,27 @@ export function ComposeModal({
               </span>
             )}
           </div>
+
+          {/* Badge dropdown - only for new posts, not replies */}
+          {!isReply && badgesEnabled && (
+            <div className="mt-4">
+              <label className="block text-xs text-muted font-mono mb-1">
+                add label (optional)
+              </label>
+              <select
+                value={selectedBadge}
+                onChange={(e) => setSelectedBadge(e.target.value as BadgeType | '')}
+                className="w-full p-2 bg-[var(--bg-alt)] border border-[var(--border)] font-mono text-sm text-[var(--fg)]"
+              >
+                <option value="">none</option>
+                {BADGE_OPTIONS.map((badge) => (
+                  <option key={badge} value={badge}>
+                    {badge}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {/* Doodle section */}
           {!isReply && (

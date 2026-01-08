@@ -71,7 +71,7 @@ export function Board({
     setComposeOpen(true);
   };
 
-  const handlePost = async (body: string, doodleData: string | null) => {
+  const handlePost = async (body: string, doodleData: string | null, badge: string | null) => {
     if (!presenceToken) {
       throw new Error('Location not verified. Please refresh your location.');
     }
@@ -85,6 +85,7 @@ export function Board({
       body: JSON.stringify({
         body,
         doodle_data: doodleData,
+        badge: isReply ? null : badge, // Never send badge for replies
         presence_token: presenceToken,
         parent_pin_id: replyToId,
       }),
@@ -446,6 +447,7 @@ export function Board({
         onSubmit={handlePost}
         replyToId={replyToId}
         postsRemaining={localPostsRemaining}
+        badgesEnabled={flags.BADGES}
       />
 
       <PaymentModal
