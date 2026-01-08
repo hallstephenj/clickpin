@@ -290,7 +290,7 @@ export function Board({
   }
 
   return (
-    <div className="min-h-screen bg-[#fafafa] dark:bg-[#0a0a0a] pb-16">
+    <div className="min-h-screen bg-[#fafafa] dark:bg-[#0a0a0a]">
       {/* Header */}
       <header className="border-b border-[var(--border)] bg-[#fafafa] dark:bg-[#0a0a0a]">
         <div className="max-w-2xl mx-auto px-4 py-4">
@@ -471,14 +471,12 @@ export function Board({
       </main>
 
       {/* Footer */}
-      <footer className="fixed bottom-0 left-0 right-0 border-t border-[var(--border)] bg-[#fafafa] dark:bg-[#0a0a0a]">
-        <div className="max-w-2xl mx-auto px-4 py-3 flex justify-center gap-6 text-xs text-faint">
-          <a href={flags.PROXHOME_ADVANCED ? '/?view=nearby' : '/map'} className="hover:text-[var(--fg-muted)] transition-colors">nearby</a>
-          <a href="/map" className="hover:text-[var(--fg-muted)] transition-colors">map</a>
-          <a href="/about" className="hover:text-[var(--fg-muted)] transition-colors">about</a>
-          <a href="/terms" className="hover:text-[var(--fg-muted)] transition-colors">terms</a>
-          <a href="/privacy" className="hover:text-[var(--fg-muted)] transition-colors">privacy</a>
-        </div>
+      <footer className="mt-8 pb-6 flex justify-center gap-6 text-xs text-faint">
+        <a href={flags.PROXHOME_ADVANCED ? '/?view=nearby' : '/map'} className="hover:text-[var(--fg-muted)] transition-colors">nearby</a>
+        <a href="/map" className="hover:text-[var(--fg-muted)] transition-colors">map</a>
+        <a href="/about" className="hover:text-[var(--fg-muted)] transition-colors">about</a>
+        <a href="/terms" className="hover:text-[var(--fg-muted)] transition-colors">terms</a>
+        <a href="/privacy" className="hover:text-[var(--fg-muted)] transition-colors">privacy</a>
       </footer>
 
       {/* Modals */}
