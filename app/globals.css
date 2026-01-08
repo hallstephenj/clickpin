@@ -810,3 +810,323 @@ textarea {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* =====================================================
+   PAPERWEIGHT PIN STYLES
+   Physical paper-like pins that feel like objects
+   ===================================================== */
+
+/* Container for paperweight pins - looser layout */
+.paperweight-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 0; /* Staggered gaps applied per-pin */
+}
+
+/* Base pin styling */
+.paperweight-pin {
+  position: relative;
+  background: #fdfcfa;
+  padding: 14px 16px 10px 16px; /* Irregular: more top than bottom */
+  max-width: 560px;
+  box-shadow:
+    0 1px 2px rgba(139, 90, 43, 0.08),
+    0 0 0 1px rgba(139, 90, 43, 0.03);
+  transition:
+    transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.2s ease;
+  margin-bottom: 6px;
+}
+
+/* Staggered spacing - vary margins slightly */
+.paperweight-pin:nth-child(3n) {
+  margin-bottom: 10px;
+}
+
+.paperweight-pin:nth-child(5n) {
+  margin-bottom: 14px;
+  max-width: 520px;
+}
+
+.paperweight-pin:nth-child(7n) {
+  max-width: 580px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .paperweight-pin {
+    background: #18170f;
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.2),
+      0 0 0 1px rgba(255, 255, 255, 0.03);
+  }
+}
+
+/* Subtle paper texture overlay */
+.paperweight-pin::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+}
+
+/* Hover: subtle lift and tilt */
+.paperweight-pin:hover {
+  transform: translateY(-1px) rotate(0.3deg);
+  box-shadow:
+    0 2px 4px rgba(139, 90, 43, 0.1),
+    0 0 0 1px rgba(139, 90, 43, 0.04);
+}
+
+@media (prefers-color-scheme: dark) {
+  .paperweight-pin:hover {
+    box-shadow:
+      0 2px 4px rgba(0, 0, 0, 0.25),
+      0 0 0 1px rgba(255, 255, 255, 0.04);
+  }
+}
+
+/* Pin body text - imperfect typography */
+.paperweight-body {
+  font-size: 14px;
+  line-height: 1.65;
+  letter-spacing: -0.01em;
+  color: var(--fg);
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  max-width: 42ch; /* Wrap earlier for compact feel */
+}
+
+/* Doodle in paperweight style */
+.paperweight-doodle {
+  margin-bottom: 10px;
+}
+
+.paperweight-doodle img {
+  max-width: 180px;
+  max-height: 140px;
+  object-fit: contain;
+  border: 1px solid rgba(139, 90, 43, 0.1);
+  box-shadow: 0 1px 2px rgba(139, 90, 43, 0.06);
+}
+
+@media (prefers-color-scheme: dark) {
+  .paperweight-doodle img {
+    border-color: rgba(255, 255, 255, 0.06);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  }
+}
+
+/* Metadata - pencil scribble at bottom right */
+.paperweight-meta {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  font-size: 11px;
+  font-weight: 300;
+  color: var(--fg-faint);
+  opacity: 0.7;
+}
+
+.paperweight-time {
+  font-family: "SF Mono", monospace;
+  font-size: 10px;
+}
+
+.paperweight-mine {
+  color: var(--accent);
+  opacity: 0.8;
+}
+
+/* Actions - fade in on hover, near cursor feel */
+.paperweight-actions {
+  display: flex;
+  gap: 10px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.paperweight-pin:hover .paperweight-actions {
+  opacity: 1;
+}
+
+.paperweight-actions button {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 10px;
+  font-weight: 300;
+  color: var(--fg-faint);
+  cursor: pointer;
+  transition: color 0.1s;
+}
+
+.paperweight-actions button:hover {
+  color: var(--fg-muted);
+}
+
+.paperweight-actions .action-flag:hover {
+  color: var(--danger);
+}
+
+.paperweight-actions .action-delete:hover {
+  color: var(--danger);
+}
+
+.paperweight-actions .action-boost:hover {
+  color: var(--accent);
+}
+
+/* =====================================================
+   PAPERWEIGHT AGING EFFECTS
+   Fresh pins are brighter/flatter, older ones age
+   ===================================================== */
+
+/* Fresh: < 5 minutes - crisp and bright */
+.paperweight-age-fresh {
+  background: #fefdfb;
+}
+
+@media (prefers-color-scheme: dark) {
+  .paperweight-age-fresh {
+    background: #1a1912;
+  }
+}
+
+/* Recent: 5-30 minutes - settling in */
+.paperweight-age-recent {
+  background: #fdfcf9;
+}
+
+@media (prefers-color-scheme: dark) {
+  .paperweight-age-recent {
+    background: #181710;
+  }
+}
+
+/* Aged: 30 min - 2 hours - comfortable */
+.paperweight-age-aged {
+  background: #fbfaf6;
+  filter: contrast(0.98);
+}
+
+.paperweight-age-aged::before {
+  opacity: 0.035;
+}
+
+@media (prefers-color-scheme: dark) {
+  .paperweight-age-aged {
+    background: #16150e;
+  }
+}
+
+/* Vintage: > 2 hours - weathered */
+.paperweight-age-vintage {
+  background: #f9f8f3;
+  filter: contrast(0.96) saturate(0.95);
+}
+
+.paperweight-age-vintage::before {
+  opacity: 0.045;
+}
+
+@media (prefers-color-scheme: dark) {
+  .paperweight-age-vintage {
+    background: #14130c;
+  }
+}
+
+/* =====================================================
+   PAPERWEIGHT BOOSTED STATE
+   Re-pinned look - tighter, more prominent
+   ===================================================== */
+
+.paperweight-boosted {
+  box-shadow:
+    0 1px 3px rgba(247, 147, 26, 0.12),
+    0 0 0 1px rgba(247, 147, 26, 0.15);
+  transform: scale(1.005);
+}
+
+.paperweight-boosted::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 6px;
+  height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.paperweight-boosted:hover {
+  transform: translateY(-1px) rotate(0.3deg) scale(1.005);
+  box-shadow:
+    0 2px 6px rgba(247, 147, 26, 0.15),
+    0 0 0 1px rgba(247, 147, 26, 0.2);
+}
+
+/* Boost indicator tag */
+.paperweight-boost-tag {
+  position: absolute;
+  top: -2px;
+  right: 8px;
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--accent);
+  opacity: 0.8;
+}
+
+/* =====================================================
+   PAPERWEIGHT REPLIES
+   ===================================================== */
+
+.paperweight-replies {
+  margin-top: 8px;
+  margin-left: 12px;
+  padding-left: 10px;
+  border-left: 1px solid rgba(139, 90, 43, 0.08);
+}
+
+@media (prefers-color-scheme: dark) {
+  .paperweight-replies {
+    border-left-color: rgba(255, 255, 255, 0.06);
+  }
+}
+
+.paperweight-replies-toggle {
+  font-size: 10px;
+  font-weight: 300;
+  color: var(--fg-faint);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  margin-bottom: 6px;
+}
+
+.paperweight-replies-toggle:hover {
+  color: var(--fg-muted);
+}
+
+.paperweight-reply {
+  padding: 8px 12px 6px 12px;
+  margin-bottom: 4px;
+  background: rgba(139, 90, 43, 0.02);
+  max-width: 480px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .paperweight-reply {
+    background: rgba(255, 255, 255, 0.02);
+  }
+}
+
+.paperweight-reply .paperweight-body {
+  font-size: 13px;
+  max-width: 38ch;
+}

@@ -177,6 +177,7 @@ export interface FeatureFlags {
   fancy_aging: boolean;
   fancy_dig_mode: boolean;
   GHOSTS: boolean;
+  PAPERWEIGHT: boolean;
 }
 
 // Fancy Board Types
