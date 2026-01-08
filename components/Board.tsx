@@ -391,7 +391,7 @@ export function Board({
                   />
                 ))}
               </div>
-            )}}
+            )}
 
             {/* Hidden posts collapsible section */}
             {hiddenPins.length > 0 && (
