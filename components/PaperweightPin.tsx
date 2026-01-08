@@ -94,10 +94,8 @@ export function PaperweightPin({
         {/* Body */}
         <p className="paperweight-body">{pin.body}</p>
 
-        {/* Metadata */}
+        {/* Metadata - actions left, timestamp right */}
         <div className="paperweight-meta">
-          <span className="paperweight-time">{fuzzyTime}</span>
-          {pin.is_mine && <span className="paperweight-mine">you</span>}
           <div className="paperweight-actions">
             {!pin.is_mine && (
               <button
@@ -113,6 +111,10 @@ export function PaperweightPin({
                 delete
               </button>
             )}
+          </div>
+          <div className="paperweight-time-group">
+            {pin.is_mine && <span className="paperweight-mine">you</span>}
+            <span className="paperweight-time">{fuzzyTime}</span>
           </div>
         </div>
       </div>
@@ -143,10 +145,8 @@ export function PaperweightPin({
         {/* Body */}
         <p className="paperweight-body">{pin.body}</p>
 
-        {/* Metadata - scribbled at bottom */}
+        {/* Metadata - actions left, timestamp right */}
         <div className="paperweight-meta">
-          <span className="paperweight-time">{fuzzyTime}</span>
-          {pin.is_mine && <span className="paperweight-mine">you</span>}
           <div className="paperweight-actions">
             <button onClick={() => onReply(pin.id)}>reply</button>
             {!pin.is_mine && (
@@ -166,6 +166,10 @@ export function PaperweightPin({
                 delete
               </button>
             )}
+          </div>
+          <div className="paperweight-time-group">
+            {pin.is_mine && <span className="paperweight-mine">you</span>}
+            <span className="paperweight-time">{fuzzyTime}</span>
           </div>
         </div>
       </div>

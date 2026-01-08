@@ -931,32 +931,21 @@ textarea {
 }
 
 /* =====================================================
-   DOODLES - Fixed layouts, not freeform
+   DOODLES - 4chan style: float left, text wraps
    ===================================================== */
 
-/* Layout 1: Above text (default) */
 .paperweight-doodle {
-  margin-bottom: 8px;
+  float: left;
+  margin-right: 12px;
+  margin-bottom: 6px;
 }
 
 .paperweight-doodle img {
-  max-width: 140px;
-  max-height: 100px;
+  max-width: 120px;
+  max-height: 120px;
   object-fit: contain;
   opacity: 0.9;
   filter: saturate(0.95);
-}
-
-/* Layout 2: Inline left - for short posts */
-.paperweight-pin.pw-short .paperweight-doodle {
-  float: left;
-  margin-right: 10px;
-  margin-bottom: 4px;
-}
-
-.paperweight-pin.pw-short .paperweight-doodle img {
-  max-width: 80px;
-  max-height: 60px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -966,8 +955,15 @@ textarea {
   }
 }
 
+/* Clear float after pin content */
+.paperweight-pin::after {
+  content: '';
+  display: table;
+  clear: both;
+}
+
 /* =====================================================
-   METADATA - Lives ON the pin, bottom-right corner
+   METADATA - All bottom-right: actions then timestamp
    ===================================================== */
 
 .paperweight-meta {
@@ -989,6 +985,12 @@ textarea {
     color: #5a5040;
     opacity: 0.5;
   }
+}
+
+.paperweight-time-group {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
 }
 
 .paperweight-time {
@@ -1131,6 +1133,7 @@ textarea {
 .paperweight-replies-container {
   margin-top: 4px;
   margin-left: 20px;
+  margin-bottom: 16px;
   padding-left: 12px;
   border-left: 1px solid rgba(100, 80, 50, 0.08);
 }
