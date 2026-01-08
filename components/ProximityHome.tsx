@@ -112,7 +112,7 @@ export function ProximityHome({ state, onRequestLocation, sessionId }: Proximity
               <div className="text-muted text-sm">
                 but there {boardsCount === 1 ? 'is' : 'are'}{' '}
                 <span className="text-accent font-semibold">{boardsCount} board{boardsCount !== 1 ? 's' : ''}</span>{' '}
-                {stats?.expanded_search ? 'within 10km' : 'within reach'}
+                nearby
               </div>
             ) : (
               <div className="text-muted text-sm">
@@ -148,10 +148,10 @@ export function ProximityHome({ state, onRequestLocation, sessionId }: Proximity
                   key={board.id}
                   className="p-3 bg-[var(--bg-alt)] border border-[var(--border)] rounded"
                 >
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
-                      <div className="font-medium text-sm text-[var(--fg)] truncate flex items-center gap-1.5">
-                        <span>{board.name}</span>
+                      <div className="font-medium text-sm text-[var(--fg)] flex flex-wrap items-center gap-1.5">
+                        <span className="break-words">{board.name}</span>
                         {(board.btcmap_id || board.is_bitcoin_merchant) && (
                           <span className="text-[#f7931a] text-xs" title="Accepts Bitcoin">⚡</span>
                         )}
