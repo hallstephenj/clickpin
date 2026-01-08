@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Lightning } from '@phosphor-icons/react';
+import { Lightning, Ghost, PencilSimple, Storefront, Broom, Trash } from '@phosphor-icons/react';
 
 interface LocationRequest {
   id: string;
@@ -864,12 +864,9 @@ export default function AdminPage() {
                               {loc.btcmap_id && <span className="text-faint"> · btcmap #{loc.btcmap_id}</span>}
                             </div>
                           </div>
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-2">
                             <span className="text-xs text-muted font-mono">
-                              {loc.radius_m}m
-                            </span>
-                            <span className="text-xs text-muted font-mono">
-                              {loc.pin_count || 0} pin{loc.pin_count !== 1 ? 's' : ''}
+                              {loc.radius_m}m · {loc.pin_count || 0}
                             </span>
                             <button
                               onClick={(e) => {
@@ -877,32 +874,32 @@ export default function AdminPage() {
                                 handleToggleGhosts(loc);
                               }}
                               disabled={actionLoading === `ghosts-${loc.id}`}
-                              className={`text-xs font-mono ${
-                                loc.ghosts_enabled
-                                  ? 'text-accent'
-                                  : 'text-muted hover:text-[var(--fg)]'
+                              className={`p-1.5 rounded hover:bg-[var(--bg-alt)] ${
+                                loc.ghosts_enabled ? 'text-accent' : 'text-muted hover:text-[var(--fg)]'
                               }`}
-                              title={loc.ghosts_enabled ? 'Ghosts enabled' : 'Ghosts disabled'}
+                              title={loc.ghosts_enabled ? 'Ghosts enabled - click to disable' : 'Ghosts disabled - click to enable'}
                             >
-                              {actionLoading === `ghosts-${loc.id}` ? '...' : loc.ghosts_enabled ? '👻' : '○'}
+                              <Ghost size={16} weight={loc.ghosts_enabled ? 'fill' : 'regular'} />
                             </button>
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleStartEdit(loc);
                               }}
-                              className="text-xs text-muted hover:text-[var(--fg)] font-mono"
+                              className="p-1.5 rounded text-muted hover:text-[var(--fg)] hover:bg-[var(--bg-alt)]"
+                              title="Edit location"
                             >
-                              edit
+                              <PencilSimple size={16} />
                             </button>
                             {/* Merchant actions dropdown */}
                             {(loc.is_claimed || loc.is_bitcoin_merchant) && (
                               <div className="relative group">
                                 <button
                                   onClick={(e) => e.stopPropagation()}
-                                  className="text-xs text-muted hover:text-[var(--fg)] font-mono"
+                                  className="p-1.5 rounded text-muted hover:text-[var(--fg)] hover:bg-[var(--bg-alt)]"
+                                  title="Merchant actions"
                                 >
-                                  merchant ▾
+                                  <Storefront size={16} />
                                 </button>
                                 <div className="absolute right-0 top-full mt-1 bg-[var(--bg)] border border-[var(--border)] shadow-lg z-10 hidden group-hover:block min-w-[140px]">
                                   {loc.is_claimed && (
@@ -946,9 +943,10 @@ export default function AdminPage() {
                                 handleClearPins(loc);
                               }}
                               disabled={actionLoading === `clear-${loc.id}` || (loc.pin_count || 0) === 0}
-                              className="text-xs text-danger hover:underline font-mono disabled:opacity-50"
+                              className="p-1.5 rounded text-muted hover:text-danger hover:bg-[var(--bg-alt)] disabled:opacity-30 disabled:hover:text-muted disabled:hover:bg-transparent"
+                              title="Clear all posts"
                             >
-                              {actionLoading === `clear-${loc.id}` ? '...' : 'clear posts'}
+                              <Broom size={16} />
                             </button>
                             <button
                               onClick={(e) => {
@@ -956,9 +954,10 @@ export default function AdminPage() {
                                 handleDeleteLocation(loc);
                               }}
                               disabled={actionLoading === loc.id}
-                              className="text-xs text-danger hover:underline font-mono"
+                              className="p-1.5 rounded text-muted hover:text-danger hover:bg-[var(--bg-alt)]"
+                              title="Delete location"
                             >
-                              {actionLoading === loc.id ? '...' : 'delete'}
+                              <Trash size={16} />
                             </button>
                           </div>
                         </div>
