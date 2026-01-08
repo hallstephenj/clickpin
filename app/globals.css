@@ -953,6 +953,13 @@ textarea {
   opacity: 1;
 }
 
+/* On touch devices (no hover), always show actions */
+@media (hover: none) {
+  .paperweight-actions {
+    opacity: 0.6;
+  }
+}
+
 .paperweight-actions button {
   background: none;
   border: none;
