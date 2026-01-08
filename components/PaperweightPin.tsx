@@ -2,7 +2,6 @@
 
 import { useState, useMemo } from 'react';
 import { Pin } from '@/types';
-import { formatDistanceToNow } from 'date-fns';
 import { config } from '@/lib/config';
 
 interface PaperweightPinProps {
@@ -27,6 +26,33 @@ function getAgeClass(createdAt: string): AgeClass {
   return 'vintage';
 }
 
+// Fuzzy, human timestamps - "remembered, not measured"
+function getFuzzyTime(createdAt: string): string {
+  const ageMs = Date.now() - new Date(createdAt).getTime();
+  const minutes = ageMs / (1000 * 60);
+  const hours = minutes / 60;
+
+  if (minutes < 2) return 'just now';
+  if (minutes < 5) return 'moments ago';
+  if (minutes < 15) return 'a few minutes';
+  if (minutes < 45) return 'half an hour or so';
+  if (minutes < 90) return 'about an hour';
+  if (hours < 3) return 'a couple hours';
+  if (hours < 6) return 'a few hours';
+  if (hours < 12) return 'earlier today';
+  if (hours < 24) return 'today';
+  if (hours < 48) return 'yesterday';
+  return 'a while back';
+}
+
+// Size class based on content length
+function getSizeClass(body: string): string {
+  const length = body.length;
+  if (length < 60) return 'pw-short';
+  if (length > 200) return 'pw-long';
+  return '';
+}
+
 export function PaperweightPin({
   pin,
   presenceToken,
@@ -39,9 +65,10 @@ export function PaperweightPin({
   const [showReplies, setShowReplies] = useState(true);
   const [flagging, setFlagging] = useState(false);
 
-  const timeAgo = formatDistanceToNow(new Date(pin.created_at), { addSuffix: false });
+  const fuzzyTime = useMemo(() => getFuzzyTime(pin.created_at), [pin.created_at]);
   const isBoosted = pin.boost_score > 0 && pin.boost_expires_at && new Date(pin.boost_expires_at) > new Date();
   const ageClass = useMemo(() => getAgeClass(pin.created_at), [pin.created_at]);
+  const sizeClass = useMemo(() => getSizeClass(pin.body), [pin.body]);
 
   const pinAge = Date.now() - new Date(pin.created_at).getTime();
   const canFreeDelete = pin.is_mine && pinAge < config.payment.freeDeleteWindowMs;
@@ -53,47 +80,75 @@ export function PaperweightPin({
     setFlagging(false);
   };
 
-  const baseClasses = isReply ? 'paperweight-reply' : 'paperweight-pin';
-  const ageClasses = !isReply ? `paperweight-age-${ageClass}` : '';
-  const boostedClasses = isBoosted && !isReply ? 'paperweight-boosted' : '';
-
-  return (
-    <div className={isReply ? 'paperweight-replies' : ''}>
-      <div className={`${baseClasses} ${ageClasses} ${boostedClasses}`}>
-        {/* Boost indicator */}
-        {isBoosted && !isReply && (
-          <span className="paperweight-boost-tag">boosted</span>
-        )}
-
+  // Reply rendering
+  if (isReply) {
+    return (
+      <div className="paperweight-reply">
         {/* Doodle */}
         {pin.doodle_data && (
           <div className="paperweight-doodle">
-            <img
-              src={pin.doodle_data}
-              alt="doodle"
-            />
+            <img src={pin.doodle_data} alt="" />
           </div>
         )}
 
         {/* Body */}
         <p className="paperweight-body">{pin.body}</p>
 
-        {/* Metadata row - pencil scribble style */}
+        {/* Metadata */}
         <div className="paperweight-meta">
-          <span className="paperweight-time">{timeAgo}</span>
-
-          {pin.is_mine && (
-            <span className="paperweight-mine">you</span>
-          )}
-
-          {/* Actions - fade in on hover */}
+          <span className="paperweight-time">{fuzzyTime}</span>
+          {pin.is_mine && <span className="paperweight-mine">you</span>}
           <div className="paperweight-actions">
-            {!isReply && (
-              <button onClick={() => onReply(pin.id)}>
-                reply
+            {!pin.is_mine && (
+              <button
+                onClick={handleFlag}
+                disabled={flagging}
+                className="action-flag"
+              >
+                flag
               </button>
             )}
+            {pin.is_mine && (
+              <button onClick={() => onDelete(pin.id)} className="action-delete">
+                delete
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
+  // Main pin rendering
+  const pinClasses = [
+    'paperweight-pin',
+    `paperweight-age-${ageClass}`,
+    sizeClass,
+    isBoosted ? 'paperweight-boosted' : '',
+  ].filter(Boolean).join(' ');
+
+  return (
+    <div>
+      <div className={pinClasses}>
+        {/* Pushpin for boosted */}
+        {isBoosted && <div className="paperweight-pushpin" />}
+
+        {/* Doodle - bleeds to edge, overlaps text */}
+        {pin.doodle_data && (
+          <div className="paperweight-doodle">
+            <img src={pin.doodle_data} alt="" />
+          </div>
+        )}
+
+        {/* Body */}
+        <p className="paperweight-body">{pin.body}</p>
+
+        {/* Metadata - scribbled at bottom */}
+        <div className="paperweight-meta">
+          <span className="paperweight-time">{fuzzyTime}</span>
+          {pin.is_mine && <span className="paperweight-mine">you</span>}
+          <div className="paperweight-actions">
+            <button onClick={() => onReply(pin.id)}>reply</button>
             {!pin.is_mine && (
               <button
                 onClick={handleFlag}
@@ -103,36 +158,26 @@ export function PaperweightPin({
                 flag{pin.flag_count ? ` ${pin.flag_count}` : ''}
               </button>
             )}
-
-            {!isReply && (
-              <button
-                onClick={() => onBoost(pin.id)}
-                className="action-boost"
-              >
-                boost
-              </button>
-            )}
-
+            <button onClick={() => onBoost(pin.id)} className="action-boost">
+              boost
+            </button>
             {pin.is_mine && (
-              <button
-                onClick={() => onDelete(pin.id)}
-                className="action-delete"
-              >
-                {canFreeDelete ? 'delete' : 'delete'}
+              <button onClick={() => onDelete(pin.id)} className="action-delete">
+                delete
               </button>
             )}
           </div>
         </div>
       </div>
 
-      {/* Replies */}
-      {!isReply && pin.replies && pin.replies.length > 0 && (
-        <div className="paperweight-replies">
+      {/* Replies - attached scraps */}
+      {pin.replies && pin.replies.length > 0 && (
+        <div className="paperweight-replies-container">
           <button
             onClick={() => setShowReplies(!showReplies)}
             className="paperweight-replies-toggle"
           >
-            {showReplies ? '−' : '+'} {pin.replies.length} {pin.replies.length === 1 ? 'reply' : 'replies'}
+            {showReplies ? '−' : '+'} {pin.replies.length} {pin.replies.length === 1 ? 'scrap' : 'scraps'}
           </button>
 
           {showReplies && (
