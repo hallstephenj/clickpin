@@ -9,6 +9,7 @@ interface LocationRequest {
   suggested_name: string;
   status: string;
   created_at: string;
+  is_bitcoin_merchant: boolean;
 }
 
 interface GroupedRequest {
@@ -931,7 +932,12 @@ export default function AdminPage() {
                         <div className="space-y-2">
                           {group.requests.map((req) => (
                             <div key={req.id} className="text-sm font-mono flex justify-between">
-                              <span>"{req.suggested_name}"</span>
+                              <span>
+                                "{req.suggested_name}"
+                                {req.is_bitcoin_merchant && (
+                                  <span className="text-[#f7931a] ml-1" title="Bitcoin merchant">⚡</span>
+                                )}
+                              </span>
                               <span className="text-faint text-xs">
                                 {new Date(req.created_at).toLocaleDateString()}
                               </span>

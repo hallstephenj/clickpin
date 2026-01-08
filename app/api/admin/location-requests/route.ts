@@ -26,6 +26,7 @@ interface LocationRequest {
   suggested_name: string;
   status: string;
   created_at: string;
+  is_bitcoin_merchant: boolean;
 }
 
 interface GroupedRequest {
@@ -46,7 +47,7 @@ export async function GET(request: NextRequest) {
     // Fetch pending requests
     const { data: requests, error } = await supabaseAdmin
       .from('location_requests')
-      .select('id, lat, lng, suggested_name, status, created_at')
+      .select('id, lat, lng, suggested_name, status, created_at, is_bitcoin_merchant')
       .eq('status', 'pending')
       .order('created_at', { ascending: false });
 

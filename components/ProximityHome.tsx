@@ -30,6 +30,8 @@ interface NearbyBoard {
   lat: number;
   lng: number;
   radius_m: number;
+  btcmap_id?: number | null;
+  is_bitcoin_merchant?: boolean;
 }
 
 interface ProximityStats {
@@ -129,6 +131,8 @@ export function ProximityHome({ state, onRequestLocation, sessionId }: Proximity
                   lat: b.lat,
                   lng: b.lng,
                   radius_m: b.radius_m,
+                  btcmap_id: b.btcmap_id,
+                  is_bitcoin_merchant: b.is_bitcoin_merchant,
                 }))}
               />
             </div>
@@ -144,8 +148,11 @@ export function ProximityHome({ state, onRequestLocation, sessionId }: Proximity
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0">
-                      <div className="font-medium text-sm text-[var(--fg)] truncate">
-                        {board.name}
+                      <div className="font-medium text-sm text-[var(--fg)] truncate flex items-center gap-2">
+                        <span>{board.name}</span>
+                        {(board.btcmap_id || board.is_bitcoin_merchant) && (
+                          <span className="text-xs text-[#f7931a] font-mono">⚡ accepts bitcoin</span>
+                        )}
                       </div>
                       <div className="text-xs text-muted font-mono">
                         {formatDistance(board.distance_m)} away

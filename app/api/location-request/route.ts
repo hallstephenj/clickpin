@@ -5,7 +5,7 @@ import { supabaseAdmin } from '@/lib/supabase';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { lat, lng, suggested_name, session_id } = body;
+    const { lat, lng, suggested_name, session_id, is_bitcoin_merchant } = body;
 
     // Validate inputs
     if (typeof lat !== 'number' || typeof lng !== 'number') {
@@ -47,6 +47,7 @@ export async function POST(request: NextRequest) {
         suggested_name: suggested_name.trim(),
         device_session_id: session_id || null,
         status: 'pending',
+        is_bitcoin_merchant: is_bitcoin_merchant || false,
       })
       .select()
       .single();

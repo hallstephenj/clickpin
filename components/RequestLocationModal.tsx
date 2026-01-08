@@ -18,6 +18,7 @@ export function RequestLocationModal({
   sessionId,
 }: RequestLocationModalProps) {
   const [name, setName] = useState('');
+  const [isBitcoinMerchant, setIsBitcoinMerchant] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -51,6 +52,7 @@ export function RequestLocationModal({
           lng,
           suggested_name: name.trim(),
           session_id: sessionId,
+          is_bitcoin_merchant: isBitcoinMerchant,
         }),
       });
 
@@ -70,6 +72,7 @@ export function RequestLocationModal({
 
   const handleClose = () => {
     setName('');
+    setIsBitcoinMerchant(false);
     setSubmitted(false);
     setError(null);
     onClose();
@@ -131,6 +134,19 @@ export function RequestLocationModal({
                   {name.length}/100
                 </div>
               </div>
+
+              {/* Bitcoin merchant checkbox */}
+              <label className="flex items-center gap-3 mb-4 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={isBitcoinMerchant}
+                  onChange={(e) => setIsBitcoinMerchant(e.target.checked)}
+                  className="w-4 h-4 accent-[#f7931a]"
+                />
+                <span className="text-sm font-mono">
+                  this is a bitcoin merchant <span className="text-[#f7931a]">⚡</span>
+                </span>
+              </label>
 
               {/* Error */}
               {error && (

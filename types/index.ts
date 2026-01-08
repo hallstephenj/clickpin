@@ -10,6 +10,7 @@ export interface Location {
   lng: number;
   radius_m: number;
   is_active: boolean;
+  is_bitcoin_merchant?: boolean;
   created_at: string;
   sponsor_label?: string | null;
   sponsor_url?: string | null;

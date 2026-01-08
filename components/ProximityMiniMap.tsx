@@ -10,6 +10,8 @@ interface Location {
   lat: number;
   lng: number;
   radius_m: number;
+  btcmap_id?: number | null;
+  is_bitcoin_merchant?: boolean;
 }
 
 interface ProximityMiniMapProps {
@@ -37,7 +39,8 @@ const createIcon = (color: string, size: number = 16) => {
   });
 };
 
-const locationIcon = createIcon('#f7931a', 14);
+const bitcoinMerchantIcon = createIcon('#f7931a', 14);
+const communityIcon = createIcon('#6b7280', 14);
 const userIcon = createIcon('#3b82f6', 18);
 
 // Auto-fit map to show all markers
@@ -83,29 +86,36 @@ export function ProximityMiniMap({ userLat, userLng, locations }: ProximityMiniM
         <Marker position={[userLat, userLng]} icon={userIcon} />
 
         {/* Location radius circles */}
-        {locations.map((loc) => (
-          <Circle
-            key={`circle-${loc.id}`}
-            center={[loc.lat, loc.lng]}
-            radius={loc.radius_m}
-            pathOptions={{
-              color: '#f7931a',
-              fillColor: '#f7931a',
-              fillOpacity: 0.15,
-              weight: 2,
-              opacity: 0.6,
-            }}
-          />
-        ))}
+        {locations.map((loc) => {
+          const isBitcoinMerchant = !!loc.btcmap_id || !!loc.is_bitcoin_merchant;
+          const color = isBitcoinMerchant ? '#f7931a' : '#6b7280';
+          return (
+            <Circle
+              key={`circle-${loc.id}`}
+              center={[loc.lat, loc.lng]}
+              radius={loc.radius_m}
+              pathOptions={{
+                color,
+                fillColor: color,
+                fillOpacity: 0.15,
+                weight: 2,
+                opacity: 0.6,
+              }}
+            />
+          );
+        })}
 
         {/* Location markers */}
-        {locations.map((loc) => (
-          <Marker
-            key={loc.id}
-            position={[loc.lat, loc.lng]}
-            icon={locationIcon}
-          />
-        ))}
+        {locations.map((loc) => {
+          const isBitcoinMerchant = !!loc.btcmap_id || !!loc.is_bitcoin_merchant;
+          return (
+            <Marker
+              key={loc.id}
+              position={[loc.lat, loc.lng]}
+              icon={isBitcoinMerchant ? bitcoinMerchantIcon : communityIcon}
+            />
+          );
+        })}
       </MapContainer>
     </div>
   );

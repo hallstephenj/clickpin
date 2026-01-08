@@ -11,6 +11,8 @@ interface Location {
   lat: number;
   lng: number;
   radius_m: number;
+  btcmap_id?: number | null;
+  is_bitcoin_merchant?: boolean;
 }
 
 interface LocationMapProps {
@@ -37,7 +39,8 @@ const createIcon = (color: string) => {
   });
 };
 
-const locationIcon = createIcon('#f7931a'); // Bitcoin orange
+const bitcoinMerchantIcon = createIcon('#f7931a'); // Bitcoin orange for merchants
+const communityIcon = createIcon('#6b7280'); // Gray for community boards
 const userIcon = createIcon('#3b82f6'); // Blue for user
 
 // Component to update map center when user location changes
@@ -124,41 +127,55 @@ export function LocationMap({ userLat, userLng }: LocationMapProps) {
         )}
 
         {/* Location radius circles */}
-        {locations.map((loc) => (
-          <Circle
-            key={`circle-${loc.id}`}
-            center={[loc.lat, loc.lng]}
-            radius={loc.radius_m}
-            pathOptions={{
-              color: '#f7931a',
-              fillColor: '#f7931a',
-              fillOpacity: 0.1,
-              weight: 2,
-              opacity: 0.6,
-            }}
-          />
-        ))}
+        {locations.map((loc) => {
+          const isBitcoinMerchant = !!loc.btcmap_id || !!loc.is_bitcoin_merchant;
+          const color = isBitcoinMerchant ? '#f7931a' : '#6b7280';
+          return (
+            <Circle
+              key={`circle-${loc.id}`}
+              center={[loc.lat, loc.lng]}
+              radius={loc.radius_m}
+              pathOptions={{
+                color,
+                fillColor: color,
+                fillOpacity: 0.1,
+                weight: 2,
+                opacity: 0.6,
+              }}
+            />
+          );
+        })}
 
         {/* Location markers */}
-        {locations.map((loc) => (
-          <Marker
-            key={loc.id}
-            position={[loc.lat, loc.lng]}
-            icon={locationIcon}
-          >
-            <Popup>
-              <div className="font-mono text-sm">
-                <strong className="text-[#f7931a]">⚡ {loc.name}</strong>
-                <p className="text-xs text-gray-500 mt-1">
-                  Radius: {loc.radius_m}m
-                </p>
-                <p className="text-xs text-gray-500">
-                  Go here to view the board
-                </p>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
+        {locations.map((loc) => {
+          const isBitcoinMerchant = !!loc.btcmap_id || !!loc.is_bitcoin_merchant;
+          return (
+            <Marker
+              key={loc.id}
+              position={[loc.lat, loc.lng]}
+              icon={isBitcoinMerchant ? bitcoinMerchantIcon : communityIcon}
+            >
+              <Popup>
+                <div className="font-mono text-sm">
+                  <strong style={{ color: isBitcoinMerchant ? '#f7931a' : '#6b7280' }}>
+                    {isBitcoinMerchant ? '⚡ ' : ''}{loc.name}
+                  </strong>
+                  {isBitcoinMerchant && (
+                    <p className="text-xs text-[#f7931a] mt-1">
+                      Bitcoin accepted here
+                    </p>
+                  )}
+                  <p className="text-xs text-gray-500 mt-1">
+                    Radius: {loc.radius_m}m
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Go here to view the board
+                  </p>
+                </div>
+              </Popup>
+            </Marker>
+          );
+        })}
       </MapContainer>
 
       {/* Loading overlay */}
@@ -171,18 +188,30 @@ export function LocationMap({ userLat, userLng }: LocationMapProps) {
       )}
 
       {/* Legend */}
-      <div className="absolute bottom-4 left-4 bg-white dark:bg-[#0a0a0a] border border-[var(--border)] px-3 py-2 z-[1000] font-mono text-xs">
-        <div className="flex items-center gap-2 mb-1">
-          <span style={{ color: '#f7931a' }}>●</span>
-          <span>clickpin board ({locations.length})</span>
-        </div>
-        {userPosition && (
-          <div className="flex items-center gap-2">
-            <span style={{ color: '#3b82f6' }}>●</span>
-            <span>your location</span>
+      {(() => {
+        const merchantCount = locations.filter(l => l.btcmap_id || l.is_bitcoin_merchant).length;
+        const communityCount = locations.length - merchantCount;
+        return (
+          <div className="absolute bottom-4 left-4 bg-white dark:bg-[#0a0a0a] border border-[var(--border)] px-3 py-2 z-[1000] font-mono text-xs">
+            <div className="flex items-center gap-2 mb-1">
+              <span style={{ color: '#f7931a' }}>●</span>
+              <span>bitcoin merchant ({merchantCount})</span>
+            </div>
+            {communityCount > 0 && (
+              <div className="flex items-center gap-2 mb-1">
+                <span style={{ color: '#6b7280' }}>●</span>
+                <span>community board ({communityCount})</span>
+              </div>
+            )}
+            {userPosition && (
+              <div className="flex items-center gap-2">
+                <span style={{ color: '#3b82f6' }}>●</span>
+                <span>your location</span>
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        );
+      })()}
     </div>
   );
 }

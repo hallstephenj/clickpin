@@ -25,6 +25,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
+    // Check if any of the requests marked this as a bitcoin merchant
+    const { data: requests } = await supabaseAdmin
+      .from('location_requests')
+      .select('is_bitcoin_merchant')
+      .in('id', request_ids);
+
+    const isBitcoinMerchant = requests?.some(r => r.is_bitcoin_merchant) || false;
+
     // Generate unique slug
     let slug = generateSlug(name);
     let slugSuffix = 0;
@@ -54,6 +62,7 @@ export async function POST(request: NextRequest) {
         lat,
         lng,
         radius_m: 200, // Default radius
+        is_bitcoin_merchant: isBitcoinMerchant,
       })
       .select()
       .single();
