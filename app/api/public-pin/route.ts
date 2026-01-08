@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
       .is('deleted_at', null)
       .eq('is_hidden', false);
 
-    const location = pin.locations as {
+    type LocationData = {
       id: string;
       name: string;
       city: string | null;
@@ -74,6 +74,8 @@ export async function GET(request: NextRequest) {
       lat: number;
       lng: number;
     };
+    const locationData = pin.locations as unknown as LocationData | LocationData[];
+    const location = Array.isArray(locationData) ? locationData[0] : locationData;
 
     return NextResponse.json({
       pin: isRemoved ? null : {

@@ -48,7 +48,8 @@ export async function GET(request: NextRequest) {
       .is('parent_pin_id', null)
       .single();
 
-    const location = pin?.locations as { name: string; city: string | null } | null;
+    const locationData = pin?.locations as unknown as { name: string; city: string | null } | { name: string; city: string | null }[] | null;
+    const location = Array.isArray(locationData) ? locationData[0] : locationData;
     const locationText = location
       ? location.city
         ? `${location.name}, ${location.city}`

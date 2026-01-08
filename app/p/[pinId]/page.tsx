@@ -59,7 +59,7 @@ async function getPinData(pinId: string) {
     .is('deleted_at', null)
     .eq('is_hidden', false);
 
-  const location = pin.locations as {
+  type LocationData = {
     id: string;
     name: string;
     city: string | null;
@@ -67,6 +67,8 @@ async function getPinData(pinId: string) {
     lat: number;
     lng: number;
   };
+  const locationData = pin.locations as unknown as LocationData | LocationData[];
+  const location = Array.isArray(locationData) ? locationData[0] : locationData;
 
   return {
     pin: isRemoved ? null : {
