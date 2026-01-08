@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
         .from('locations')
         .select('id, name, slug, lat, lng, radius_m, btcmap_id, is_bitcoin_merchant, is_claimed')
         .eq('is_active', true)
-        .limit(100);
+        .limit(500);
 
       if (error) {
         console.error('Error fetching locations:', error);
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
       .lte('lat', lat + radiusDegrees)
       .gte('lng', lng - radiusDegrees)
       .lte('lng', lng + radiusDegrees)
-      .limit(100);
+      .limit(500);
 
     if (error) {
       console.error('Error fetching nearby locations:', error);
