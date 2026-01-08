@@ -1235,3 +1235,138 @@ textarea {
 .action-share {
   color: var(--accent);
 }
+
+/* ========================================
+   PROMPT CAROUSEL (ROTATONATOR)
+   ======================================== */
+
+.prompt-carousel {
+  width: 100%;
+  height: 120px;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 24px;
+}
+
+.prompt-carousel-inner {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.prompt-item {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 300;
+  letter-spacing: 0.5px;
+  color: #9CA3AF;
+  transition: all 0.8s ease-in-out;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 16px;
+}
+
+@media (min-width: 640px) {
+  .prompt-item {
+    font-size: 20px;
+    letter-spacing: 0.75px;
+  }
+}
+
+/* Top prompt - above center, faded */
+.prompt-item.prompt-top {
+  top: 10px;
+  opacity: 0.3;
+  transform: scale(0.9);
+  filter: blur(0.5px);
+}
+
+/* Center prompt - active, full visibility */
+.prompt-item.prompt-center {
+  top: 50%;
+  transform: translateY(-50%) scale(1);
+  opacity: 1;
+  filter: blur(0);
+}
+
+/* Bottom prompt - below center, faded */
+.prompt-item.prompt-bottom {
+  bottom: 10px;
+  top: auto;
+  opacity: 0.3;
+  transform: scale(0.9);
+  filter: blur(0.5px);
+}
+
+/* Incoming prompt - hidden below, ready to slide up */
+.prompt-item.prompt-incoming {
+  bottom: -30px;
+  top: auto;
+  opacity: 0;
+  transform: scale(0.85);
+  filter: blur(1px);
+}
+
+/* Transition states - slide everything up */
+.prompt-carousel-inner.transitioning .prompt-item.prompt-top {
+  top: -30px;
+  opacity: 0;
+  filter: blur(1px);
+}
+
+.prompt-carousel-inner.transitioning .prompt-item.prompt-center {
+  top: 10px;
+  transform: translateY(0) scale(0.9);
+  opacity: 0.3;
+  filter: blur(0.5px);
+}
+
+.prompt-carousel-inner.transitioning .prompt-item.prompt-bottom {
+  bottom: auto;
+  top: 50%;
+  transform: translateY(-50%) scale(1);
+  opacity: 1;
+  filter: blur(0);
+}
+
+.prompt-carousel-inner.transitioning .prompt-item.prompt-incoming {
+  bottom: 10px;
+  opacity: 0.3;
+  transform: scale(0.9);
+  filter: blur(0.5px);
+}
+
+/* Subtle gradient masks at top and bottom */
+.prompt-carousel::before,
+.prompt-carousel::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 20px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.prompt-carousel::before {
+  top: 0;
+  background: linear-gradient(to bottom, var(--bg) 0%, transparent 100%);
+}
+
+.prompt-carousel::after {
+  bottom: 0;
+  background: linear-gradient(to top, var(--bg) 0%, transparent 100%);
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+  .prompt-item {
+    color: #6B7280;
+  }
+}

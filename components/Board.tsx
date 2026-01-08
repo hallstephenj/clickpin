@@ -7,6 +7,7 @@ import { ComposeModal } from './ComposeModal';
 import { PaymentModal } from './PaymentModal';
 import { SponsorModal } from './SponsorModal';
 import { FancyBoard } from './FancyBoard';
+import { PromptCarousel } from './PromptCarousel';
 import { useFeatureFlags } from '@/lib/hooks/useFeatureFlags';
 import { isFancyBoardActive } from '@/lib/featureFlags';
 import { config } from '@/lib/config';
@@ -364,6 +365,7 @@ export function Board({
       <main className="max-w-2xl mx-auto px-4 py-2">
         {pins.length === 0 && hiddenPins.length === 0 ? (
           <div className="py-12 text-center">
+            {flags.ROTATONATOR && <PromptCarousel />}
             <p className="text-muted mb-4">no posts here yet</p>
             <button
               onClick={() => handleOpenCompose(null)}

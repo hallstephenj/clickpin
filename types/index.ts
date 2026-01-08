@@ -180,6 +180,7 @@ export interface FeatureFlags {
   GHOSTS: boolean;
   BADGES: boolean;
   SHARENOTES: boolean;
+  ROTATONATOR: boolean;
 }
 
 // Badge types
