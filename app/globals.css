@@ -816,98 +816,117 @@ textarea {
    Physical paper-like pins that feel like handled material
    ===================================================== */
 
-/* Container for paperweight pins - loose, asymmetric layout */
+/* Container - centered with max width, asymmetric spacing */
 .paperweight-feed {
   display: flex;
   flex-direction: column;
-  gap: 0;
+  align-items: center;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 0 16px;
 }
 
-/* Base pin styling - texture over glow */
+/* Base pin - constrained width, real paper edge, flat background */
 .paperweight-pin {
   position: relative;
-  background: #faf9f6;
-  padding: 12px 14px 8px 14px;
-  max-width: 520px;
-  /* Tight shadow that hugs content, inner edge for boundary */
+  width: 100%;
+  max-width: 580px;
+  /* Flat paper background - no gradients */
+  background: #f8f7f4;
+  padding: 14px 16px 10px 16px;
+  /* Real paper edge: warm border + inner shadow, minimal outer glow */
+  border: 1px solid rgba(120, 90, 60, 0.18);
   box-shadow:
-    inset 0 0 0 1px rgba(139, 90, 43, 0.04),
-    0 0.5px 1px rgba(139, 90, 43, 0.06);
+    inset 0 1px 3px rgba(100, 80, 50, 0.04),
+    0 0.5px 1px rgba(100, 80, 50, 0.03);
   transition:
     transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
-    box-shadow 0.15s ease;
-  margin-bottom: 8px;
+    box-shadow 0.12s ease;
+  margin-bottom: 10px;
 }
 
-/* Asymmetric variations via nth-child - varied padding, rotation, width */
+/* Asymmetric variations - varied spacing, padding, width, rotation */
 .paperweight-pin:nth-child(3n) {
-  padding-left: 16px;
-  margin-bottom: 12px;
-  transform: rotate(-0.2deg);
+  padding: 16px 14px 8px 18px;
+  margin-bottom: 14px;
+  max-width: 560px;
+  transform: rotate(-0.15deg);
+  margin-left: 8px;
 }
 
 .paperweight-pin:nth-child(3n+1) {
-  padding-left: 12px;
-  max-width: 480px;
-  transform: rotate(0.15deg);
+  padding: 12px 18px 10px 14px;
+  margin-bottom: 8px;
+  max-width: 540px;
+  transform: rotate(0.2deg);
+  margin-right: 12px;
 }
 
 .paperweight-pin:nth-child(5n) {
-  margin-bottom: 14px;
-  padding-right: 18px;
-  transform: rotate(0.3deg);
+  margin-bottom: 16px;
+  padding: 14px 16px 12px 20px;
+  max-width: 600px;
+  transform: rotate(0.25deg);
 }
 
 .paperweight-pin:nth-child(7n) {
-  max-width: 540px;
-  padding-left: 18px;
-  transform: rotate(-0.25deg);
+  max-width: 520px;
+  padding: 18px 14px 8px 16px;
+  margin-bottom: 12px;
+  transform: rotate(-0.3deg);
+  margin-left: 16px;
 }
 
 .paperweight-pin:nth-child(11n) {
-  max-width: 460px;
-  transform: rotate(0.4deg);
+  max-width: 500px;
+  transform: rotate(0.35deg);
+  margin-right: 20px;
+  margin-bottom: 18px;
 }
 
 @media (prefers-color-scheme: dark) {
   .paperweight-pin {
-    background: #151410;
+    /* Flat dark base - no gradients */
+    background: #141311;
+    border-color: rgba(80, 70, 55, 0.25);
     box-shadow:
-      inset 0 0 0 1px rgba(255, 255, 255, 0.03),
-      0 0.5px 1px rgba(0, 0, 0, 0.15);
+      inset 0 1px 3px rgba(0, 0, 0, 0.1),
+      0 0.5px 1px rgba(0, 0, 0, 0.05);
   }
 }
 
-/* Paper grain texture - more visible, uneven */
+/* Paper grain texture - does the heavy lifting */
 .paperweight-pin::before {
   content: '';
   position: absolute;
   inset: 0;
   pointer-events: none;
-  opacity: 0.04;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
   mix-blend-mode: multiply;
 }
 
 @media (prefers-color-scheme: dark) {
   .paperweight-pin::before {
-    mix-blend-mode: soft-light;
-    opacity: 0.06;
+    mix-blend-mode: overlay;
+    opacity: 0.08;
   }
 }
 
-/* Hover: subtle lift, preserve rotation */
+/* Hover: minimal lift, keep texture prominent */
 .paperweight-pin:hover {
+  border-color: rgba(120, 90, 60, 0.22);
   box-shadow:
-    inset 0 0 0 1px rgba(139, 90, 43, 0.05),
-    0 1px 2px rgba(139, 90, 43, 0.08);
+    inset 0 1px 3px rgba(100, 80, 50, 0.05),
+    0 1px 2px rgba(100, 80, 50, 0.04);
 }
 
 @media (prefers-color-scheme: dark) {
   .paperweight-pin:hover {
+    border-color: rgba(80, 70, 55, 0.3);
     box-shadow:
-      inset 0 0 0 1px rgba(255, 255, 255, 0.04),
-      0 1px 2px rgba(0, 0, 0, 0.2);
+      inset 0 1px 3px rgba(0, 0, 0, 0.12),
+      0 1px 2px rgba(0, 0, 0, 0.06);
   }
 }
 
@@ -919,7 +938,9 @@ textarea {
   color: var(--fg);
   word-wrap: break-word;
   white-space: pre-wrap;
-  max-width: 40ch;
+  max-width: 42ch;
+  /* Leave room for absolute-positioned metadata */
+  padding-bottom: 18px;
 }
 
 /* First line styling - heavier */
@@ -930,13 +951,15 @@ textarea {
 
 /* Short posts feel compact */
 .paperweight-pin.pw-short .paperweight-body {
-  max-width: 32ch;
+  max-width: 34ch;
+  padding-bottom: 16px;
 }
 
 /* Long posts feel sprawling */
 .paperweight-pin.pw-long .paperweight-body {
-  max-width: 46ch;
+  max-width: 48ch;
   line-height: 1.7;
+  padding-bottom: 20px;
 }
 
 /* =====================================================
@@ -971,49 +994,56 @@ textarea {
 }
 
 /* =====================================================
-   METADATA - Scribbled at the bottom edge
+   METADATA - Lives ON the pin, bottom-right corner
    ===================================================== */
 
 .paperweight-meta {
+  position: absolute;
+  bottom: 6px;
+  right: 10px;
   display: flex;
-  justify-content: flex-end;
   align-items: baseline;
-  gap: 8px;
-  margin-top: 8px;
-  padding-top: 4px;
-  font-size: 10px;
+  gap: 6px;
+  font-size: 9px;
   font-weight: 300;
-  /* Warm, faded - like pencil */
-  color: #a89880;
-  opacity: 0.55;
+  /* Warm pencil tone, very faded */
+  color: #9a8a70;
+  opacity: 0.4;
 }
 
 @media (prefers-color-scheme: dark) {
   .paperweight-meta {
-    color: #6b6050;
-    opacity: 0.6;
+    color: #5a5040;
+    opacity: 0.5;
   }
 }
 
 .paperweight-time {
   font-family: inherit;
   font-style: italic;
-  font-size: 10px;
-  letter-spacing: 0.01em;
+  font-size: 9px;
+  letter-spacing: 0.005em;
 }
 
 .paperweight-mine {
-  color: var(--accent);
-  opacity: 0.7;
+  color: #b8944a;
+  opacity: 0.6;
   font-style: normal;
 }
 
-/* Actions - fade in on hover */
+@media (prefers-color-scheme: dark) {
+  .paperweight-mine {
+    color: #8a7040;
+  }
+}
+
+/* Actions - fade in on hover, near the meta */
 .paperweight-actions {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   opacity: 0;
-  transition: opacity 0.15s ease;
+  transition: opacity 0.12s ease;
+  margin-left: 4px;
 }
 
 .paperweight-pin:hover .paperweight-actions {
@@ -1035,11 +1065,9 @@ textarea {
   color: inherit;
   cursor: pointer;
   transition: color 0.1s;
-  opacity: 0.8;
 }
 
 .paperweight-actions button:hover {
-  opacity: 1;
   color: var(--fg-muted);
 }
 
@@ -1056,75 +1084,81 @@ textarea {
 }
 
 /* =====================================================
-   AGING EFFECTS - Time as texture, not state
+   AGING EFFECTS - Texture and wear, not color shifts
    ===================================================== */
 
-/* Fresh: < 5 minutes - flat, clean, crisp edges */
+/* Fresh: < 5 minutes - crisp, clean paper */
 .paperweight-age-fresh {
-  background: #fcfbf8;
+  background: #faf9f6;
+  border-color: rgba(120, 90, 60, 0.15);
 }
 
 .paperweight-age-fresh::before {
-  opacity: 0.02;
+  opacity: 0.03;
 }
 
 @media (prefers-color-scheme: dark) {
   .paperweight-age-fresh {
-    background: #181714;
+    background: #151412;
+    border-color: rgba(80, 70, 55, 0.2);
   }
 }
 
-/* Recent: 5-30 minutes - settling */
+/* Recent: 5-30 minutes - settling in */
 .paperweight-age-recent {
-  background: #faf9f5;
+  background: #f8f7f3;
+  border-color: rgba(120, 90, 60, 0.18);
 }
 
 .paperweight-age-recent::before {
-  opacity: 0.035;
+  opacity: 0.045;
 }
 
 @media (prefers-color-scheme: dark) {
   .paperweight-age-recent {
-    background: #161512;
+    background: #141310;
+    border-color: rgba(80, 70, 55, 0.24);
   }
 }
 
-/* Aged: 30 min - 2 hours - lived in */
+/* Aged: 30 min - 2 hours - handled, lived in */
 .paperweight-age-aged {
-  background: #f7f6f1;
-  filter: contrast(0.98);
+  background: #f6f5f0;
+  border-color: rgba(110, 85, 55, 0.2);
 }
 
 .paperweight-age-aged::before {
-  opacity: 0.05;
+  opacity: 0.06;
 }
 
-/* Faint edge darkening */
+/* Edge wear - subtle darkening at corners */
 .paperweight-age-aged::after {
   content: '';
   position: absolute;
   inset: 0;
   pointer-events: none;
-  box-shadow: inset 0 0 8px rgba(100, 80, 50, 0.03);
+  box-shadow: inset 0 0 6px rgba(80, 60, 30, 0.04);
+  border-radius: inherit;
 }
 
 @media (prefers-color-scheme: dark) {
   .paperweight-age-aged {
-    background: #13120e;
+    background: #12110e;
+    border-color: rgba(70, 60, 45, 0.28);
   }
   .paperweight-age-aged::after {
-    box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.08);
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
   }
 }
 
-/* Vintage: > 2 hours - weathered, handled */
+/* Vintage: > 2 hours - weathered, well-handled */
 .paperweight-age-vintage {
-  background: #f4f3ed;
-  filter: contrast(0.95) saturate(0.92);
+  background: #f3f2ec;
+  border-color: rgba(100, 80, 50, 0.22);
 }
 
 .paperweight-age-vintage::before {
-  opacity: 0.065;
+  opacity: 0.075;
 }
 
 .paperweight-age-vintage::after {
@@ -1132,89 +1166,91 @@ textarea {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  box-shadow: inset 0 0 12px rgba(90, 70, 40, 0.05);
+  box-shadow: inset 0 0 10px rgba(70, 50, 25, 0.05);
+  border-radius: inherit;
 }
 
 @media (prefers-color-scheme: dark) {
   .paperweight-age-vintage {
-    background: #100f0b;
+    background: #100f0c;
+    border-color: rgba(60, 50, 40, 0.3);
   }
   .paperweight-age-vintage::after {
-    box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.12);
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.14);
   }
 }
 
 /* =====================================================
-   BOOSTED - Re-handled, pulled and re-pinned
+   BOOSTED - Re-pinned, pressed down again
    ===================================================== */
 
 .paperweight-boosted {
-  /* Tighter, more defined - like it was pressed down again */
+  /* Slightly tighter border, hint of warmth */
+  border-color: rgba(180, 120, 50, 0.22);
   box-shadow:
-    inset 0 0 0 1px rgba(247, 147, 26, 0.08),
-    0 0.5px 1.5px rgba(139, 90, 43, 0.1);
-  /* Subtle flattening effect */
-  filter: contrast(1.01);
+    inset 0 1px 2px rgba(100, 80, 50, 0.05),
+    0 0.5px 1px rgba(100, 80, 50, 0.04);
 }
 
 .paperweight-boosted::before {
-  /* Slightly less texture - smoother from handling */
-  opacity: 0.03;
+  /* Smoother from handling */
+  opacity: 0.035;
 }
 
-/* Pushpin dot */
+/* Pushpin dot - subtle, not glowing */
 .paperweight-boosted .paperweight-pushpin {
   position: absolute;
-  top: -3px;
-  right: 12px;
-  width: 8px;
-  height: 8px;
-  background: var(--accent);
+  top: -4px;
+  right: 16px;
+  width: 7px;
+  height: 7px;
+  background: #c8944a;
   border-radius: 50%;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.12);
+}
+
+@media (prefers-color-scheme: dark) {
+  .paperweight-boosted {
+    border-color: rgba(140, 100, 50, 0.28);
+  }
+  .paperweight-boosted .paperweight-pushpin {
+    background: #a87830;
+  }
 }
 
 .paperweight-boosted:hover {
-  box-shadow:
-    inset 0 0 0 1px rgba(247, 147, 26, 0.1),
-    0 1px 2px rgba(139, 90, 43, 0.12);
+  border-color: rgba(180, 120, 50, 0.26);
 }
 
 /* =====================================================
-   REPLIES - Scraps stuck under the original
+   REPLIES - Smaller scraps attached to parent pin
+   Not indented comments - physical attachments
    ===================================================== */
 
 .paperweight-replies-container {
   position: relative;
-  margin-top: 2px;
-  margin-left: 8px;
+  /* Attached directly under parent, slight overlap */
+  margin-top: -4px;
+  margin-left: 24px;
+  padding-top: 6px;
 }
 
-/* Tape/connection motif */
+/* Subtle tape/staple connector to parent */
 .paperweight-replies-container::before {
   content: '';
   position: absolute;
-  left: 4px;
+  left: -12px;
   top: 0;
-  bottom: 8px;
-  width: 2px;
-  background: linear-gradient(
-    to bottom,
-    rgba(139, 90, 43, 0.08) 0%,
-    rgba(139, 90, 43, 0.04) 50%,
-    transparent 100%
-  );
+  width: 16px;
+  height: 3px;
+  background: rgba(180, 160, 120, 0.15);
   border-radius: 1px;
+  transform: rotate(-8deg);
 }
 
 @media (prefers-color-scheme: dark) {
   .paperweight-replies-container::before {
-    background: linear-gradient(
-      to bottom,
-      rgba(255, 255, 255, 0.06) 0%,
-      rgba(255, 255, 255, 0.03) 50%,
-      transparent 100%
-    );
+    background: rgba(100, 90, 70, 0.2);
   }
 }
 
@@ -1222,68 +1258,105 @@ textarea {
   font-size: 9px;
   font-weight: 300;
   font-style: italic;
-  color: #a89880;
-  opacity: 0.6;
+  color: #9a8a70;
+  opacity: 0.5;
   background: none;
   border: none;
-  padding: 2px 0 2px 12px;
+  padding: 0;
   cursor: pointer;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 @media (prefers-color-scheme: dark) {
   .paperweight-replies-toggle {
-    color: #6b6050;
+    color: #5a5040;
   }
 }
 
 .paperweight-replies-toggle:hover {
-  opacity: 0.8;
+  opacity: 0.7;
 }
 
-/* Reply as attached scrap */
+/* Reply as attached scrap - smaller, lighter, askew */
 .paperweight-reply {
   position: relative;
-  padding: 6px 10px 5px 10px;
-  margin-left: 12px;
-  margin-bottom: 3px;
-  background: rgba(250, 248, 244, 0.6);
-  max-width: 380px;
-  /* Smaller, lighter, slightly askew */
+  padding: 8px 10px 14px 10px;
+  margin-bottom: 6px;
+  /* Smaller paper scrap */
+  background: #f6f5f1;
+  border: 1px solid rgba(120, 90, 60, 0.12);
+  max-width: 340px;
   font-size: 12px;
   box-shadow:
-    inset 0 0 0 1px rgba(139, 90, 43, 0.03),
-    0 0.5px 0.5px rgba(139, 90, 43, 0.04);
+    inset 0 1px 2px rgba(100, 80, 50, 0.03),
+    0 0.5px 1px rgba(100, 80, 50, 0.02);
 }
 
-.paperweight-reply:nth-child(odd) {
-  transform: rotate(0.3deg);
-  margin-left: 14px;
+/* Varied positioning - not aligned */
+.paperweight-reply:nth-child(2) {
+  transform: rotate(0.4deg);
+  margin-left: 4px;
 }
 
-.paperweight-reply:nth-child(even) {
-  transform: rotate(-0.2deg);
-  margin-left: 10px;
+.paperweight-reply:nth-child(3) {
+  transform: rotate(-0.3deg);
+  margin-left: 12px;
+  max-width: 320px;
+}
+
+.paperweight-reply:nth-child(4) {
+  transform: rotate(0.2deg);
+  margin-left: -2px;
+}
+
+.paperweight-reply:nth-child(5) {
+  transform: rotate(-0.5deg);
+  margin-left: 8px;
+  max-width: 300px;
 }
 
 @media (prefers-color-scheme: dark) {
   .paperweight-reply {
-    background: rgba(20, 19, 15, 0.6);
+    background: #121110;
+    border-color: rgba(80, 70, 55, 0.18);
     box-shadow:
-      inset 0 0 0 1px rgba(255, 255, 255, 0.02),
-      0 0.5px 0.5px rgba(0, 0, 0, 0.1);
+      inset 0 1px 2px rgba(0, 0, 0, 0.06),
+      0 0.5px 1px rgba(0, 0, 0, 0.03);
+  }
+}
+
+/* Reply texture */
+.paperweight-reply::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  mix-blend-mode: multiply;
+}
+
+@media (prefers-color-scheme: dark) {
+  .paperweight-reply::before {
+    mix-blend-mode: overlay;
+    opacity: 0.06;
   }
 }
 
 .paperweight-reply .paperweight-body {
   font-size: 12px;
   line-height: 1.5;
-  max-width: 34ch;
+  max-width: 32ch;
   color: var(--fg-muted);
+  padding-bottom: 0;
 }
 
 .paperweight-reply .paperweight-meta {
-  margin-top: 4px;
-  font-size: 9px;
-  opacity: 0.45;
+  position: relative;
+  bottom: auto;
+  right: auto;
+  margin-top: 6px;
+  font-size: 8px;
+  opacity: 0.35;
+  justify-content: flex-end;
 }
