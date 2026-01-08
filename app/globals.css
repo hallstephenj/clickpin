@@ -813,120 +813,104 @@ textarea {
 
 /* =====================================================
    PAPERWEIGHT PIN STYLES
-   Physical paper-like pins that feel like handled material
+   Physical paper - constrained, centered, minimal chaos
    ===================================================== */
 
-/* Container - centered with max width, asymmetric spacing */
+/* Container - single centered column */
 .paperweight-feed {
   display: flex;
   flex-direction: column;
   align-items: center;
-  max-width: 680px;
+  max-width: 600px;
   margin: 0 auto;
   padding: 0 16px;
 }
 
-/* Base pin - constrained width, real paper edge, flat background */
+/* Base pin - one paper color, one texture, real edges */
 .paperweight-pin {
   position: relative;
   width: 100%;
-  max-width: 580px;
-  /* Flat paper background - no gradients */
-  background: #f8f7f4;
+  max-width: 540px;
+  /* Single paper color - no hue variation */
+  background: #f7f6f3;
   padding: 14px 16px 10px 16px;
-  /* Real paper edge: warm border + inner shadow, minimal outer glow */
-  border: 1px solid rgba(120, 90, 60, 0.18);
-  box-shadow:
-    inset 0 1px 3px rgba(100, 80, 50, 0.04),
-    0 0.5px 1px rgba(100, 80, 50, 0.03);
-  transition:
-    transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
-    box-shadow 0.12s ease;
-  margin-bottom: 10px;
+  /* Real paper edge, no glow */
+  border: 1px solid rgba(100, 80, 50, 0.15);
+  box-shadow: inset 0 1px 2px rgba(80, 60, 30, 0.03);
+  /* Fixed spacing with tiny variation via nth-child */
+  margin-bottom: 12px;
 }
 
-/* Asymmetric variations - varied spacing, padding, width, rotation */
+/* Subtle variation - no side wandering, minimal rotation */
 .paperweight-pin:nth-child(3n) {
-  padding: 16px 14px 8px 18px;
   margin-bottom: 14px;
-  max-width: 560px;
-  transform: rotate(-0.15deg);
-  margin-left: 8px;
+  transform: rotate(-0.3deg);
 }
 
 .paperweight-pin:nth-child(3n+1) {
-  padding: 12px 18px 10px 14px;
-  margin-bottom: 8px;
-  max-width: 540px;
-  transform: rotate(0.2deg);
-  margin-right: 12px;
+  margin-bottom: 10px;
+  /* No rotation - many pins are straight */
 }
 
 .paperweight-pin:nth-child(5n) {
   margin-bottom: 16px;
-  padding: 14px 16px 12px 20px;
-  max-width: 600px;
-  transform: rotate(0.25deg);
+  transform: rotate(0.4deg);
 }
 
 .paperweight-pin:nth-child(7n) {
-  max-width: 520px;
-  padding: 18px 14px 8px 16px;
-  margin-bottom: 12px;
-  transform: rotate(-0.3deg);
-  margin-left: 16px;
+  margin-bottom: 8px;
+  transform: rotate(-0.5deg);
 }
 
 .paperweight-pin:nth-child(11n) {
-  max-width: 500px;
-  transform: rotate(0.35deg);
-  margin-right: 20px;
-  margin-bottom: 18px;
+  margin-bottom: 14px;
+  transform: rotate(0.6deg);
+}
+
+/* Slight horizontal nudge - max ±4px, no wandering */
+.paperweight-pin:nth-child(4n) {
+  margin-left: 2px;
+}
+
+.paperweight-pin:nth-child(4n+2) {
+  margin-left: -2px;
 }
 
 @media (prefers-color-scheme: dark) {
   .paperweight-pin {
-    /* Flat dark base - no gradients */
-    background: #141311;
-    border-color: rgba(80, 70, 55, 0.25);
-    box-shadow:
-      inset 0 1px 3px rgba(0, 0, 0, 0.1),
-      0 0.5px 1px rgba(0, 0, 0, 0.05);
+    /* Single dark paper color */
+    background: #131210;
+    border-color: rgba(70, 60, 45, 0.2);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
   }
 }
 
-/* Paper grain texture - does the heavy lifting */
+/* Single paper texture - consistent across all pins */
 .paperweight-pin::before {
   content: '';
   position: absolute;
   inset: 0;
   pointer-events: none;
-  opacity: 0.05;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
   mix-blend-mode: multiply;
 }
 
 @media (prefers-color-scheme: dark) {
   .paperweight-pin::before {
     mix-blend-mode: overlay;
-    opacity: 0.08;
+    opacity: 0.06;
   }
 }
 
-/* Hover: minimal lift, keep texture prominent */
+/* Hover: edge darkens slightly, no lift */
 .paperweight-pin:hover {
-  border-color: rgba(120, 90, 60, 0.22);
-  box-shadow:
-    inset 0 1px 3px rgba(100, 80, 50, 0.05),
-    0 1px 2px rgba(100, 80, 50, 0.04);
+  border-color: rgba(100, 80, 50, 0.2);
 }
 
 @media (prefers-color-scheme: dark) {
   .paperweight-pin:hover {
-    border-color: rgba(80, 70, 55, 0.3);
-    box-shadow:
-      inset 0 1px 3px rgba(0, 0, 0, 0.12),
-      0 1px 2px rgba(0, 0, 0, 0.06);
+    border-color: rgba(70, 60, 45, 0.28);
   }
 }
 
@@ -963,33 +947,38 @@ textarea {
 }
 
 /* =====================================================
-   DOODLES - Ink on paper, not embedded media
+   DOODLES - Fixed layouts, not freeform
    ===================================================== */
 
+/* Layout 1: Above text (default) */
 .paperweight-doodle {
-  /* Overlap into text area - drawn first, text came after */
-  margin: -4px -6px 6px -4px;
-  position: relative;
+  margin-bottom: 8px;
 }
 
 .paperweight-doodle img {
-  max-width: 160px;
-  max-height: 120px;
+  max-width: 140px;
+  max-height: 100px;
   object-fit: contain;
-  /* Soft, imperfect edges - no hard rectangle */
-  border: none;
-  border-radius: 1px;
-  opacity: 0.92;
-  /* Faint ink-on-paper feel */
-  filter: contrast(1.02) saturate(0.95);
-  mix-blend-mode: multiply;
+  opacity: 0.9;
+  filter: saturate(0.95);
+}
+
+/* Layout 2: Inline left - for short posts */
+.paperweight-pin.pw-short .paperweight-doodle {
+  float: left;
+  margin-right: 10px;
+  margin-bottom: 4px;
+}
+
+.paperweight-pin.pw-short .paperweight-doodle img {
+  max-width: 80px;
+  max-height: 60px;
 }
 
 @media (prefers-color-scheme: dark) {
   .paperweight-doodle img {
-    mix-blend-mode: screen;
-    opacity: 0.88;
-    filter: contrast(0.98);
+    opacity: 0.85;
+    filter: saturate(0.9);
   }
 }
 
@@ -1084,182 +1073,95 @@ textarea {
 }
 
 /* =====================================================
-   AGING EFFECTS - Texture and wear, not color shifts
+   AGING EFFECTS - Contrast only, same paper color
    ===================================================== */
 
-/* Fresh: < 5 minutes - crisp, clean paper */
+/* Fresh: < 5 minutes - full contrast */
 .paperweight-age-fresh {
-  background: #faf9f6;
-  border-color: rgba(120, 90, 60, 0.15);
+  /* Same paper color, no change */
 }
 
 .paperweight-age-fresh::before {
   opacity: 0.03;
 }
 
-@media (prefers-color-scheme: dark) {
-  .paperweight-age-fresh {
-    background: #151412;
-    border-color: rgba(80, 70, 55, 0.2);
-  }
-}
-
-/* Recent: 5-30 minutes - settling in */
+/* Recent: 5-30 minutes - slight softening */
 .paperweight-age-recent {
-  background: #f8f7f3;
-  border-color: rgba(120, 90, 60, 0.18);
+  filter: contrast(0.99);
 }
 
 .paperweight-age-recent::before {
-  opacity: 0.045;
+  opacity: 0.04;
 }
 
-@media (prefers-color-scheme: dark) {
-  .paperweight-age-recent {
-    background: #141310;
-    border-color: rgba(80, 70, 55, 0.24);
-  }
-}
-
-/* Aged: 30 min - 2 hours - handled, lived in */
+/* Aged: 30 min - 2 hours - softer */
 .paperweight-age-aged {
-  background: #f6f5f0;
-  border-color: rgba(110, 85, 55, 0.2);
+  filter: contrast(0.97);
 }
 
 .paperweight-age-aged::before {
-  opacity: 0.06;
+  opacity: 0.05;
 }
 
-/* Edge wear - subtle darkening at corners */
-.paperweight-age-aged::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  box-shadow: inset 0 0 6px rgba(80, 60, 30, 0.04);
-  border-radius: inherit;
-}
-
-@media (prefers-color-scheme: dark) {
-  .paperweight-age-aged {
-    background: #12110e;
-    border-color: rgba(70, 60, 45, 0.28);
-  }
-  .paperweight-age-aged::after {
-    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
-  }
-}
-
-/* Vintage: > 2 hours - weathered, well-handled */
+/* Vintage: > 2 hours - softest */
 .paperweight-age-vintage {
-  background: #f3f2ec;
-  border-color: rgba(100, 80, 50, 0.22);
+  filter: contrast(0.94);
 }
 
 .paperweight-age-vintage::before {
-  opacity: 0.075;
-}
-
-.paperweight-age-vintage::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  box-shadow: inset 0 0 10px rgba(70, 50, 25, 0.05);
-  border-radius: inherit;
-}
-
-@media (prefers-color-scheme: dark) {
-  .paperweight-age-vintage {
-    background: #100f0c;
-    border-color: rgba(60, 50, 40, 0.3);
-  }
-  .paperweight-age-vintage::after {
-    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.14);
-  }
+  opacity: 0.06;
 }
 
 /* =====================================================
-   BOOSTED - Re-pinned, pressed down again
+   BOOSTED - Slightly darker border, pushpin
    ===================================================== */
 
 .paperweight-boosted {
-  /* Slightly tighter border, hint of warmth */
-  border-color: rgba(180, 120, 50, 0.22);
-  box-shadow:
-    inset 0 1px 2px rgba(100, 80, 50, 0.05),
-    0 0.5px 1px rgba(100, 80, 50, 0.04);
+  border-color: rgba(100, 80, 50, 0.22);
 }
 
-.paperweight-boosted::before {
-  /* Smoother from handling */
-  opacity: 0.035;
-}
-
-/* Pushpin dot - subtle, not glowing */
+/* Pushpin dot */
 .paperweight-boosted .paperweight-pushpin {
   position: absolute;
-  top: -4px;
-  right: 16px;
-  width: 7px;
-  height: 7px;
-  background: #c8944a;
+  top: -3px;
+  right: 14px;
+  width: 6px;
+  height: 6px;
+  background: #b08040;
   border-radius: 50%;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.12);
 }
 
 @media (prefers-color-scheme: dark) {
   .paperweight-boosted {
-    border-color: rgba(140, 100, 50, 0.28);
+    border-color: rgba(70, 60, 45, 0.3);
   }
   .paperweight-boosted .paperweight-pushpin {
-    background: #a87830;
+    background: #907030;
   }
-}
-
-.paperweight-boosted:hover {
-  border-color: rgba(180, 120, 50, 0.26);
 }
 
 /* =====================================================
-   REPLIES - Smaller scraps attached to parent pin
-   Not indented comments - physical attachments
+   REPLIES - Smaller, lighter, supporting not competing
    ===================================================== */
 
 .paperweight-replies-container {
-  position: relative;
-  /* Attached directly under parent, slight overlap */
-  margin-top: -4px;
-  margin-left: 24px;
-  padding-top: 6px;
-}
-
-/* Subtle tape/staple connector to parent */
-.paperweight-replies-container::before {
-  content: '';
-  position: absolute;
-  left: -12px;
-  top: 0;
-  width: 16px;
-  height: 3px;
-  background: rgba(180, 160, 120, 0.15);
-  border-radius: 1px;
-  transform: rotate(-8deg);
+  margin-top: 4px;
+  margin-left: 20px;
+  padding-left: 12px;
+  border-left: 1px solid rgba(100, 80, 50, 0.08);
 }
 
 @media (prefers-color-scheme: dark) {
-  .paperweight-replies-container::before {
-    background: rgba(100, 90, 70, 0.2);
+  .paperweight-replies-container {
+    border-left-color: rgba(70, 60, 45, 0.12);
   }
 }
 
 .paperweight-replies-toggle {
   font-size: 9px;
   font-weight: 300;
-  font-style: italic;
-  color: #9a8a70;
-  opacity: 0.5;
+  color: var(--fg-faint);
+  opacity: 0.6;
   background: none;
   border: none;
   padding: 0;
@@ -1267,86 +1169,60 @@ textarea {
   margin-bottom: 6px;
 }
 
-@media (prefers-color-scheme: dark) {
-  .paperweight-replies-toggle {
-    color: #5a5040;
-  }
-}
-
 .paperweight-replies-toggle:hover {
-  opacity: 0.7;
+  opacity: 0.8;
 }
 
-/* Reply as attached scrap - smaller, lighter, askew */
+/* Reply - clearly smaller, no competing styling */
 .paperweight-reply {
   position: relative;
-  padding: 8px 10px 14px 10px;
+  padding: 6px 10px 12px 10px;
   margin-bottom: 6px;
-  /* Smaller paper scrap */
-  background: #f6f5f1;
-  border: 1px solid rgba(120, 90, 60, 0.12);
-  max-width: 340px;
-  font-size: 12px;
-  box-shadow:
-    inset 0 1px 2px rgba(100, 80, 50, 0.03),
-    0 0.5px 1px rgba(100, 80, 50, 0.02);
+  /* Same paper, just smaller and lighter */
+  background: #f7f6f3;
+  border: 1px solid rgba(100, 80, 50, 0.1);
+  max-width: 400px;
+  opacity: 0.85;
 }
 
-/* Varied positioning - not aligned */
-.paperweight-reply:nth-child(2) {
-  transform: rotate(0.4deg);
-  margin-left: 4px;
-}
-
-.paperweight-reply:nth-child(3) {
-  transform: rotate(-0.3deg);
-  margin-left: 12px;
-  max-width: 320px;
-}
-
-.paperweight-reply:nth-child(4) {
+/* Minimal rotation variation */
+.paperweight-reply:nth-child(odd) {
   transform: rotate(0.2deg);
-  margin-left: -2px;
 }
 
-.paperweight-reply:nth-child(5) {
-  transform: rotate(-0.5deg);
-  margin-left: 8px;
-  max-width: 300px;
+.paperweight-reply:nth-child(even) {
+  transform: rotate(-0.15deg);
 }
 
 @media (prefers-color-scheme: dark) {
   .paperweight-reply {
-    background: #121110;
-    border-color: rgba(80, 70, 55, 0.18);
-    box-shadow:
-      inset 0 1px 2px rgba(0, 0, 0, 0.06),
-      0 0.5px 1px rgba(0, 0, 0, 0.03);
+    background: #131210;
+    border-color: rgba(70, 60, 45, 0.15);
   }
 }
 
-/* Reply texture */
+/* Reply uses same texture as parent, just lighter */
 .paperweight-reply::before {
   content: '';
   position: absolute;
   inset: 0;
   pointer-events: none;
-  opacity: 0.04;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
   mix-blend-mode: multiply;
 }
 
 @media (prefers-color-scheme: dark) {
   .paperweight-reply::before {
     mix-blend-mode: overlay;
-    opacity: 0.06;
+    opacity: 0.04;
   }
 }
 
 .paperweight-reply .paperweight-body {
   font-size: 12px;
-  line-height: 1.5;
-  max-width: 32ch;
+  line-height: 1.45;
+  max-width: 36ch;
   color: var(--fg-muted);
   padding-bottom: 0;
 }
@@ -1355,8 +1231,9 @@ textarea {
   position: relative;
   bottom: auto;
   right: auto;
-  margin-top: 6px;
-  font-size: 8px;
-  opacity: 0.35;
+  display: flex;
   justify-content: flex-end;
+  margin-top: 4px;
+  font-size: 8px;
+  opacity: 0.4;
 }
