@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, ReactNode } from 'react';
 import { Pin } from '@/types';
 import { config } from '@/lib/config';
 
@@ -52,6 +52,32 @@ function getSizeClass(body: string): string {
   if (length < 60) return 'pw-short';
   if (length > 200) return 'pw-long';
   return '';
+}
+
+// Convert URLs in text to clickable links
+function linkifyText(text: string): ReactNode[] {
+  const urlRegex = /(https?:\/\/[^\s<]+[^\s<.,;:!?)}\]"'])/gi;
+  const parts = text.split(urlRegex);
+
+  return parts.map((part, i) => {
+    if (urlRegex.test(part)) {
+      // Reset regex lastIndex since we're reusing it
+      urlRegex.lastIndex = 0;
+      return (
+        <a
+          key={i}
+          href={part}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-accent hover:underline break-all"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {part}
+        </a>
+      );
+    }
+    return part;
+  });
 }
 
 export function PaperweightPin({
@@ -124,7 +150,7 @@ export function PaperweightPin({
         )}
 
         {/* Body */}
-        <p className="paperweight-body">{pin.body}</p>
+        <p className="paperweight-body">{linkifyText(pin.body)}</p>
 
         {/* Metadata - actions left, timestamp right */}
         <div className="paperweight-meta">
@@ -177,7 +203,7 @@ export function PaperweightPin({
         {/* Body - with optional badge at start */}
         <p className="paperweight-body">
           {pin.badge && <span className="paperweight-badge">{pin.badge}</span>}
-          {pin.body}
+          {linkifyText(pin.body)}
         </p>
 
         {/* Metadata - actions left, timestamp right */}

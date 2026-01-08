@@ -429,6 +429,7 @@ export function FancyBoard({
       <footer className="fancy-board-footer">
         <div className="flex justify-center gap-6 text-xs text-faint">
           <a href={flags.PROXHOME_ADVANCED ? '/?view=nearby' : '/map'} className="hover:text-[var(--fg-muted)] transition-colors">nearby</a>
+          <a href="/map" className="hover:text-[var(--fg-muted)] transition-colors">map</a>
           <a href="/about" className="hover:text-[var(--fg-muted)] transition-colors">about</a>
           <a href="/terms" className="hover:text-[var(--fg-muted)] transition-colors">terms</a>
           <a href="/privacy" className="hover:text-[var(--fg-muted)] transition-colors">privacy</a>

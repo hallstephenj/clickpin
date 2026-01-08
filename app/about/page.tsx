@@ -205,7 +205,8 @@ export default function AboutPage() {
       {/* Footer */}
       <footer className="border-t border-[var(--border)] mt-8">
         <div className="max-w-2xl mx-auto px-4 py-6 flex justify-center gap-6 text-xs text-faint">
-          <a href="/map" className="hover:text-[var(--fg-muted)] transition-colors">nearby</a>
+          <a href="/" className="hover:text-[var(--fg-muted)] transition-colors">nearby</a>
+          <a href="/map" className="hover:text-[var(--fg-muted)] transition-colors">map</a>
           <a href="/about" className="hover:text-[var(--fg-muted)] transition-colors">about</a>
           <a href="/terms" className="hover:text-[var(--fg-muted)] transition-colors">terms</a>
           <a href="/privacy" className="hover:text-[var(--fg-muted)] transition-colors">privacy</a>

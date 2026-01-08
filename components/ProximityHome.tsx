@@ -284,18 +284,6 @@ export function ProximityHome({ state, onRequestLocation, sessionId, currentLoca
                           </div>
           )}
 
-          {/* See full map link */}
-          {nearbyBoards.length > 0 && (
-            <div className="text-center mb-6">
-              <Link
-                href="/map"
-                className="text-sm text-muted hover:text-accent transition-colors"
-              >
-                See the full map →
-              </Link>
-            </div>
-          )}
-
           {/* Action buttons */}
           <div className="flex flex-col gap-2">
             <button
@@ -318,7 +306,7 @@ export function ProximityHome({ state, onRequestLocation, sessionId, currentLoca
 
         {/* Footer */}
         <div className="mt-6 flex justify-center gap-6 text-xs text-faint">
-          <Link href="/map" className="hover:text-[var(--fg-muted)] transition-colors">nearby</Link>
+          <Link href="/map" className="hover:text-[var(--fg-muted)] transition-colors">map</Link>
           <Link href="/about" className="hover:text-[var(--fg-muted)] transition-colors">about</Link>
           <Link href="/terms" className="hover:text-[var(--fg-muted)] transition-colors">terms</Link>
           <Link href="/privacy" className="hover:text-[var(--fg-muted)] transition-colors">privacy</Link>
