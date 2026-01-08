@@ -13,6 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://clickpin.io"),
   title: "clickpin",
   description: "Anonymous, hyperlocal message board. Posts are tied to physical locations — you can only see and create posts when you're actually there. No accounts, no followers, no algorithms.",
   manifest: "/manifest.json",
