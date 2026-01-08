@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { supabaseAdmin } from '@/lib/supabase';
 import { getFeatureFlags } from '@/lib/featureFlags';
 import { SharedPinView } from '@/components/SharedPinView';
+import { Lightning } from '@phosphor-icons/react';
 
 interface PageProps {
   params: Promise<{ pinId: string }>;
@@ -154,7 +155,7 @@ export default async function SharedPinPage({ params }: PageProps) {
         <header className="border-b border-[var(--border)]">
           <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
             <a href="/" className="flex items-center gap-2 hover:opacity-80">
-              <span className="text-[#f7931a] font-bold text-lg">⚡</span>
+              <Lightning size={20} weight="fill" className="text-[#f7931a]" />
               <span className="font-bold">clickpin</span>
             </a>
             <a href="/about" className="btn">

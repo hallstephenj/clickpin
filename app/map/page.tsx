@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import { Lightning } from '@phosphor-icons/react';
 
 // Dynamically import the map component to avoid SSR issues with Leaflet
 const LocationMap = dynamic(
@@ -24,7 +25,7 @@ export default function MapPage() {
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/" className="text-accent font-bold text-lg hover:opacity-80">
-              ⚡
+              <Lightning size={24} weight="fill" />
             </Link>
             <h1 className="font-bold text-[var(--fg)]">nearby boards</h1>
           </div>

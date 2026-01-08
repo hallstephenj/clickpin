@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Lightning } from '@phosphor-icons/react';
 
 export default function AboutPage() {
   return (
@@ -7,7 +8,7 @@ export default function AboutPage() {
       <header className="border-b border-[var(--border)]">
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 hover:opacity-80">
-            <span className="text-[#f7931a] font-bold text-lg">⚡</span>
+            <Lightning size={20} weight="fill" className="text-[#f7931a]" />
             <span className="font-bold">clickpin</span>
           </Link>
           <Link href="/" className="btn">
@@ -20,7 +21,7 @@ export default function AboutPage() {
       <main className="max-w-2xl mx-auto px-4 py-8">
         {/* Hero */}
         <div className="text-center mb-12">
-          <div className="text-6xl mb-4">⚡</div>
+          <Lightning size={64} weight="fill" className="text-accent mx-auto mb-4" />
           <h1 className="text-3xl font-bold mb-2">clickpin</h1>
           <p className="text-[var(--fg-muted)] font-mono">
             the bitcoin underground
@@ -98,8 +99,8 @@ export default function AboutPage() {
 
         {/* Lightning payments */}
         <section className="mb-10">
-          <h2 className="font-bold text-lg mb-3 border-b border-[var(--border)] pb-2">
-            ⚡ lightning payments
+          <h2 className="font-bold text-lg mb-3 border-b border-[var(--border)] pb-2 flex items-center gap-2">
+            <Lightning size={20} weight="fill" className="text-accent" /> lightning payments
           </h2>
           <div className="space-y-3 text-[var(--fg-muted)]">
             <p>

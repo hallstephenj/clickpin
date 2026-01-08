@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useState, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { Lightning } from '@phosphor-icons/react';
 import { useSession } from '@/lib/hooks/useSession';
 import { useGeolocation } from '@/lib/hooks/useGeolocation';
 import { useBoard } from '@/lib/hooks/useBoard';
@@ -26,7 +27,7 @@ function LoadingScreen({ message, progress }: { message: string; progress: numbe
   return (
     <div className="min-h-screen bg-[#fafafa] dark:bg-[#0a0a0a] flex items-center justify-center">
       <div className="text-center">
-        <div className="text-4xl mb-4">⚡</div>
+        <Lightning size={48} weight="fill" className="text-accent mb-4 mx-auto" />
         <div className="font-mono text-sm text-[#666] dark:text-[#999]">
           {message}
         </div>
