@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { Pin, Location, FancyPin } from '@/types';
-import { PinCard } from './PinCard';
 import { PaperweightPin } from './PaperweightPin';
 import { ComposeModal } from './ComposeModal';
 import { PaymentModal } from './PaymentModal';
@@ -378,7 +377,7 @@ export function Board({
               <div className="py-8 text-center">
                 <p className="text-muted">no visible posts</p>
               </div>
-            ) : flags.PAPERWEIGHT ? (
+            ) : (
               <div className="paperweight-feed">
                 {pins.map((pin) => (
                   <PaperweightPin
@@ -392,20 +391,7 @@ export function Board({
                   />
                 ))}
               </div>
-            ) : (
-              pins.map((pin, index) => (
-                <PinCard
-                  key={pin.id}
-                  pin={pin}
-                  presenceToken={presenceToken}
-                  onReply={handleOpenCompose}
-                  onDelete={handleDelete}
-                  onFlag={handleFlag}
-                  onBoost={handleBoost}
-                  index={index}
-                />
-              ))
-            )}
+            )}}
 
             {/* Hidden posts collapsible section */}
             {hiddenPins.length > 0 && (
@@ -419,35 +405,19 @@ export function Board({
                 </button>
                 {showHidden && (
                   <div className="pl-4 border-l-2 border-[var(--border)]">
-                    {flags.PAPERWEIGHT ? (
-                      <div className="paperweight-feed opacity-60">
-                        {hiddenPins.map((pin) => (
-                          <PaperweightPin
-                            key={pin.id}
-                            pin={pin}
-                            presenceToken={presenceToken}
-                            onReply={handleOpenCompose}
-                            onDelete={handleDelete}
-                            onFlag={handleFlag}
-                            onBoost={handleBoost}
-                          />
-                        ))}
-                      </div>
-                    ) : (
-                      hiddenPins.map((pin, index) => (
-                        <div key={pin.id} className="opacity-60">
-                          <PinCard
-                            pin={pin}
-                            presenceToken={presenceToken}
-                            onReply={handleOpenCompose}
-                            onDelete={handleDelete}
-                            onFlag={handleFlag}
-                            onBoost={handleBoost}
-                            index={pins.length + index}
-                          />
-                        </div>
-                      ))
-                    )}
+                    <div className="paperweight-feed opacity-60">
+                      {hiddenPins.map((pin) => (
+                        <PaperweightPin
+                          key={pin.id}
+                          pin={pin}
+                          presenceToken={presenceToken}
+                          onReply={handleOpenCompose}
+                          onDelete={handleDelete}
+                          onFlag={handleFlag}
+                          onBoost={handleBoost}
+                        />
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>

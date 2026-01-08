@@ -1011,7 +1011,7 @@ export default function AdminPage() {
                   main features:
                 </div>
                 {featureFlags
-                  .filter((flag) => flag.key === 'fancy_board_enabled' || flag.key === 'GHOSTS' || flag.key === 'PAPERWEIGHT')
+                  .filter((flag) => flag.key === 'fancy_board_enabled' || flag.key === 'GHOSTS')
                   .map((flag) => (
                     <div
                       key={flag.id}
@@ -1050,7 +1050,7 @@ export default function AdminPage() {
                   fancy board sub-features (require fancy_board_enabled ON):
                 </div>
                 {featureFlags
-                  .filter((flag) => flag.key !== 'fancy_board_enabled' && flag.key !== 'GHOSTS' && flag.key !== 'PAPERWEIGHT')
+                  .filter((flag) => flag.key !== 'fancy_board_enabled' && flag.key !== 'GHOSTS')
                   .map((flag) => {
                     const masterEnabled = featureFlags.find(
                       (f) => f.key === 'fancy_board_enabled'
@@ -1088,7 +1088,7 @@ export default function AdminPage() {
                   })}
 
                 {/* Warning if sub-features enabled but master off */}
-                {featureFlags.some((f) => f.key !== 'fancy_board_enabled' && f.key !== 'GHOSTS' && f.key !== 'PAPERWEIGHT' && f.enabled) &&
+                {featureFlags.some((f) => f.key !== 'fancy_board_enabled' && f.key !== 'GHOSTS' && f.enabled) &&
                   !featureFlags.find((f) => f.key === 'fancy_board_enabled')?.enabled && (
                     <div className="mt-4 p-3 bg-[var(--danger)]/10 border border-[var(--danger)] text-danger text-xs font-mono">
                       Warning: Fancy board sub-features are enabled but fancy_board_enabled is OFF. Enable
