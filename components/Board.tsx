@@ -389,6 +389,7 @@ export function Board({
                     onDelete={handleDelete}
                     onFlag={handleFlag}
                     onBoost={handleBoost}
+                    shareEnabled={flags.SHARENOTES}
                   />
                 ))}
               </div>
@@ -416,6 +417,7 @@ export function Board({
                           onDelete={handleDelete}
                           onFlag={handleFlag}
                           onBoost={handleBoost}
+                          shareEnabled={flags.SHARENOTES}
                         />
                       ))}
                     </div>

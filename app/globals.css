@@ -1230,3 +1230,126 @@ textarea {
   font-size: 8px;
   opacity: 0.4;
 }
+
+/* ========================================
+   SHARED PIN PAGE STYLES
+   ======================================== */
+
+/* Pin card - paper note style */
+.shared-pin-card {
+  background: #f7f6f3;
+  border: 1px solid rgba(100, 80, 50, 0.15);
+  padding: 20px;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+@media (prefers-color-scheme: dark) {
+  .shared-pin-card {
+    background: #1a1917;
+    border-color: rgba(100, 80, 50, 0.2);
+  }
+}
+
+.shared-pin-removed {
+  color: var(--fg-muted);
+  font-style: italic;
+}
+
+.shared-pin-doodle {
+  margin-bottom: 12px;
+}
+
+.shared-pin-doodle img {
+  max-width: 100%;
+  max-height: 200px;
+  object-fit: contain;
+}
+
+.shared-pin-body {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--fg);
+  margin: 0;
+  word-break: break-word;
+}
+
+.shared-pin-meta {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(100, 80, 50, 0.1);
+}
+
+.shared-pin-location {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--fg);
+}
+
+.shared-pin-time {
+  font-size: 12px;
+  color: var(--fg-muted);
+  margin-top: 4px;
+}
+
+/* Reply count */
+.shared-pin-replies {
+  font-size: 13px;
+  color: var(--fg-muted);
+  margin-bottom: 24px;
+  font-style: italic;
+}
+
+/* Explainer box */
+.shared-pin-explainer {
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.shared-pin-explainer-text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--fg-muted);
+  margin: 0 0 16px 0;
+}
+
+.shared-pin-explainer-text strong {
+  color: var(--fg);
+}
+
+.shared-pin-explainer-count {
+  font-size: 13px;
+  color: var(--accent);
+  margin: 0 0 16px 0;
+}
+
+.shared-pin-map-btn {
+  width: 100%;
+  justify-content: center;
+}
+
+/* Footer */
+.shared-pin-footer {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  padding: 24px 0;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+}
+
+.shared-pin-footer a {
+  color: var(--fg-muted);
+  text-decoration: none;
+}
+
+.shared-pin-footer a:hover {
+  color: var(--fg);
+}
+
+/* Share button styling */
+.action-share {
+  color: var(--accent);
+}

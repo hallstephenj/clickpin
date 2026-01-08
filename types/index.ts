@@ -179,6 +179,7 @@ export interface FeatureFlags {
   fancy_dig_mode: boolean;
   GHOSTS: boolean;
   BADGES: boolean;
+  SHARENOTES: boolean;
 }
 
 // Badge types

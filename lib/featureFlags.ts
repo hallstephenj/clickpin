@@ -13,6 +13,7 @@ export const DEFAULT_FLAGS: FeatureFlags = {
   fancy_dig_mode: false,
   GHOSTS: false,
   BADGES: false,
+  SHARENOTES: false,
 };
 
 // All feature flag keys
@@ -27,6 +28,7 @@ export const FEATURE_FLAG_KEYS = [
   'fancy_dig_mode',
   'GHOSTS',
   'BADGES',
+  'SHARENOTES',
 ] as const;
 
 // Server-side: Fetch all flags from database

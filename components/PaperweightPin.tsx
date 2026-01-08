@@ -12,6 +12,7 @@ interface PaperweightPinProps {
   onFlag: (pinId: string) => void;
   onBoost: (pinId: string) => void;
   isReply?: boolean;
+  shareEnabled?: boolean;
 }
 
 type AgeClass = 'fresh' | 'recent' | 'aged' | 'vintage';
@@ -61,9 +62,11 @@ export function PaperweightPin({
   onFlag,
   onBoost,
   isReply = false,
+  shareEnabled = false,
 }: PaperweightPinProps) {
   const [showReplies, setShowReplies] = useState(true);
   const [flagging, setFlagging] = useState(false);
+  const [shareState, setShareState] = useState<'idle' | 'copied'>('idle');
 
   const fuzzyTime = useMemo(() => getFuzzyTime(pin.created_at), [pin.created_at]);
   const isBoosted = pin.boost_score > 0 && pin.boost_expires_at && new Date(pin.boost_expires_at) > new Date();
@@ -78,6 +81,35 @@ export function PaperweightPin({
     setFlagging(true);
     await onFlag(pin.id);
     setFlagging(false);
+  };
+
+  const handleShare = async () => {
+    const shareUrl = `${window.location.origin}/p/${pin.id}`;
+    const shareData = {
+      title: 'clickpin',
+      text: pin.body.length > 100 ? pin.body.slice(0, 100) + '...' : pin.body,
+      url: shareUrl,
+    };
+
+    // Try native share sheet on mobile
+    if (navigator.share && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+      try {
+        await navigator.share(shareData);
+        return;
+      } catch (err) {
+        // User cancelled or share failed, fall back to copy
+        if ((err as Error).name === 'AbortError') return;
+      }
+    }
+
+    // Fall back to clipboard copy
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setShareState('copied');
+      setTimeout(() => setShareState('idle'), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
   };
 
   // Reply rendering
@@ -164,6 +196,11 @@ export function PaperweightPin({
             <button onClick={() => onBoost(pin.id)} className="action-boost">
               boost
             </button>
+            {shareEnabled && (
+              <button onClick={handleShare} className="action-share">
+                {shareState === 'copied' ? 'copied!' : 'share'}
+              </button>
+            )}
             {pin.is_mine && (
               <button onClick={() => onDelete(pin.id)} className="action-delete">
                 delete
