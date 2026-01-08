@@ -32,6 +32,7 @@ interface NearbyBoard {
   radius_m: number;
   btcmap_id?: number | null;
   is_bitcoin_merchant?: boolean;
+  website?: string | null;
 }
 
 interface ProximityStats {
@@ -148,34 +149,99 @@ export function ProximityHome({ state, onRequestLocation, sessionId }: Proximity
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0">
-                      <div className="font-medium text-sm text-[var(--fg)] truncate flex items-center gap-2">
+                      <div className="font-medium text-sm text-[var(--fg)] truncate flex items-center gap-1.5">
                         <span>{board.name}</span>
                         {(board.btcmap_id || board.is_bitcoin_merchant) && (
-                          <span className="text-xs text-[#f7931a] font-mono">⚡ accepts bitcoin</span>
+                          <span className="text-[#f7931a] text-xs" title="Accepts Bitcoin">⚡</span>
+                        )}
+                        {board.website && (
+                          <a
+                            href={board.website}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-muted hover:text-accent transition-colors"
+                            title="Visit website"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="12"
+                              height="12"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                              <polyline points="15 3 21 3 21 9" />
+                              <line x1="10" y1="14" x2="21" y2="3" />
+                            </svg>
+                          </a>
                         )}
                       </div>
                       <div className="text-xs text-muted font-mono">
                         {formatDistance(board.distance_m)} away
                       </div>
                     </div>
-                    <div className="text-right ml-3">
-                      {board.active_sessions > 0 ? (
-                        <div className="text-xs text-accent font-mono">
-                          {board.active_sessions} active now
-                        </div>
-                      ) : board.pins_today > 0 ? (
-                        <div className="text-xs text-muted font-mono">
-                          {board.pins_today} pins today
-                        </div>
-                      ) : (
-                        <div className="text-xs text-faint font-mono">
-                          quiet
-                        </div>
-                      )}
+                    <div className="flex items-center gap-3">
+                      <div className="text-right">
+                        {board.active_sessions > 0 ? (
+                          <div className="text-xs text-accent font-mono">
+                            {board.active_sessions} active now
+                          </div>
+                        ) : board.pins_today > 0 ? (
+                          <div className="text-xs text-muted font-mono">
+                            {board.pins_today} pins today
+                          </div>
+                        ) : (
+                          <div className="text-xs text-faint font-mono">
+                            quiet
+                          </div>
+                        )}
+                      </div>
+                      <a
+                        href={`https://maps.apple.com/?daddr=${board.lat},${board.lng}`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          // Try Apple Maps first (iOS), fall back to Google Maps
+                          const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+                          const url = isIOS
+                            ? `maps://maps.apple.com/?daddr=${board.lat},${board.lng}`
+                            : `https://www.google.com/maps/dir/?api=1&destination=${board.lat},${board.lng}`;
+                          window.open(url, '_blank');
+                        }}
+                        className="p-2 text-muted hover:text-accent transition-colors"
+                        title={`Navigate to ${board.name}`}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <polygon points="3 11 22 2 13 21 11 13 3 11" />
+                        </svg>
+                      </a>
                     </div>
                   </div>
                 </div>
               ))}
+
+              {/* Legend */}
+              {nearbyBoards.slice(0, 3).some(b => b.btcmap_id || b.is_bitcoin_merchant) && (
+                <div className="flex items-center justify-center gap-4 text-xs text-faint font-mono pt-2">
+                  <span className="flex items-center gap-1">
+                    <span className="text-[#f7931a]">⚡</span> accepts bitcoin
+                  </span>
+                </div>
+              )}
 
               {/* Aggregate stat if there are pins */}
               {stats && stats.total_pins_last_hour > 0 && (

@@ -28,6 +28,7 @@ export interface NearbyBoardStats {
   radius_m: number;
   btcmap_id?: number | null;
   is_bitcoin_merchant?: boolean;
+  website?: string | null;
 }
 
 export interface ProximityStatsResponse {
@@ -53,7 +54,7 @@ export async function GET(request: NextRequest) {
     // Fetch all active locations
     const { data: locations, error: locError } = await supabaseAdmin
       .from('locations')
-      .select('id, name, slug, lat, lng, radius_m, btcmap_id, is_bitcoin_merchant')
+      .select('id, name, slug, lat, lng, radius_m, btcmap_id, is_bitcoin_merchant, website')
       .eq('is_active', true);
 
     if (locError || !locations) {
@@ -120,6 +121,7 @@ export async function GET(request: NextRequest) {
           radius_m: loc.radius_m,
           btcmap_id: loc.btcmap_id,
           is_bitcoin_merchant: loc.is_bitcoin_merchant,
+          website: loc.website,
         };
       })
     );
