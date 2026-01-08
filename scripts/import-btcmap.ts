@@ -98,7 +98,7 @@ async function fetchBTCMapLocations(lat: number, lon: number, radiusKm: number):
   return places;
 }
 
-async function importLocations(lat: number, lon: number, radiusKm: number, dryRun: boolean) {
+async function importLocations(lat: number, lon: number, radiusKm: number, cityName: string, dryRun: boolean) {
   const places = await fetchBTCMapLocations(lat, lon, radiusKm);
 
   // Get existing BTCMap IDs to avoid duplicates
@@ -144,7 +144,7 @@ async function importLocations(lat: number, lon: number, radiusKm: number, dryRu
       radius_m: 100,
       is_active: true,
       category,
-      city: 'Austin', // Hardcoded for now
+      city: cityName,
       // BTCMap fields
       btcmap_id: place.id,
       osm_id: place.osm_id,
@@ -331,6 +331,7 @@ const getArg = (name: string): string | undefined => {
 const lat = parseFloat(getArg('lat') || '30.2672'); // Austin default
 const lon = parseFloat(getArg('lon') || '-97.7431');
 const radius = parseFloat(getArg('radius') || '50');
+const city = getArg('city') || 'Austin';
 const dryRun = args.includes('--dry-run');
 const confirm = args.includes('--confirm');
 
@@ -341,12 +342,13 @@ console.log(`Command: ${command}`);
 if (command === 'import') {
   console.log(`Center: ${lat}, ${lon}`);
   console.log(`Radius: ${radius}km`);
+  console.log(`City: ${city}`);
   console.log(`Dry run: ${dryRun}\n`);
 }
 
 switch (command) {
   case 'import':
-    importLocations(lat, lon, radius, dryRun).catch(console.error);
+    importLocations(lat, lon, radius, city, dryRun).catch(console.error);
     break;
   case 'sync':
     syncLocations().catch(console.error);
