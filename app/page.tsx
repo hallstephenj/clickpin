@@ -6,6 +6,7 @@ import { useGeolocation } from '@/lib/hooks/useGeolocation';
 import { useBoard } from '@/lib/hooks/useBoard';
 import { useFeatureFlags } from '@/lib/hooks/useFeatureFlags';
 import { LocationGate } from '@/components/LocationGate';
+import { ProximityHome } from '@/components/ProximityHome';
 import { Board } from '@/components/Board';
 import { GhostFeed } from '@/components/GhostFeed';
 import { config } from '@/lib/config';
@@ -114,8 +115,20 @@ export default function Home() {
     return <GhostFeed onRequestLocation={handleRequestLocation} />;
   }
 
-  // No location resolved - show location gate
+  // No location resolved - show location gate or proximity home
   if (!geoLocation) {
+    // Use ProximityHome for discovery-framed experience when PROXHOME is enabled
+    // and user has position but no board found
+    if (flags.PROXHOME && state.position) {
+      return (
+        <ProximityHome
+          state={state}
+          onRequestLocation={handleRequestLocation}
+          sessionId={sessionId}
+        />
+      );
+    }
+
     return (
       <LocationGate
         state={state}
