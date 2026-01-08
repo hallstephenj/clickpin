@@ -17,8 +17,31 @@ export const metadata: Metadata = {
   description: "location-locked posts for real places",
   manifest: "/manifest.json",
   icons: {
-    icon: "/icon.svg",
-    apple: "/icon.svg",
+    icon: "/favicon.png",
+    shortcut: "/favicon.png",
+    apple: "/favicon.png",
+  },
+  openGraph: {
+    title: "clickpin",
+    description: "location-locked posts for real places",
+    url: "https://clickpin.io",
+    siteName: "clickpin",
+    images: [
+      {
+        url: "/opengraph.png",
+        width: 1200,
+        height: 630,
+        alt: "clickpin - the bitcoin underground",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "clickpin",
+    description: "location-locked posts for real places",
+    images: ["/opengraph.png"],
   },
   appleWebApp: {
     capable: true,
