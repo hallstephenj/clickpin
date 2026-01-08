@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "clickpin",
-  description: "location-locked posts for real places",
+  description: "Anonymous, hyperlocal message board. Posts are tied to physical locations — you can only see and create posts when you're actually there. No accounts, no followers, no algorithms.",
   manifest: "/manifest.json",
   icons: {
     icon: "/favicon.png",
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "clickpin",
-    description: "location-locked posts for real places",
+    description: "Anonymous, hyperlocal message board. Posts are tied to physical locations — you can only see and create posts when you're actually there.",
     url: "https://clickpin.io",
     siteName: "clickpin",
     images: [
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
         url: "/opengraph.png",
         width: 1200,
         height: 630,
-        alt: "clickpin - the bitcoin underground",
+        alt: "clickpin - anonymous hyperlocal message board",
       },
     ],
     locale: "en_US",
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "clickpin",
-    description: "location-locked posts for real places",
+    description: "Anonymous, hyperlocal message board. Posts are tied to physical locations — you can only see and create posts when you're actually there.",
     images: ["/opengraph.png"],
   },
   appleWebApp: {
