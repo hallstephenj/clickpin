@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Pin } from '@/types';
 import { formatDistanceToNow } from 'date-fns';
 import { config } from '@/lib/config';
+import { Lightning } from '@phosphor-icons/react';
 
 interface PinCardProps {
   pin: Pin;
@@ -57,7 +58,9 @@ export function PinCard({
           <div className="flex-1 min-w-0">
             {/* Boost tag */}
             {isBoosted && (
-              <span className="tag tag-boost mr-2">⚡ boosted</span>
+              <span className="tag tag-boost mr-2 inline-flex items-center gap-1">
+                <Lightning size={12} weight="fill" /> boosted
+              </span>
             )}
 
             {/* Pin body */}
@@ -126,9 +129,9 @@ export function PinCard({
                   <span>•</span>
                   <button
                     onClick={() => onDelete(pin.id)}
-                    className="hover:text-[var(--danger)] hover:underline"
+                    className="hover:text-[var(--danger)] hover:underline inline-flex items-center gap-0.5"
                   >
-                    delete{canFreeDelete ? '' : ' ⚡'}
+                    delete{!canFreeDelete && <Lightning size={12} weight="fill" />}
                   </button>
                 </>
               )}

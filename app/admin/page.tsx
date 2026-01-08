@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { Lightning } from '@phosphor-icons/react';
 
 interface LocationRequest {
   id: string;
@@ -484,8 +485,8 @@ export default function AdminPage() {
       <div className="min-h-screen bg-[#fafafa] dark:bg-[#0a0a0a] flex items-center justify-center p-4">
         <div className="max-w-sm w-full">
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold mb-1">
-              <span className="text-accent">⚡</span> clickpin admin
+            <h1 className="text-2xl font-bold mb-1 inline-flex items-center gap-1">
+              <Lightning size={24} weight="fill" className="text-accent" /> clickpin admin
             </h1>
             <p className="text-muted text-sm font-mono">location management</p>
           </div>
@@ -672,8 +673,8 @@ export default function AdminPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold">
-              <span className="text-accent">⚡</span> clickpin admin
+            <h1 className="text-2xl font-bold inline-flex items-center gap-1">
+              <Lightning size={24} weight="fill" className="text-accent" /> clickpin admin
             </h1>
           </div>
         </div>
@@ -935,7 +936,7 @@ export default function AdminPage() {
                               <span>
                                 "{req.suggested_name}"
                                 {req.is_bitcoin_merchant && (
-                                  <span className="text-[#f7931a] ml-1" title="Bitcoin merchant">⚡</span>
+                                  <Lightning size={14} weight="fill" className="text-[#f7931a] ml-1 inline" title="Bitcoin merchant" />
                                 )}
                               </span>
                               <span className="text-faint text-xs">
@@ -1012,13 +1013,18 @@ export default function AdminPage() {
               </div>
             ) : (
               <div className="space-y-2">
-                {/* Main feature flags */}
+                {/* Feature flags organized with sub-features under parents */}
                 <div className="text-xs text-muted font-mono mb-2">
-                  main features:
+                  feature flags:
                 </div>
-                {featureFlags
-                  .filter((flag) => flag.key === 'fancy_board_enabled' || flag.key === 'GHOSTS' || flag.key === 'BADGES' || flag.key === 'SHARENOTES' || flag.key === 'ROTATONATOR' || flag.key === 'PROXHOME')
-                  .map((flag) => (
+                {(() => {
+                  const majorFlags = ['PAPERWEIGHT', 'MERCHANTS', 'GHOSTS', 'BADGES', 'SHARENOTES', 'ROTATONATOR', 'PROXHOME', 'fancy_board_enabled'];
+                  const proxhomeSubFlags = ['PROXHOME_ADVANCED'];
+                  const fancySubFlags = featureFlags
+                    .filter((f) => f.key.startsWith('fancy_') && f.key !== 'fancy_board_enabled')
+                    .map((f) => f.key);
+
+                  const renderMajorFlag = (flag: FeatureFlag) => (
                     <div
                       key={flag.id}
                       className={`border-2 p-4 ${
@@ -1049,29 +1055,21 @@ export default function AdminPage() {
                         </button>
                       </div>
                     </div>
-                  ))}
+                  );
 
-                {/* Fancy Board sub-features */}
-                <div className="text-xs text-muted font-mono mt-4 mb-2 pt-4 border-t border-[var(--border)]">
-                  fancy board sub-features (require fancy_board_enabled ON):
-                </div>
-                {featureFlags
-                  .filter((flag) => flag.key !== 'fancy_board_enabled' && flag.key !== 'GHOSTS' && flag.key !== 'BADGES' && flag.key !== 'SHARENOTES' && flag.key !== 'ROTATONATOR' && flag.key !== 'PROXHOME')
-                  .map((flag) => {
-                    const masterEnabled = featureFlags.find(
-                      (f) => f.key === 'fancy_board_enabled'
-                    )?.enabled;
+                  const renderSubFlag = (flag: FeatureFlag, masterKey: string, displayName?: string) => {
+                    const masterEnabled = featureFlags.find((f) => f.key === masterKey)?.enabled;
                     return (
                       <div
                         key={flag.id}
-                        className={`border border-[var(--border)] p-4 ${
+                        className={`border border-[var(--border)] p-3 ml-6 ${
                           !masterEnabled ? 'opacity-50' : ''
                         } ${flag.enabled && masterEnabled ? 'border-l-4 border-l-[var(--accent)]' : ''}`}
                       >
                         <div className="flex items-center justify-between">
                           <div>
                             <div className="font-mono text-sm flex items-center gap-2">
-                              {flag.enabled ? '🟢' : '⚪'} {flag.key.replace('fancy_', '')}
+                              {flag.enabled ? '🟢' : '⚪'} {displayName || flag.key}
                             </div>
                             <div className="text-xs text-muted font-mono mt-1">
                               {flag.description || 'No description'}
@@ -1091,16 +1089,27 @@ export default function AdminPage() {
                         </div>
                       </div>
                     );
-                  })}
+                  };
 
-                {/* Warning if sub-features enabled but master off */}
-                {featureFlags.some((f) => f.key !== 'fancy_board_enabled' && f.key !== 'GHOSTS' && f.key !== 'BADGES' && f.key !== 'SHARENOTES' && f.key !== 'ROTATONATOR' && f.key !== 'PROXHOME' && f.enabled) &&
-                  !featureFlags.find((f) => f.key === 'fancy_board_enabled')?.enabled && (
-                    <div className="mt-4 p-3 bg-[var(--danger)]/10 border border-[var(--danger)] text-danger text-xs font-mono">
-                      Warning: Fancy board sub-features are enabled but fancy_board_enabled is OFF. Enable
-                      "fancy_board_enabled" to activate these features.
-                    </div>
-                  )}
+                  return featureFlags
+                    .filter((flag) => majorFlags.includes(flag.key))
+                    .sort((a, b) => majorFlags.indexOf(a.key) - majorFlags.indexOf(b.key))
+                    .map((flag) => (
+                      <div key={flag.id}>
+                        {renderMajorFlag(flag)}
+
+                        {/* PROXHOME sub-features */}
+                        {flag.key === 'PROXHOME' && featureFlags
+                          .filter((f) => proxhomeSubFlags.includes(f.key))
+                          .map((subFlag) => renderSubFlag(subFlag, 'PROXHOME'))}
+
+                        {/* Fancy board sub-features */}
+                        {flag.key === 'fancy_board_enabled' && featureFlags
+                          .filter((f) => fancySubFlags.includes(f.key))
+                          .map((subFlag) => renderSubFlag(subFlag, 'fancy_board_enabled', subFlag.key.replace('fancy_', '')))}
+                      </div>
+                    ));
+                })()}
               </div>
             )}
           </>

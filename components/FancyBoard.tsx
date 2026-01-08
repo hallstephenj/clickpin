@@ -8,6 +8,7 @@ import { ComposeModal } from './ComposeModal';
 import { PaymentModal } from './PaymentModal';
 import { SponsorModal } from './SponsorModal';
 import { config } from '@/lib/config';
+import { X } from '@phosphor-icons/react';
 
 // Stacked notes icon with post count
 function PostCountIndicator({ count }: { count: number }) {
@@ -384,7 +385,7 @@ export function FancyBoard({
       {error && (
         <div className="fancy-board-error">
           <span>{error}</span>
-          <button onClick={() => setError(null)}>×</button>
+          <button onClick={() => setError(null)}><X size={16} /></button>
         </div>
       )}
 

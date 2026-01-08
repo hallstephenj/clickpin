@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
 import L from 'leaflet';
+import { Lightning, CheckCircle, Circle as CircleIcon } from '@phosphor-icons/react';
 
 interface Location {
   id: string;
@@ -13,6 +14,7 @@ interface Location {
   radius_m: number;
   btcmap_id?: number | null;
   is_bitcoin_merchant?: boolean;
+  is_claimed?: boolean;
 }
 
 interface LocationMapProps {
@@ -42,6 +44,41 @@ const createIcon = (color: string) => {
 const bitcoinMerchantIcon = createIcon('#f7931a'); // Bitcoin orange for merchants
 const communityIcon = createIcon('#6b7280'); // Gray for community boards
 const userIcon = createIcon('#3b82f6'); // Blue for user
+
+// Verified merchant icon with checkmark badge
+const verifiedMerchantIcon = L.divIcon({
+  className: 'custom-marker-verified',
+  html: `<div style="position: relative;">
+    <div style="
+      background-color: #f7931a;
+      width: 24px;
+      height: 24px;
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      border: 2px solid white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    "></div>
+    <div style="
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      background-color: #22c55e;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2px solid white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      color: white;
+      font-weight: bold;
+    ">✓</div>
+  </div>`,
+  iconSize: [24, 24],
+  iconAnchor: [12, 24],
+  popupAnchor: [0, -24],
+});
 
 // Component to update map center when user location changes
 function MapUpdater({ center }: { center: [number, number] }) {
@@ -149,18 +186,32 @@ export function LocationMap({ userLat, userLng }: LocationMapProps) {
         {/* Location markers */}
         {locations.map((loc) => {
           const isBitcoinMerchant = !!loc.btcmap_id || !!loc.is_bitcoin_merchant;
+          const isVerified = isBitcoinMerchant && !!loc.is_claimed;
+          const icon = isVerified
+            ? verifiedMerchantIcon
+            : isBitcoinMerchant
+              ? bitcoinMerchantIcon
+              : communityIcon;
+
           return (
             <Marker
               key={loc.id}
               position={[loc.lat, loc.lng]}
-              icon={isBitcoinMerchant ? bitcoinMerchantIcon : communityIcon}
+              icon={icon}
             >
               <Popup>
                 <div className="font-mono text-sm">
-                  <strong style={{ color: isBitcoinMerchant ? '#f7931a' : '#6b7280' }}>
-                    {isBitcoinMerchant ? '⚡ ' : ''}{loc.name}
+                  <strong style={{ color: isBitcoinMerchant ? '#f7931a' : '#6b7280' }} className="inline-flex items-center gap-1">
+                    {isBitcoinMerchant && <Lightning size={14} weight="fill" />}
+                    {loc.name}
+                    {isVerified && <CheckCircle size={14} weight="fill" className="text-green-500" />}
                   </strong>
-                  {isBitcoinMerchant && (
+                  {isVerified && (
+                    <p className="text-xs text-green-600 mt-1">
+                      Verified merchant
+                    </p>
+                  )}
+                  {isBitcoinMerchant && !isVerified && (
                     <p className="text-xs text-[#f7931a] mt-1">
                       Bitcoin accepted here
                     </p>
@@ -189,23 +240,32 @@ export function LocationMap({ userLat, userLng }: LocationMapProps) {
 
       {/* Legend */}
       {(() => {
-        const merchantCount = locations.filter(l => l.btcmap_id || l.is_bitcoin_merchant).length;
-        const communityCount = locations.length - merchantCount;
+        const verifiedCount = locations.filter(l => (l.btcmap_id || l.is_bitcoin_merchant) && l.is_claimed).length;
+        const merchantCount = locations.filter(l => (l.btcmap_id || l.is_bitcoin_merchant) && !l.is_claimed).length;
+        const communityCount = locations.filter(l => !l.btcmap_id && !l.is_bitcoin_merchant).length;
         return (
           <div className="absolute bottom-4 left-4 bg-white dark:bg-[#0a0a0a] border border-[var(--border)] px-3 py-2 z-[1000] font-mono text-xs">
-            <div className="flex items-center gap-2 mb-1">
-              <span style={{ color: '#f7931a' }}>●</span>
-              <span>bitcoin merchant ({merchantCount})</span>
-            </div>
+            {verifiedCount > 0 && (
+              <div className="flex items-center gap-2 mb-1">
+                <CircleIcon size={10} weight="fill" className="text-green-500" />
+                <span>verified merchant ({verifiedCount})</span>
+              </div>
+            )}
+            {merchantCount > 0 && (
+              <div className="flex items-center gap-2 mb-1">
+                <CircleIcon size={10} weight="fill" className="text-[#f7931a]" />
+                <span>bitcoin merchant ({merchantCount})</span>
+              </div>
+            )}
             {communityCount > 0 && (
               <div className="flex items-center gap-2 mb-1">
-                <span style={{ color: '#6b7280' }}>●</span>
+                <CircleIcon size={10} weight="fill" className="text-gray-500" />
                 <span>community board ({communityCount})</span>
               </div>
             )}
             {userPosition && (
               <div className="flex items-center gap-2">
-                <span style={{ color: '#3b82f6' }}>●</span>
+                <CircleIcon size={10} weight="fill" className="text-blue-500" />
                 <span>your location</span>
               </div>
             )}

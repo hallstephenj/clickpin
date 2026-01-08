@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { config } from '@/lib/config';
 import { logGhostEvent } from '@/lib/ghostEvents';
+import { verifyMerchantClaim } from '@/lib/merchant';
 
 // POST /api/lightning/webhook - Handle payment confirmations from Lightning provider
 export async function POST(request: NextRequest) {
@@ -189,6 +190,13 @@ export async function applyPaymentEffects(
       .eq('id', postPayment.id);
 
     return { success: true, type: 'post' };
+  }
+
+  // Check merchant claims
+  const verifiedClaim = await verifyMerchantClaim(invoiceId);
+  if (verifiedClaim) {
+    logGhostEvent(verifiedClaim.location_id, 'merchant_claimed');
+    return { success: true, type: 'merchant_claim' };
   }
 
   return { success: false, error: 'Invoice not found or already processed' };

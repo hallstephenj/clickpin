@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { GeolocationState, Location } from '@/types';
 import { RequestLocationModal } from './RequestLocationModal';
+import { Lightning } from '@phosphor-icons/react';
 
 // Dynamically import map to avoid SSR issues
 const ProximityMiniMap = dynamic(
@@ -97,8 +98,8 @@ export function ProximityHome({ state, onRequestLocation, sessionId, currentLoca
       <div className="max-w-md w-full">
         {/* Header */}
         <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold mb-1">
-            <span className="text-accent">⚡</span> clickpin
+          <h1 className="text-2xl font-bold mb-1 inline-flex items-center gap-1">
+            <Lightning size={24} weight="fill" className="text-accent" /> clickpin
           </h1>
           <p className="text-muted text-sm font-mono">
             the bitcoin underground
@@ -183,7 +184,7 @@ export function ProximityHome({ state, onRequestLocation, sessionId, currentLoca
                       <div className="font-medium text-sm text-[var(--fg)] flex flex-wrap items-center gap-1.5">
                         <span className="break-words">{board.name}</span>
                         {(board.btcmap_id || board.is_bitcoin_merchant) && (
-                          <span className="text-[#f7931a] text-xs" title="Accepts Bitcoin">⚡</span>
+                          <Lightning size={14} weight="fill" className="text-[#f7931a]" title="Accepts Bitcoin" />
                         )}
                         {board.website && (
                           <a
@@ -269,7 +270,7 @@ export function ProximityHome({ state, onRequestLocation, sessionId, currentLoca
               {nearbyBoards.slice(0, 3).some(b => b.btcmap_id || b.is_bitcoin_merchant) && (
                 <div className="flex items-center justify-center gap-4 text-xs text-faint font-mono pt-2">
                   <span className="flex items-center gap-1">
-                    <span className="text-[#f7931a]">⚡</span> accepts bitcoin
+                    <Lightning size={14} weight="fill" className="text-[#f7931a]" /> accepts bitcoin
                   </span>
                 </div>
               )}

@@ -4,6 +4,7 @@ import { useState, useRef, useCallback, useMemo } from 'react';
 import { FancyPin, FeatureFlags, PinTemplate, PinSize } from '@/types';
 import { formatDistanceToNow } from 'date-fns';
 import { config } from '@/lib/config';
+import { Lightning } from '@phosphor-icons/react';
 
 interface FancyBoardPinProps {
   pin: FancyPin;
@@ -173,7 +174,7 @@ export function FancyBoardPin({
                 onClick={(e) => { e.stopPropagation(); onDelete(pin.id); }}
                 className="fancy-pin-action-delete"
               >
-                delete{canFreeDelete ? '' : ' ⚡'}
+                delete{!canFreeDelete && <Lightning size={12} weight="fill" className="ml-0.5 inline" />}
               </button>
             )}
           </div>

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import Link from 'next/link';
+import { Lightning, CheckCircle } from '@phosphor-icons/react';
 
 export default function TestWalletPage() {
   const [invoice, setInvoice] = useState('');
@@ -103,8 +104,8 @@ export default function TestWalletPage() {
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold mb-1">
-            <span className="text-accent">⚡</span> Test Wallet
+          <h1 className="text-2xl font-bold mb-1 inline-flex items-center gap-1">
+            <Lightning size={24} weight="fill" className="text-accent" /> Test Wallet
           </h1>
           <p className="text-muted text-sm font-mono">
             Simulate paying Lightning invoices
@@ -127,7 +128,7 @@ export default function TestWalletPage() {
           <div className="p-4">
             {status === 'paid' ? (
               <div className="py-8 text-center">
-                <div className="text-accent text-4xl mb-2">✓</div>
+                <CheckCircle size={48} weight="fill" className="text-accent mb-2 mx-auto" />
                 <p className="font-mono text-lg mb-2">Payment Sent!</p>
                 <p className="text-muted text-sm font-mono">
                   {invoiceDetails?.amount?.toLocaleString()} sats
@@ -179,8 +180,8 @@ export default function TestWalletPage() {
                       />
                     </div>
                     <div className="text-center">
-                      <div className="text-xl font-mono font-bold text-accent">
-                        ⚡ {invoiceDetails.amount?.toLocaleString() || '?'} sats
+                      <div className="text-xl font-mono font-bold text-accent inline-flex items-center justify-center gap-1">
+                        <Lightning size={20} weight="fill" /> {invoiceDetails.amount?.toLocaleString() || '?'} sats
                       </div>
                     </div>
                   </div>

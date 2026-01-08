@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { config } from '@/lib/config';
 import { BADGE_OPTIONS, BadgeType } from '@/types';
+import { X, Lightning } from '@phosphor-icons/react';
 
 interface ComposeModalProps {
   isOpen: boolean;
@@ -159,9 +160,9 @@ export function ComposeModal({
           </span>
           <button
             onClick={onClose}
-            className="text-muted hover:text-[var(--fg)] text-lg leading-none"
+            className="text-muted hover:text-[var(--fg)] leading-none"
           >
-            ×
+            <X size={18} />
           </button>
         </div>
 
@@ -182,8 +183,8 @@ export function ComposeModal({
               {charCount}/{maxLength}
             </span>
             {!isReply && postsRemaining !== undefined && (
-              <span className="text-faint">
-                {postsRemaining > 0 ? `${postsRemaining} free` : 'paid post ⚡'}
+              <span className="text-faint inline-flex items-center gap-1">
+                {postsRemaining > 0 ? `${postsRemaining} free` : (<>paid post <Lightning size={12} weight="fill" /></>)}
               </span>
             )}
           </div>

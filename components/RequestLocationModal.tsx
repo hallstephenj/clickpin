@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { X, Lightning, CheckCircle } from '@phosphor-icons/react';
 
 interface RequestLocationModalProps {
   isOpen: boolean;
@@ -88,16 +89,16 @@ export function RequestLocationModal({
           <span className="font-mono text-sm text-muted">request new location</span>
           <button
             onClick={handleClose}
-            className="text-muted hover:text-[var(--fg)] text-lg leading-none"
+            className="text-muted hover:text-[var(--fg)] leading-none"
           >
-            ×
+            <X size={18} />
           </button>
         </div>
 
         <div className="p-4">
           {submitted ? (
             <div className="py-6 text-center">
-              <div className="text-[#f7931a] text-2xl mb-2">✓</div>
+              <CheckCircle size={32} weight="fill" className="text-[#f7931a] mx-auto mb-2" />
               <p className="font-mono text-sm mb-2">request submitted</p>
               <p className="text-xs text-muted">
                 we'll review your suggestion and may add this location soon.
@@ -143,8 +144,8 @@ export function RequestLocationModal({
                   onChange={(e) => setIsBitcoinMerchant(e.target.checked)}
                   className="w-4 h-4 accent-[#f7931a]"
                 />
-                <span className="text-sm font-mono">
-                  this is a bitcoin merchant <span className="text-[#f7931a]">⚡</span>
+                <span className="text-sm font-mono inline-flex items-center gap-1">
+                  this is a bitcoin merchant <Lightning size={14} weight="fill" className="text-[#f7931a]" />
                 </span>
               </label>
 

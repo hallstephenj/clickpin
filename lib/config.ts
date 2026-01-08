@@ -51,4 +51,11 @@ export const config = {
     maxBodyLength: 280,
     maxDoodleSize: parseInt(process.env.MAX_DOODLE_SIZE || '50000', 10), // ~50KB base64
   },
+
+  // Merchant settings
+  merchant: {
+    claimPriceSats: parseInt(process.env.MERCHANT_CLAIM_PRICE_SATS || '1000', 10),
+    welcomeMessageMaxLength: 280,
+    specialExpiresHours: 24,
+  },
 };

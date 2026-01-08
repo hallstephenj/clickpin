@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { GeolocationState } from '@/types';
 import { RequestLocationModal } from './RequestLocationModal';
+import { Lightning } from '@phosphor-icons/react';
 
 function AnimatedProgressBar() {
   const [progress, setProgress] = useState(0);
@@ -47,8 +48,8 @@ export function LocationGate({ state, error, onRequestLocation, sessionId }: Loc
       <div className="max-w-sm w-full">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold mb-1">
-            <span className="text-accent">⚡</span> clickpin
+          <h1 className="text-2xl font-bold mb-1 inline-flex items-center gap-1 justify-center">
+            <Lightning size={24} weight="fill" className="text-accent" /> clickpin
           </h1>
           <p className="text-muted text-sm font-mono">
             the bitcoin underground

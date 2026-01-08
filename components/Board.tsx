@@ -8,9 +8,11 @@ import { PaymentModal } from './PaymentModal';
 import { SponsorModal } from './SponsorModal';
 import { FancyBoard } from './FancyBoard';
 import { PromptCarousel } from './PromptCarousel';
+import { ClaimButton, ClaimModal, VerifiedBadge, WelcomeBanner } from './merchant';
 import { useFeatureFlags } from '@/lib/hooks/useFeatureFlags';
 import { isFancyBoardActive } from '@/lib/featureFlags';
 import { config } from '@/lib/config';
+import { X } from '@phosphor-icons/react';
 
 // Stacked notes icon with post count
 function PostCountIndicator({ count }: { count: number }) {
@@ -66,6 +68,11 @@ export function Board({
   const [error, setError] = useState<string | null>(null);
   const [localPostsRemaining, setLocalPostsRemaining] = useState(postsRemaining);
   const [sponsorModalOpen, setSponsorModalOpen] = useState(false);
+  const [claimModalOpen, setClaimModalOpen] = useState(false);
+
+  // Determine if this is a merchant location (can be claimed)
+  const isMerchantLocation = Boolean(location.is_bitcoin_merchant || location.btcmap_id);
+  const isClaimed = Boolean(location.is_claimed);
 
   const handleOpenCompose = (replyId: string | null = null) => {
     setReplyToId(replyId);
@@ -292,10 +299,33 @@ export function Board({
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
                 <h1 className="font-bold text-lg text-[var(--fg)] truncate">{location.name}</h1>
+                {isClaimed && <VerifiedBadge />}
                 <span className="live-dot" title="Live" />
               </div>
               {location.city && (
                 <p className="text-sm text-muted mt-0.5">{location.city}</p>
+              )}
+
+              {/* Merchant claim button (only for unclaimed merchant locations) */}
+              {flags.MERCHANTS && isMerchantLocation && !isClaimed && (
+                <div className="mt-1">
+                  <ClaimButton
+                    onClick={() => setClaimModalOpen(true)}
+                    isMerchantLocation={isMerchantLocation}
+                  />
+                </div>
+              )}
+
+              {/* Merchant dashboard link (for claimed locations) */}
+              {flags.MERCHANTS && isClaimed && (
+                <div className="mt-1">
+                  <a
+                    href={`/merchant/${location.slug}`}
+                    className="text-xs font-mono text-accent hover:underline"
+                  >
+                    manage board →
+                  </a>
+                </div>
               )}
 
               {/* Sponsorship row */}
@@ -356,13 +386,22 @@ export function Board({
         <div className="max-w-2xl mx-auto px-4 py-2">
           <div className="bg-[var(--bg-alt)] border border-[var(--danger)] text-[var(--danger)] px-3 py-2 text-sm flex justify-between items-center">
             <span>{error}</span>
-            <button onClick={() => setError(null)} className="hover:text-[var(--fg)]">×</button>
+            <button onClick={() => setError(null)} className="hover:text-[var(--fg)]"><X size={16} /></button>
           </div>
         </div>
       )}
 
       {/* Posts feed */}
       <main className="max-w-2xl mx-auto px-4 py-2">
+        {/* Merchant welcome banner */}
+        {flags.MERCHANTS && isClaimed && location.merchant_settings && (
+          <WelcomeBanner
+            settings={location.merchant_settings}
+            locationName={location.name}
+            openingHours={location.opening_hours}
+          />
+        )}
+
         {pins.length === 0 && hiddenPins.length === 0 ? (
           <div className="py-12 text-center">
             {flags.ROTATONATOR && <PromptCarousel />}
@@ -477,6 +516,21 @@ export function Board({
         locationId={location.id}
         currentSponsorAmount={location.sponsor_amount_sats || null}
       />
+
+      {flags.MERCHANTS && sessionId && (
+        <ClaimModal
+          isOpen={claimModalOpen}
+          onClose={() => setClaimModalOpen(false)}
+          onClaimComplete={async () => {
+            setClaimModalOpen(false);
+            await onRefreshBoard();
+            await onRefreshLocation();
+          }}
+          locationId={location.id}
+          locationName={location.name}
+          sessionId={sessionId}
+        />
+      )}
     </div>
   );
 }

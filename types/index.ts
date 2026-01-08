@@ -11,6 +11,8 @@ export interface Location {
   radius_m: number;
   is_active: boolean;
   is_bitcoin_merchant?: boolean;
+  is_claimed?: boolean;
+  merchant_settings?: MerchantSettings;
   created_at: string;
   sponsor_label?: string | null;
   sponsor_url?: string | null;
@@ -50,6 +52,12 @@ export interface Pin {
   replies?: Pin[];
   flag_count?: number;
   is_mine?: boolean;
+  // Merchant features
+  is_merchant_pinned?: boolean;
+  is_merchant_hidden?: boolean;
+  is_merchant_post?: boolean;
+  is_daily_special?: boolean;
+  special_expires_at?: string | null;
 }
 
 export interface PinFlag {
@@ -194,6 +202,7 @@ export interface FeatureFlags {
   ROTATONATOR: boolean;
   PROXHOME: boolean;
   PROXHOME_ADVANCED: boolean;
+  MERCHANTS: boolean;
 }
 
 // Badge types
@@ -230,7 +239,8 @@ export type GhostEventType =
   | 'pin_deleted_paid'
   | 'sponsor_bid_paid'
   | 'sponsor_activated'
-  | 'pin_flagged';
+  | 'pin_flagged'
+  | 'merchant_claimed';
 
 export interface LocationActivityEvent {
   id: string;
@@ -281,4 +291,40 @@ export interface GhostFeedResponse {
   city_wide: GhostCard[];
   sponsored: GhostCard[];
   ghosts_enabled: boolean;
+}
+
+// Merchant Types
+export type MerchantVerificationMethod = 'lightning' | 'domain' | 'manual';
+export type MerchantClaimStatus = 'pending' | 'verified' | 'revoked';
+
+export interface MerchantClaim {
+  id: string;
+  location_id: string;
+  device_session_id: string;
+  verification_method: MerchantVerificationMethod;
+  verification_proof: Record<string, unknown>;
+  claim_code: string;
+  status: MerchantClaimStatus;
+  claimed_at: string | null;
+  created_at: string;
+}
+
+export interface MerchantSettings {
+  welcome_message?: string;
+  logo_url?: string;
+  custom_name?: string;
+  tip_jar_address?: string;
+  tip_jar_enabled?: boolean;
+  hours_override?: string;
+}
+
+export interface MerchantDashboardData {
+  claim: MerchantClaim;
+  location: Location;
+  settings: MerchantSettings;
+  stats: {
+    pins_7d: number;
+    replies_7d: number;
+    views_7d: number;
+  };
 }

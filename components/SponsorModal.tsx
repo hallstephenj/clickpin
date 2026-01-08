@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { config } from '@/lib/config';
+import { X, Lightning, CheckCircle } from '@phosphor-icons/react';
 
 interface SponsorModalProps {
   isOpen: boolean;
@@ -244,9 +245,9 @@ export function SponsorModal({
           <span className="font-mono text-sm text-muted">sponsor this board</span>
           <button
             onClick={onClose}
-            className="text-muted hover:text-[var(--fg)] text-lg leading-none"
+            className="text-muted hover:text-[var(--fg)] leading-none"
           >
-            ×
+            <X size={18} />
           </button>
         </div>
 
@@ -464,8 +465,9 @@ export function SponsorModal({
 
               {/* Amount */}
               <div className="text-center py-4">
-                <div className="text-accent text-2xl font-mono font-bold">
-                  ⚡ {amountSats?.toLocaleString()} sats
+                <div className="text-accent text-2xl font-mono font-bold flex items-center justify-center gap-1">
+                  <Lightning size={24} weight="fill" />
+                  {amountSats?.toLocaleString()} sats
                 </div>
                 <div className="text-xs text-faint mt-1 font-mono">
                   sponsoring as "{sponsorLabel}"
@@ -536,7 +538,7 @@ export function SponsorModal({
 
           {step === 'complete' && (
             <div className="py-8 text-center">
-              <div className="text-accent text-2xl mb-2">✓</div>
+              <CheckCircle size={32} weight="fill" className="text-accent mx-auto mb-2" />
               <p className="font-mono text-sm">payment received!</p>
               <p className="text-xs text-faint mt-2">
                 {currentSponsorAmount

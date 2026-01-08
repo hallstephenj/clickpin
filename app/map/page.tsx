@@ -41,8 +41,13 @@ export default function MapPage() {
 
       {/* Footer hint */}
       <footer className="flex-shrink-0 border-t border-[var(--border)] px-4 py-3">
-        <div className="max-w-4xl mx-auto text-center text-xs text-faint font-mono">
-          visit a location to access its board
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="text-xs text-faint font-mono">
+            visit a location to access its board
+          </div>
+          <div className="text-[10px] text-faint mt-1">
+            Merchant data provided by <a href="https://btcmap.org" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--fg-muted)]">BTC Map</a> (AGPL-3.0 open-source project)
+          </div>
         </div>
       </footer>
     </div>

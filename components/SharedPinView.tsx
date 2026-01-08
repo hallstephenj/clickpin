@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import Link from 'next/link';
+import { Lightning } from '@phosphor-icons/react';
 
 interface SharedPinData {
   pin: {
@@ -65,7 +66,7 @@ export function SharedPinView({ data }: { data: SharedPinData }) {
       <header className="border-b border-[var(--border)]">
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 hover:opacity-80">
-            <span className="text-[#f7931a] font-bold text-lg">⚡</span>
+            <Lightning size={20} weight="fill" className="text-[#f7931a]" />
             <span className="font-bold">clickpin</span>
           </Link>
           <Link href="/about" className="btn">

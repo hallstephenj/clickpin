@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useGhosts } from '@/lib/hooks/useGhosts';
 import { GhostCard, GhostSection } from './GhostCard';
+import { Lightning } from '@phosphor-icons/react';
 
 interface GhostFeedProps {
   onRequestLocation: () => void;
@@ -52,7 +53,7 @@ export function GhostFeed({ onRequestLocation }: GhostFeedProps) {
     return (
       <div className="min-h-screen bg-[#fafafa] dark:bg-[#0a0a0a] flex items-center justify-center">
         <div className="text-center">
-          <div className="text-accent text-2xl mb-2">⚡</div>
+          <Lightning size={32} weight="fill" className="text-accent mx-auto mb-2" />
           <p className="text-muted font-mono text-sm">loading signals...</p>
         </div>
       </div>
@@ -64,8 +65,8 @@ export function GhostFeed({ onRequestLocation }: GhostFeedProps) {
     return (
       <div className="min-h-screen bg-[#fafafa] dark:bg-[#0a0a0a] flex items-center justify-center p-4">
         <div className="max-w-md text-center">
-          <h1 className="text-2xl font-bold mb-4">
-            <span className="text-accent">⚡</span> clickpin
+          <h1 className="text-2xl font-bold mb-4 inline-flex items-center gap-1">
+            <Lightning size={24} weight="fill" className="text-accent" /> clickpin
           </h1>
           <p className="text-muted font-mono text-sm mb-6">
             Location-gated anonymous boards. Visit a location to view its board.
@@ -96,8 +97,8 @@ export function GhostFeed({ onRequestLocation }: GhostFeedProps) {
       <header className="border-b border-[var(--border)] px-4 py-4">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold">
-              <span className="text-accent">⚡</span> clickpin
+            <h1 className="text-xl font-bold inline-flex items-center gap-1">
+              <Lightning size={20} weight="fill" className="text-accent" /> clickpin
             </h1>
             <p className="text-xs text-muted font-mono">activity signals</p>
           </div>

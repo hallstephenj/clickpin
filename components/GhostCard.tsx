@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { GhostCard as GhostCardType } from '@/types';
+import { Lightning } from '@phosphor-icons/react';
 
 interface GhostCardProps {
   ghost: GhostCardType;
@@ -61,7 +62,7 @@ export function GhostCard({ ghost, showDistance = false }: GhostCardProps) {
       {/* Sponsor badge */}
       {ghost.sponsorship_active && ghost.sponsor_label && (
         <div className="mb-3 text-xs text-muted font-mono flex items-center gap-1">
-          <span className="text-accent">⚡</span>
+          <Lightning size={14} weight="fill" className="text-accent" />
           <span>Sponsored by {ghost.sponsor_label}</span>
         </div>
       )}
