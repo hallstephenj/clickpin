@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import { Lightning } from '@phosphor-icons/react';
 

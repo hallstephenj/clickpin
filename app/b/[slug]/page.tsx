@@ -36,7 +36,7 @@ export default function BoardPage() {
       pins={pins}
       hiddenPins={hiddenPins}
       sessionId={sessionId}
-      onRefresh={refreshBoard}
+      onRefreshBoard={refreshBoard}
     />
   );
 }

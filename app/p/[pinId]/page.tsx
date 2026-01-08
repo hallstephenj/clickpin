@@ -2,7 +2,15 @@ import { Metadata } from 'next';
 import { supabaseAdmin } from '@/lib/supabase';
 import { getFeatureFlags } from '@/lib/featureFlags';
 import { SharedPinView } from '@/components/SharedPinView';
-import { Lightning } from '@phosphor-icons/react';
+
+// Inline SVG for server component (can't use Phosphor client components)
+function LightningIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 256 256" fill="#f7931a">
+      <path d="M215.79,118.17a8,8,0,0,0-5-5.66L153.18,90.9l14.66-73.33a8,8,0,0,0-13.69-7l-112,120a8,8,0,0,0,3,13l57.63,21.61L88.16,238.43a8,8,0,0,0,13.69,7l112-120A8,8,0,0,0,215.79,118.17Z"/>
+    </svg>
+  );
+}
 
 interface PageProps {
   params: Promise<{ pinId: string }>;
@@ -155,7 +163,7 @@ export default async function SharedPinPage({ params }: PageProps) {
         <header className="border-b border-[var(--border)]">
           <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
             <a href="/" className="flex items-center gap-2 hover:opacity-80">
-              <Lightning size={20} weight="fill" className="text-[#f7931a]" />
+              <LightningIcon />
               <span className="font-bold">clickpin</span>
             </a>
             <a href="/about" className="btn">

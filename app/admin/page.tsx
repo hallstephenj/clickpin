@@ -936,7 +936,7 @@ export default function AdminPage() {
                               <span>
                                 "{req.suggested_name}"
                                 {req.is_bitcoin_merchant && (
-                                  <Lightning size={14} weight="fill" className="text-[#f7931a] ml-1 inline" title="Bitcoin merchant" />
+                                  <span title="Bitcoin merchant"><Lightning size={14} weight="fill" className="text-[#f7931a] ml-1 inline" /></span>
                                 )}
                               </span>
                               <span className="text-faint text-xs">

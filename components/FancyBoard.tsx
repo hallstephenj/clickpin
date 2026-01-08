@@ -31,8 +31,8 @@ interface FancyBoardProps {
   presenceToken: string | null;
   sessionId: string | null;
   flags: FeatureFlags;
-  onRefreshBoard: () => Promise<void>;
-  onRefreshLocation: () => Promise<void>;
+  onRefreshBoard?: () => Promise<void>;
+  onRefreshLocation?: () => Promise<void>;
   postsRemaining: number;
 }
 
@@ -189,7 +189,7 @@ export function FancyBoard({
       setLocalPostsRemaining(data.posts_remaining);
     }
 
-    await onRefreshBoard();
+    await onRefreshBoard?.();
   };
 
   const handleDelete = async (pinId: string) => {
@@ -241,7 +241,7 @@ export function FancyBoard({
       return;
     }
 
-    await onRefreshBoard();
+    await onRefreshBoard?.();
   };
 
   const handleFlag = async (pinId: string) => {
@@ -262,7 +262,7 @@ export function FancyBoard({
       return;
     }
 
-    await onRefreshBoard();
+    await onRefreshBoard?.();
   };
 
   const handleBoost = async (pinId: string) => {
@@ -313,7 +313,7 @@ export function FancyBoard({
     }
 
     setPaymentModal({ open: false, type: null });
-    await onRefreshBoard();
+    await onRefreshBoard?.();
   };
 
   return (
@@ -445,7 +445,7 @@ export function FancyBoard({
           presenceToken={presenceToken}
           onClose={() => setComposePosition(null)}
           onPost={async () => {
-            await onRefreshBoard();
+            await onRefreshBoard?.();
             setLocalPostsRemaining(prev => Math.max(0, prev - 1));
           }}
           postsRemaining={localPostsRemaining}
@@ -492,7 +492,7 @@ export function FancyBoard({
         onClose={() => setSponsorModalOpen(false)}
         onComplete={async () => {
           setSponsorModalOpen(false);
-          await onRefreshBoard();
+          await onRefreshBoard?.();
         }}
         presenceToken={presenceToken}
         locationName={location.name}

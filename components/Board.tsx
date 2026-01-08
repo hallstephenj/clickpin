@@ -36,22 +36,22 @@ interface BoardProps {
   location: Location;
   pins: Pin[];
   hiddenPins: Pin[];
-  presenceToken: string | null;
+  presenceToken?: string | null;
   sessionId: string | null;
-  onRefreshBoard: () => Promise<void>;
-  onRefreshLocation: () => Promise<void>;
-  postsRemaining: number;
+  onRefreshBoard?: () => Promise<void>;
+  onRefreshLocation?: () => Promise<void>;
+  postsRemaining?: number;
 }
 
 export function Board({
   location,
   pins,
   hiddenPins,
-  presenceToken,
+  presenceToken = null,
   sessionId,
   onRefreshBoard,
   onRefreshLocation,
-  postsRemaining,
+  postsRemaining = 0,
 }: BoardProps) {
   const { flags, loading: flagsLoading } = useFeatureFlags();
   const [composeOpen, setComposeOpen] = useState(false);
@@ -135,7 +135,7 @@ export function Board({
       setLocalPostsRemaining(data.posts_remaining);
     }
 
-    await onRefreshBoard();
+    await onRefreshBoard?.();
   };
 
   const handleDelete = async (pinId: string) => {
@@ -190,7 +190,7 @@ export function Board({
       return;
     }
 
-    await onRefreshBoard();
+    await onRefreshBoard?.();
   };
 
   const handleFlag = async (pinId: string) => {
@@ -212,7 +212,7 @@ export function Board({
       return;
     }
 
-    await onRefreshBoard();
+    await onRefreshBoard?.();
   };
 
   const handleBoost = async (pinId: string) => {
@@ -269,7 +269,7 @@ export function Board({
     }
 
     setPaymentModal({ open: false, type: null });
-    await onRefreshBoard();
+    await onRefreshBoard?.();
   };
 
   // Route to FancyBoard if feature flag is enabled
@@ -509,7 +509,7 @@ export function Board({
         onClose={() => setSponsorModalOpen(false)}
         onComplete={async () => {
           setSponsorModalOpen(false);
-          await onRefreshBoard();
+          await onRefreshBoard?.();
         }}
         presenceToken={presenceToken}
         locationName={location.name}
@@ -523,8 +523,8 @@ export function Board({
           onClose={() => setClaimModalOpen(false)}
           onClaimComplete={async () => {
             setClaimModalOpen(false);
-            await onRefreshBoard();
-            await onRefreshLocation();
+            await onRefreshBoard?.();
+            await onRefreshLocation?.();
           }}
           locationId={location.id}
           locationName={location.name}

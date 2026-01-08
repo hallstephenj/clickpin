@@ -184,7 +184,7 @@ export function ProximityHome({ state, onRequestLocation, sessionId, currentLoca
                       <div className="font-medium text-sm text-[var(--fg)] flex flex-wrap items-center gap-1.5">
                         <span className="break-words">{board.name}</span>
                         {(board.btcmap_id || board.is_bitcoin_merchant) && (
-                          <Lightning size={14} weight="fill" className="text-[#f7931a]" title="Accepts Bitcoin" />
+                          <span title="Accepts Bitcoin"><Lightning size={14} weight="fill" className="text-[#f7931a]" /></span>
                         )}
                         {board.website && (
                           <a
