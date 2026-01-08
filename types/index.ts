@@ -14,6 +14,16 @@ export interface Location {
   sponsor_label?: string | null;
   sponsor_url?: string | null;
   sponsor_amount_sats?: number | null;
+  // BTCMap integration fields
+  btcmap_id?: number | null;
+  osm_id?: string | null;
+  address?: string | null;
+  phone?: string | null;
+  website?: string | null;
+  opening_hours?: string | null;
+  btcmap_icon?: string | null;
+  btcmap_verified_at?: string | null;
+  btcmap_updated_at?: string | null;
 }
 
 export interface DeviceSession {
