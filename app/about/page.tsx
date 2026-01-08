@@ -23,7 +23,7 @@ export default function AboutPage() {
           <div className="text-6xl mb-4">⚡</div>
           <h1 className="text-3xl font-bold mb-2">clickpin</h1>
           <p className="text-[var(--fg-muted)] font-mono">
-            if you're not there, you can't see it
+            the bitcoin underground
           </p>
         </div>
 

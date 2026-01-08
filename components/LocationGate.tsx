@@ -51,7 +51,7 @@ export function LocationGate({ state, error, onRequestLocation, sessionId }: Loc
             <span className="text-accent">⚡</span> clickpin
           </h1>
           <p className="text-muted text-sm font-mono">
-            if you're not there, you can't see it
+            the bitcoin underground
           </p>
         </div>
 

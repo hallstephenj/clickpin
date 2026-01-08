@@ -91,7 +91,7 @@ export function ProximityHome({ state, onRequestLocation, sessionId }: Proximity
             <span className="text-accent">⚡</span> clickpin
           </h1>
           <p className="text-muted text-sm font-mono">
-            if you're not there, you can't see it
+            the bitcoin underground
           </p>
         </div>
 
