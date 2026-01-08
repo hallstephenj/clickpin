@@ -41,7 +41,6 @@ export const config = {
     // Use NEXT_PUBLIC_ prefix so frontend can check if test mode is available
     testModeEnabled:
       process.env.NEXT_PUBLIC_LIGHTNING_TEST_MODE === 'true' ||
-      process.env.LIGHTSPARK_TEST_MODE === 'true' ||
       process.env.LIGHTNING_PROVIDER === 'dev' ||
       process.env.DEV_MODE === 'true',
   },

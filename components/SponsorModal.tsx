@@ -514,7 +514,7 @@ export function SponsorModal({
               {canSimulatePayment && (
                 <div className="mt-6 pt-4 border-t border-[var(--border)]">
                   <div className="text-xs text-faint font-mono mb-2 text-center">
-                    {config.lightning.provider === 'lightspark' ? 'test mode' : 'dev mode'}
+                    dev/test mode
                   </div>
                   <button
                     onClick={handleSimulatePayment}

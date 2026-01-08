@@ -9,7 +9,7 @@ LNbits is an open-source Lightning wallet system that provides a simple REST API
 Clickpin supports multiple Lightning payment providers:
 - `dev` - Development mode with simulated invoices (default)
 - `lnbits` - LNbits for real Lightning payments
-- `lightspark` - Lightspark test mode
+- `opennode` - OpenNode for real Lightning payments
 
 ## Prerequisites
 
@@ -208,14 +208,6 @@ DEV_MODE=true
 LIGHTNING_PROVIDER=lnbits
 LNBITS_URL=https://legend.lnbits.com
 LNBITS_API_KEY=your_api_key
-```
-
-### Use Lightspark Test Mode
-```bash
-LIGHTNING_PROVIDER=lightspark
-LIGHTSPARK_API_TOKEN_CLIENT_ID=...
-LIGHTSPARK_API_TOKEN_CLIENT_SECRET=...
-LIGHTSPARK_TEST_MODE=true
 ```
 
 ## Troubleshooting

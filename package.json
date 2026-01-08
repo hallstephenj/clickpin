@@ -10,7 +10,6 @@
     "seed": "tsx scripts/seed.ts"
   },
   "dependencies": {
-    "@lightsparkdev/lightspark-sdk": "^1.9.15",
     "@phosphor-icons/react": "^2.1.10",
     "@supabase/supabase-js": "^2.89.0",
     "date-fns": "^4.1.0",

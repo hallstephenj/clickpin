@@ -1,25 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { applyPaymentEffects } from '@/app/api/lightning/webhook/route';
-import { isLightsparkTestMode, simulateTestPayment } from '@/lib/lightspark';
-import { isLNbitsConfigured } from '@/lib/lnbits';
 import { isOpenNodeTestMode } from '@/lib/opennode';
+import { config } from '@/lib/config';
 
 // Helper to find invoice by payment_request across all payment tables
 async function findInvoiceByPaymentRequest(paymentRequest: string): Promise<{
   invoice_id: string;
   type: string;
 } | null> {
-  // The payment tables don't store payment_request directly
-  // But the invoice_id follows a pattern: ls_<uuid> for Lightspark, dev_<uuid> for dev
-  // We need to search by invoice_id that was recently created
-
-  // For Lightspark test mode, we search across all pending invoices
-  // and check if any match the payment request pattern
-
-  // First, let's get all pending invoices and check them
-  // In a production system, you'd store the payment_request in the DB
-
   const tables = [
     { name: 'post_payments', type: 'post' },
     { name: 'pin_boosts', type: 'boost' },
@@ -38,7 +27,6 @@ async function findInvoiceByPaymentRequest(paymentRequest: string): Promise<{
     if (data && data.length > 0) {
       // Return the most recent pending invoice
       // In test mode, we assume the user is paying the invoice they just created
-      // A production system would store and match payment_request
       return {
         invoice_id: data[0].invoice_id,
         type: table.type,
@@ -53,14 +41,13 @@ async function findInvoiceByPaymentRequest(paymentRequest: string): Promise<{
 export async function POST(request: NextRequest) {
   try {
     // Security check: Only allow in test/dev mode
-    const isTestMode = isLightsparkTestMode();
     const isDevMode = process.env.DEV_MODE === 'true';
     const isLightningTestMode = process.env.NEXT_PUBLIC_LIGHTNING_TEST_MODE === 'true';
     const isProduction = process.env.NODE_ENV === 'production';
     const providerName = process.env.LIGHTNING_PROVIDER || 'dev';
 
     // Allow test wallet in: dev mode, test mode, or non-production
-    const allowTestWallet = isDevMode || isTestMode || isLightningTestMode || !isProduction || providerName === 'dev';
+    const allowTestWallet = isDevMode || isLightningTestMode || !isProduction || providerName === 'dev';
 
     if (!allowTestWallet) {
       return NextResponse.json(
@@ -99,25 +86,10 @@ export async function POST(request: NextRequest) {
     }
 
     console.log(`[Test Wallet] Paying invoice: ${invoice.invoice_id} (${invoice.type})`);
-    console.log(`[Test Wallet] Provider: ${providerName}, TestMode: ${isTestMode}, DevMode: ${isDevMode}`);
+    console.log(`[Test Wallet] Provider: ${providerName}, DevMode: ${isDevMode}`);
 
     // Provider-specific payment simulation
-    if (providerName === 'lightspark' && isTestMode) {
-      // Lightspark test mode: call their API to simulate the payment
-      // This will make the payment show up in the Lightspark dashboard
-      console.log(`[Test Wallet] Calling Lightspark createTestModePayment...`);
-      try {
-        const lightsparkResult = await simulateTestPayment({ paymentRequest: payment_request });
-        console.log(`[Test Wallet] Lightspark payment result:`, lightsparkResult);
-
-        if (!lightsparkResult.success) {
-          console.warn(`[Test Wallet] Lightspark payment returned non-success status: ${lightsparkResult.status}`);
-        }
-      } catch (lightsparkError) {
-        console.error(`[Test Wallet] Lightspark payment error:`, lightsparkError);
-        // Continue anyway - we'll still mark it paid in our DB
-      }
-    } else if (providerName === 'opennode') {
+    if (providerName === 'opennode') {
       // OpenNode: Real Lightning payments
       // In test mode (dev API), we mark as paid directly for testing
       // In production, real payments are confirmed via webhook
@@ -128,8 +100,6 @@ export async function POST(request: NextRequest) {
       // In test mode, we just mark the invoice as paid directly
       // For real payments, users need to pay from an external wallet
       console.log(`[Test Wallet] LNbits mode - marking invoice as paid directly`);
-      // Note: In production without test mode, this endpoint is disabled
-      // Real payments will be confirmed via webhook when user pays from external wallet
     } else if (providerName === 'dev') {
       // Dev mode: Just mark as paid, no external integration
       console.log(`[Test Wallet] Dev mode - marking invoice as paid directly`);

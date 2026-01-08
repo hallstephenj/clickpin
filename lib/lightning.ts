@@ -1,12 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { config } from './config';
 import {
-  createTestInvoice,
-  simulateTestPayment,
-  isLightsparkConfigured,
-  isLightsparkTestMode,
-} from './lightspark';
-import {
   createInvoice as createLNbitsInvoice,
   checkInvoiceStatus as checkLNbitsInvoiceStatus,
   isLNbitsConfigured,
@@ -216,53 +210,6 @@ class OpenNodeLightningProvider implements LightningProvider {
   }
 }
 
-// Lightspark provider - uses test mode for development
-class LightsparkLightningProvider implements LightningProvider {
-  async createInvoice(amountSats: number, memo: string): Promise<LightningInvoice> {
-    if (!isLightsparkConfigured()) {
-      throw new Error(
-        'Lightspark not configured. Set LIGHTSPARK_API_TOKEN_CLIENT_ID and LIGHTSPARK_API_TOKEN_CLIENT_SECRET.'
-      );
-    }
-
-    if (!isLightsparkTestMode()) {
-      throw new Error(
-        'Lightspark production mode not yet implemented. Use LIGHTSPARK_TEST_MODE=true.'
-      );
-    }
-
-    const invoiceId = `ls_${uuidv4()}`;
-    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
-
-    const result = await createTestInvoice({ amountSats, memo });
-
-    return {
-      invoice_id: invoiceId,
-      payment_request: result.paymentRequest,
-      amount_sats: amountSats,
-      expires_at: expiresAt,
-      memo,
-    };
-  }
-
-  async checkPaymentStatus(invoiceId: string): Promise<'pending' | 'paid' | 'expired'> {
-    // For Lightspark, payment status is tracked via webhooks or manual simulation
-    // The actual status is stored in our database and updated by the webhook handler
-    // or the simulate-pay endpoint
-    console.log(`[Lightspark] Checking payment status for: ${invoiceId}`);
-    return 'pending';
-  }
-
-  async simulatePayment(paymentRequest: string): Promise<boolean> {
-    if (!isLightsparkTestMode()) {
-      throw new Error('Payment simulation only available in test mode');
-    }
-
-    const result = await simulateTestPayment({ paymentRequest });
-    return result.success;
-  }
-}
-
 // Factory function to get the configured Lightning provider
 export function getLightningProvider(): LightningProvider {
   const providerName = process.env.LIGHTNING_PROVIDER || 'dev';
@@ -270,8 +217,6 @@ export function getLightningProvider(): LightningProvider {
   switch (providerName.toLowerCase()) {
     case 'opennode':
       return new OpenNodeLightningProvider();
-    case 'lightspark':
-      return new LightsparkLightningProvider();
     case 'strike':
       return new StrikeLightningProvider();
     case 'lnbits':
@@ -283,15 +228,6 @@ export function getLightningProvider(): LightningProvider {
       }
       return new DevLightningProvider();
   }
-}
-
-// Get Lightspark provider specifically (for simulate-pay endpoint)
-export function getLightsparkProvider(): LightsparkLightningProvider | null {
-  const providerName = process.env.LIGHTNING_PROVIDER || 'dev';
-  if (providerName.toLowerCase() === 'lightspark') {
-    return new LightsparkLightningProvider();
-  }
-  return null;
 }
 
 // Helper to get amount for different payment types

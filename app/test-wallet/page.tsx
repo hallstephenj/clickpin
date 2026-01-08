@@ -111,7 +111,7 @@ export default function TestWalletPage() {
             Simulate paying Lightning invoices
           </p>
           <p className="text-faint text-xs font-mono mt-1">
-            (Lightspark test mode only)
+            (dev/test mode only)
           </p>
         </div>
 

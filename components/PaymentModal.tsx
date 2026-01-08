@@ -77,7 +77,7 @@ export function PaymentModal({
 
     setStatus('checking');
     try {
-      // Use the new simulate-pay endpoint which works for both DEV mode and Lightspark test mode
+      // Use the simulate-pay endpoint which works in DEV/test mode
       const response = await fetch(`/api/invoice/${invoiceId}/simulate-pay`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -211,7 +211,7 @@ export function PaymentModal({
               {canSimulatePayment && (
                 <div className="mt-6 pt-4 border-t border-[var(--border)]">
                   <div className="text-xs text-faint font-mono mb-2 text-center">
-                    {config.lightning.provider === 'lightspark' ? 'test mode' : 'dev mode'}
+                    dev/test mode
                   </div>
                   <button
                     onClick={handleSimulatePayment}
