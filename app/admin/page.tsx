@@ -31,6 +31,10 @@ interface Location {
   ghosts_enabled: boolean;
   created_at: string;
   pin_count?: number;
+  is_claimed?: boolean;
+  is_bitcoin_merchant?: boolean;
+  btcmap_id?: number | null;
+  merchant_settings?: Record<string, unknown>;
 }
 
 interface Pin {
@@ -480,6 +484,55 @@ export default function AdminPage() {
     }
   };
 
+  const handleMerchantReset = async (location: Location, action: 'de-verify' | 'reset-settings' | 'full-reset') => {
+    const actionLabels = {
+      'de-verify': 'remove verified status from',
+      'reset-settings': 'clear merchant settings for',
+      'full-reset': 'completely reset merchant data for',
+    };
+
+    if (!confirm(`Are you sure you want to ${actionLabels[action]} "${location.name}"?`)) return;
+
+    setActionLoading(`merchant-${location.id}`);
+    try {
+      const response = await fetch(`/api/admin/locations/${location.id}/merchant-reset`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Password': password,
+        },
+        body: JSON.stringify({ action }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        alert(`Successfully performed ${action} on ${location.name}`);
+        // Update local state
+        if (action === 'de-verify' || action === 'full-reset') {
+          setLocations((prev) =>
+            prev.map((loc) =>
+              loc.id === location.id ? { ...loc, is_claimed: false } : loc
+            )
+          );
+        }
+        if (action === 'reset-settings' || action === 'full-reset') {
+          setLocations((prev) =>
+            prev.map((loc) =>
+              loc.id === location.id ? { ...loc, merchant_settings: {} } : loc
+            )
+          );
+        }
+      } else {
+        const data = await response.json();
+        alert(data.error || 'Failed to reset merchant');
+      }
+    } catch {
+      alert('Failed to reset merchant');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   if (!authenticated) {
     return (
       <div className="min-h-screen bg-[#fafafa] dark:bg-[#0a0a0a] flex items-center justify-center p-4">
@@ -796,10 +849,19 @@ export default function AdminPage() {
                       >
                         <div className="flex items-center justify-between">
                           <div>
-                            <div className="font-mono text-sm font-medium">{loc.name}</div>
+                            <div className="font-mono text-sm font-medium flex items-center gap-2">
+                              {loc.name}
+                              {loc.is_bitcoin_merchant && (
+                                <span title="Bitcoin merchant"><Lightning size={14} weight="fill" className="text-[#f7931a]" /></span>
+                              )}
+                              {loc.is_claimed && (
+                                <span className="text-xs bg-green-500/20 text-green-600 px-1.5 py-0.5 rounded font-mono">verified</span>
+                              )}
+                            </div>
                             <div className="text-xs text-muted font-mono">
                               {loc.city && <span className="text-faint">{loc.city} · </span>}
                               /{loc.slug}
+                              {loc.btcmap_id && <span className="text-faint"> · btcmap #{loc.btcmap_id}</span>}
                             </div>
                           </div>
                           <div className="flex items-center gap-3">
@@ -833,6 +895,51 @@ export default function AdminPage() {
                             >
                               edit
                             </button>
+                            {/* Merchant actions dropdown */}
+                            {(loc.is_claimed || loc.is_bitcoin_merchant) && (
+                              <div className="relative group">
+                                <button
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="text-xs text-muted hover:text-[var(--fg)] font-mono"
+                                >
+                                  merchant ▾
+                                </button>
+                                <div className="absolute right-0 top-full mt-1 bg-[var(--bg)] border border-[var(--border)] shadow-lg z-10 hidden group-hover:block min-w-[140px]">
+                                  {loc.is_claimed && (
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleMerchantReset(loc, 'de-verify');
+                                      }}
+                                      disabled={actionLoading === `merchant-${loc.id}`}
+                                      className="block w-full text-left px-3 py-2 text-xs font-mono hover:bg-[var(--bg-alt)] text-danger"
+                                    >
+                                      de-verify
+                                    </button>
+                                  )}
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleMerchantReset(loc, 'reset-settings');
+                                    }}
+                                    disabled={actionLoading === `merchant-${loc.id}`}
+                                    className="block w-full text-left px-3 py-2 text-xs font-mono hover:bg-[var(--bg-alt)]"
+                                  >
+                                    clear settings
+                                  </button>
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleMerchantReset(loc, 'full-reset');
+                                    }}
+                                    disabled={actionLoading === `merchant-${loc.id}`}
+                                    className="block w-full text-left px-3 py-2 text-xs font-mono hover:bg-[var(--bg-alt)] text-danger border-t border-[var(--border)]"
+                                  >
+                                    full reset
+                                  </button>
+                                </div>
+                              </div>
+                            )}
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();

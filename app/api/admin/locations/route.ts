@@ -11,10 +11,10 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Fetch all locations with pin counts
+    // Fetch all locations with pin counts and merchant info
     const { data: locations, error } = await supabaseAdmin
       .from('locations')
-      .select('id, slug, name, city, lat, lng, radius_m, ghosts_enabled, created_at')
+      .select('id, slug, name, city, lat, lng, radius_m, ghosts_enabled, created_at, is_claimed, is_bitcoin_merchant, btcmap_id, merchant_settings')
       .order('name', { ascending: true });
 
     if (error) {
