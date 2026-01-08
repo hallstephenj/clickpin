@@ -1006,9 +1006,12 @@ export default function AdminPage() {
               </div>
             ) : (
               <div className="space-y-2">
-                {/* Master toggle first */}
+                {/* Main feature flags */}
+                <div className="text-xs text-muted font-mono mb-2">
+                  main features:
+                </div>
                 {featureFlags
-                  .filter((flag) => flag.key === 'fancy_board_enabled')
+                  .filter((flag) => flag.key === 'fancy_board_enabled' || flag.key === 'GHOSTS')
                   .map((flag) => (
                     <div
                       key={flag.id}
@@ -1042,12 +1045,12 @@ export default function AdminPage() {
                     </div>
                   ))}
 
-                {/* Sub-features */}
+                {/* Fancy Board sub-features */}
                 <div className="text-xs text-muted font-mono mt-4 mb-2 pt-4 border-t border-[var(--border)]">
-                  sub-features (require master toggle ON):
+                  fancy board sub-features (require fancy_board_enabled ON):
                 </div>
                 {featureFlags
-                  .filter((flag) => flag.key !== 'fancy_board_enabled')
+                  .filter((flag) => flag.key !== 'fancy_board_enabled' && flag.key !== 'GHOSTS')
                   .map((flag) => {
                     const masterEnabled = featureFlags.find(
                       (f) => f.key === 'fancy_board_enabled'
@@ -1085,10 +1088,10 @@ export default function AdminPage() {
                   })}
 
                 {/* Warning if sub-features enabled but master off */}
-                {featureFlags.some((f) => f.key !== 'fancy_board_enabled' && f.enabled) &&
+                {featureFlags.some((f) => f.key !== 'fancy_board_enabled' && f.key !== 'GHOSTS' && f.enabled) &&
                   !featureFlags.find((f) => f.key === 'fancy_board_enabled')?.enabled && (
                     <div className="mt-4 p-3 bg-[var(--danger)]/10 border border-[var(--danger)] text-danger text-xs font-mono">
-                      Warning: Sub-features are enabled but master toggle is OFF. Enable
+                      Warning: Fancy board sub-features are enabled but fancy_board_enabled is OFF. Enable
                       "fancy_board_enabled" to activate these features.
                     </div>
                   )}
