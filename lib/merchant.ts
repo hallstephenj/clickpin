@@ -1,5 +1,6 @@
 import { supabaseAdmin } from '@/lib/supabase';
 import { MerchantClaim, MerchantSettings } from '@/types';
+import { verifyMerchantAccess } from '@/lib/auth';
 import crypto from 'crypto';
 
 /**
@@ -10,12 +11,26 @@ export function generateClaimCode(): string {
 }
 
 /**
- * Verify that a device session owns the claim for a location
+ * Verify that a device session owns the claim for a location.
+ * Supports both Supabase Auth (user_id in claim) and legacy device session auth.
  */
 export async function verifyMerchantAuth(
   locationId: string,
   sessionId: string
 ): Promise<MerchantClaim | null> {
+  // First try enhanced auth (supports both Supabase and legacy)
+  const auth = await verifyMerchantAccess(locationId, sessionId);
+  if (auth) {
+    // Fetch full claim data
+    const { data: claim } = await supabaseAdmin
+      .from('merchant_claims')
+      .select('*')
+      .eq('id', auth.claim_id)
+      .single();
+    return claim;
+  }
+
+  // Fallback to direct device session check for legacy compatibility
   const { data: claim } = await supabaseAdmin
     .from('merchant_claims')
     .select('*')

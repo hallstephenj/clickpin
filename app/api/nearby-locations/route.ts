@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
+import { isValidCoordinates } from '@/lib/validation';
 
 // GET /api/nearby-locations?lat=xxx&lng=xxx - Get locations within ~200 miles
 export async function GET(request: NextRequest) {
@@ -9,7 +10,8 @@ export async function GET(request: NextRequest) {
     const lng = parseFloat(searchParams.get('lng') || '');
 
     // If no coordinates provided, return all locations
-    if (isNaN(lat) || isNaN(lng)) {
+    // Also validate coordinate ranges when provided
+    if (isNaN(lat) || isNaN(lng) || !isValidCoordinates(lat, lng)) {
       const { data: locations, error } = await supabaseAdmin
         .from('locations')
         .select('id, name, slug, lat, lng, radius_m, btcmap_id, is_bitcoin_merchant, is_claimed')

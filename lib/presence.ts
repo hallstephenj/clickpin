@@ -1,7 +1,15 @@
 import crypto from 'crypto';
 import { PresenceToken } from '@/types';
 
-const PRESENCE_TOKEN_SECRET = process.env.PRESENCE_TOKEN_SECRET || 'dev-secret-change-in-production';
+// SECURITY: Require presence token secret - no fallback to weak default
+function getPresenceTokenSecret(): string {
+  const secret = process.env.PRESENCE_TOKEN_SECRET;
+  if (!secret) {
+    throw new Error('PRESENCE_TOKEN_SECRET environment variable is required for security');
+  }
+  return secret;
+}
+
 const PRESENCE_TOKEN_TTL_MS = 2 * 60 * 1000; // 2 minutes
 
 export function createPresenceToken(
@@ -21,7 +29,7 @@ export function createPresenceToken(
 
   const payloadString = JSON.stringify(payload);
   const signature = crypto
-    .createHmac('sha256', PRESENCE_TOKEN_SECRET)
+    .createHmac('sha256', getPresenceTokenSecret())
     .update(payloadString)
     .digest('hex');
 
@@ -51,7 +59,7 @@ export function verifyPresenceToken(tokenString: string): {
     // Verify signature
     const { signature, ...payload } = token;
     const expectedSignature = crypto
-      .createHmac('sha256', PRESENCE_TOKEN_SECRET)
+      .createHmac('sha256', getPresenceTokenSecret())
       .update(JSON.stringify(payload))
       .digest('hex');
 

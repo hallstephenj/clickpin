@@ -4,21 +4,46 @@ import { config } from '@/lib/config';
 import { logGhostEvent } from '@/lib/ghostEvents';
 import { verifyMerchantClaim } from '@/lib/merchant';
 
+import crypto from 'crypto';
+
+// Verify webhook signature using HMAC-SHA256
+function verifySignature(payload: string, signature: string, secret: string): boolean {
+  const expected = crypto
+    .createHmac('sha256', secret)
+    .update(payload)
+    .digest('hex');
+  return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
+}
+
 // POST /api/lightning/webhook - Handle payment confirmations from Lightning provider
 export async function POST(request: NextRequest) {
   try {
-    // In production, validate webhook signature from Lightning provider
+    // SECURITY: Webhook signature verification is MANDATORY in production
     const webhookSecret = process.env.LIGHTNING_WEBHOOK_SECRET;
 
-    if (webhookSecret) {
-      const signature = request.headers.get('x-webhook-signature');
-      // TODO: Implement signature verification based on provider
-      if (!signature) {
-        return NextResponse.json({ error: 'Missing webhook signature' }, { status: 401 });
-      }
+    if (!webhookSecret) {
+      console.error('[Lightning Webhook] SECURITY: LIGHTNING_WEBHOOK_SECRET not configured - rejecting request');
+      return NextResponse.json(
+        { error: 'Webhook not configured' },
+        { status: 503 }
+      );
     }
 
-    const body = await request.json();
+    const signature = request.headers.get('x-webhook-signature');
+    if (!signature) {
+      console.warn('[Lightning Webhook] Missing signature header');
+      return NextResponse.json({ error: 'Missing webhook signature' }, { status: 401 });
+    }
+
+    // Get raw body for signature verification
+    const bodyText = await request.text();
+
+    if (!verifySignature(bodyText, signature, webhookSecret)) {
+      console.error('[Lightning Webhook] Signature verification failed');
+      return NextResponse.json({ error: 'Invalid webhook signature' }, { status: 401 });
+    }
+
+    const body = JSON.parse(bodyText);
     const { invoice_id, status } = body;
 
     if (!invoice_id) {

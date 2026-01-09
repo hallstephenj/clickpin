@@ -2,9 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { verifyPresenceToken } from '@/lib/presence';
 import { getLightningProvider, getPaymentAmount, getPaymentMemo } from '@/lib/lightning';
+import { rateLimiters, checkRateLimit } from '@/lib/ratelimit';
 
 // POST /api/post/create-invoice - Create invoice for a paid post (after free quota exceeded)
 export async function POST(request: NextRequest) {
+  // Rate limit: 10 requests per minute per IP
+  const rateLimitResponse = await checkRateLimit(request, rateLimiters.invoice);
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     const body = await request.json();
     const { presence_token } = body;

@@ -1,10 +1,13 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { MerchantSettings } from '@/types';
 import { VerifiedBadge } from '@/components/merchant';
 import { config } from '@/lib/config';
+import { useAuth } from '@/components/auth/AuthProvider';
+import { LoginForm } from '@/components/auth/LoginForm';
+import { Envelope, CheckCircle, Link as LinkIcon } from '@phosphor-icons/react';
 
 interface DashboardData {
   location: {
@@ -23,6 +26,8 @@ interface DashboardData {
     id: string;
     claimed_at: string;
     verification_method: string;
+    user_id?: string | null;
+    linked_at?: string | null;
   };
   stats: {
     pins_today: number;
@@ -35,7 +40,9 @@ interface DashboardData {
 export default function MerchantDashboardPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const slug = params.slug as string;
+  const { user, loading: authLoading } = useAuth();
 
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [locationId, setLocationId] = useState<string | null>(null);
@@ -45,6 +52,12 @@ export default function MerchantDashboardPage() {
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
+  // Account linking state
+  const [showLinkAccount, setShowLinkAccount] = useState(false);
+  const [linkingAccount, setLinkingAccount] = useState(false);
+  const [linkSuccess, setLinkSuccess] = useState(false);
+  const [linkError, setLinkError] = useState<string | null>(null);
+
   // Form state
   const [welcomeMessage, setWelcomeMessage] = useState('');
   const [customName, setCustomName] = useState('');
@@ -52,15 +65,16 @@ export default function MerchantDashboardPage() {
   const [tipJarAddress, setTipJarAddress] = useState('');
   const [tipJarEnabled, setTipJarEnabled] = useState(false);
 
-  // Get session ID from localStorage
+  // Check if we should auto-link after magic link callback
+  const shouldAutoLink = searchParams.get('link_claim') === 'true';
+
+  // Get session ID from localStorage (optional if logged in)
   useEffect(() => {
     const stored = localStorage.getItem('clickpin_device_session_id');
     if (stored) {
       setSessionId(stored);
-    } else {
-      setError('No session found. Please visit the board first.');
-      setLoading(false);
     }
+    // Don't set error here - we might be logged in via Supabase Auth
   }, []);
 
   // Fetch location ID by slug
@@ -92,19 +106,30 @@ export default function MerchantDashboardPage() {
 
   // Fetch dashboard data
   const fetchDashboard = useCallback(async () => {
-    if (!locationId || !sessionId) {
-      console.log('fetchDashboard: missing locationId or sessionId', { locationId, sessionId });
+    // Need location_id, and either sessionId or user (Supabase Auth)
+    if (!locationId) {
+      console.log('fetchDashboard: missing locationId');
       return;
     }
 
-    console.log('fetchDashboard: fetching with', { locationId, sessionId });
+    // If no session and not logged in, can't fetch
+    if (!sessionId && !user) {
+      console.log('fetchDashboard: no session or user, waiting for auth');
+      return;
+    }
+
+    console.log('fetchDashboard: fetching with', { locationId, sessionId, user: user?.email });
     setLoading(true);
     setError(null);
 
     try {
-      const response = await fetch(
-        `/api/merchant/dashboard?location_id=${locationId}&session_id=${sessionId}`
-      );
+      // Build URL - session_id is optional if logged in
+      let url = `/api/merchant/dashboard?location_id=${locationId}`;
+      if (sessionId) {
+        url += `&session_id=${sessionId}`;
+      }
+
+      const response = await fetch(url);
       const data = await response.json();
       console.log('fetchDashboard: response', { status: response.status, data });
 
@@ -126,14 +151,67 @@ export default function MerchantDashboardPage() {
     } finally {
       setLoading(false);
     }
-  }, [locationId, sessionId]);
+  }, [locationId, sessionId, user]);
 
   useEffect(() => {
-    console.log('Dashboard effect: checking', { locationId, sessionId });
-    if (locationId && sessionId) {
+    console.log('Dashboard effect: checking', { locationId, sessionId, user: user?.email, authLoading });
+
+    // Wait for auth to finish loading
+    if (authLoading) return;
+
+    // If we have locationId and either sessionId or user, fetch dashboard
+    if (locationId && (sessionId || user)) {
       fetchDashboard();
+    } else if (locationId && !sessionId && !user) {
+      // No session and not logged in - show login prompt
+      setLoading(false);
     }
-  }, [locationId, sessionId, fetchDashboard]);
+  }, [locationId, sessionId, user, authLoading, fetchDashboard]);
+
+  // Auto-link account after magic link callback
+  useEffect(() => {
+    if (shouldAutoLink && user && dashboard?.claim && !dashboard.claim.user_id && sessionId) {
+      handleLinkAccount();
+    }
+  }, [shouldAutoLink, user, dashboard, sessionId]);
+
+  // Link the current claim to the authenticated user
+  const handleLinkAccount = async () => {
+    if (!user || !dashboard?.claim || !sessionId) return;
+
+    setLinkingAccount(true);
+    setLinkError(null);
+
+    try {
+      const response = await fetch('/api/merchant/auth/link-claim', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          claim_id: dashboard.claim.id,
+          device_session_id: sessionId,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to link account');
+      }
+
+      setLinkSuccess(true);
+      setShowLinkAccount(false);
+
+      // Refresh dashboard to get updated claim info
+      await fetchDashboard();
+
+      // Clear the link_claim param from URL
+      router.replace(`/merchant/${slug}`);
+    } catch (err) {
+      setLinkError(err instanceof Error ? err.message : 'Failed to link account');
+    } finally {
+      setLinkingAccount(false);
+    }
+  };
 
   const handleSaveSettings = async () => {
     if (!locationId || !sessionId) return;
@@ -184,15 +262,55 @@ export default function MerchantDashboardPage() {
     );
   }
 
+  // Show login form if no session and not logged in
+  if (!loading && !dashboard && !sessionId && !user && locationId) {
+    return (
+      <div className="min-h-screen bg-[#fafafa] dark:bg-[#0a0a0a] p-4">
+        <div className="max-w-sm mx-auto">
+          <div className="text-center mb-8">
+            <h1 className="text-xl font-bold mb-1">merchant login</h1>
+            <p className="text-muted text-sm font-mono">sign in to access your dashboard</p>
+          </div>
+
+          <LoginForm
+            type="merchant"
+            redirectTo={`/merchant/${slug}`}
+          />
+
+          <div className="mt-6 text-center">
+            <button onClick={() => router.push(`/b/${slug}`)} className="text-sm text-muted hover:text-[var(--fg)] font-mono">
+              back to board
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (error || !dashboard) {
     return (
       <div className="min-h-screen bg-[#fafafa] dark:bg-[#0a0a0a] p-4">
         <div className="max-w-2xl mx-auto">
           <div className="border border-[var(--danger)] bg-[var(--danger)]/10 p-6 text-center">
             <p className="text-danger font-mono mb-4">{error || 'Not authorized'}</p>
-            <button onClick={() => router.push(`/b/${slug}`)} className="btn">
-              back to board
-            </button>
+            {!user && (
+              <p className="text-sm text-muted font-mono mb-4">
+                If you linked your email, try logging in:
+              </p>
+            )}
+            <div className="flex gap-3 justify-center">
+              {!user && (
+                <button
+                  onClick={() => setError(null)}
+                  className="btn btn-primary"
+                >
+                  sign in
+                </button>
+              )}
+              <button onClick={() => router.push(`/b/${slug}`)} className="btn">
+                back to board
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -220,6 +338,118 @@ export default function MerchantDashboardPage() {
       </header>
 
       <main className="max-w-2xl mx-auto px-4 py-6">
+        {/* Account Linking Banner - show if not linked and user is authenticated */}
+        {user && !dashboard.claim.user_id && (
+          <section className="mb-8">
+            <div className="border-2 border-[var(--accent)] bg-[var(--accent)]/10 p-4">
+              <div className="flex items-start gap-3">
+                <LinkIcon size={24} className="text-accent flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <h3 className="font-bold text-sm mb-1">link your account</h3>
+                  <p className="text-xs text-muted font-mono mb-3">
+                    Connect your email ({user.email}) to access this dashboard from any device.
+                  </p>
+                  {linkError && (
+                    <p className="text-xs text-danger font-mono mb-2">{linkError}</p>
+                  )}
+                  <button
+                    onClick={handleLinkAccount}
+                    disabled={linkingAccount}
+                    className="btn btn-primary text-xs disabled:opacity-50"
+                  >
+                    {linkingAccount ? 'linking...' : 'link account'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Account Section - show link option if not linked */}
+        {!user && !dashboard.claim.user_id && (
+          <section className="mb-8">
+            <h2 className="font-mono text-sm text-muted mb-3">account</h2>
+            {showLinkAccount ? (
+              <div className="border border-[var(--border)]">
+                <div className="p-4 border-b border-[var(--border)] bg-[var(--bg-alt)]">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-mono">add email for multi-device access</p>
+                    <button
+                      onClick={() => setShowLinkAccount(false)}
+                      className="text-xs text-muted hover:text-[var(--fg)]"
+                    >
+                      cancel
+                    </button>
+                  </div>
+                </div>
+                <div className="p-4">
+                  <LoginForm
+                    type="merchant"
+                    redirectTo={`/merchant/${slug}?link_claim=true`}
+                    locationId={locationId || undefined}
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="border border-[var(--border)] p-4">
+                <div className="flex items-start gap-3">
+                  <Envelope size={20} className="text-muted flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-sm font-mono mb-2">
+                      currently using device-only access
+                    </p>
+                    <p className="text-xs text-muted font-mono mb-3">
+                      add your email to access this dashboard from any device and recover your account if you lose this device.
+                    </p>
+                    <button
+                      onClick={() => setShowLinkAccount(true)}
+                      className="btn text-xs"
+                    >
+                      add email
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </section>
+        )}
+
+        {/* Account Linked Status */}
+        {dashboard.claim.user_id && (
+          <section className="mb-8">
+            <h2 className="font-mono text-sm text-muted mb-3">account</h2>
+            <div className="border border-[var(--accent)] bg-[var(--accent)]/5 p-4">
+              <div className="flex items-center gap-2">
+                <CheckCircle size={20} weight="fill" className="text-accent" />
+                <div>
+                  <p className="text-sm font-mono">account linked</p>
+                  {user?.email && (
+                    <p className="text-xs text-muted font-mono">{user.email}</p>
+                  )}
+                </div>
+              </div>
+              {dashboard.claim.linked_at && (
+                <p className="text-xs text-faint font-mono mt-2">
+                  linked {new Date(dashboard.claim.linked_at).toLocaleDateString()}
+                </p>
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* Link Success Message */}
+        {linkSuccess && (
+          <section className="mb-8">
+            <div className="border border-[var(--accent)] bg-[var(--accent)]/10 p-4 text-center">
+              <CheckCircle size={32} weight="fill" className="text-accent mx-auto mb-2" />
+              <p className="font-mono text-sm">account linked successfully!</p>
+              <p className="text-xs text-muted font-mono mt-1">
+                you can now access this dashboard from any device
+              </p>
+            </div>
+          </section>
+        )}
+
         {/* Stats */}
         <section className="mb-8">
           <h2 className="font-mono text-sm text-muted mb-3">activity stats</h2>

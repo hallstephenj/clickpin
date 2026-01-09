@@ -40,29 +40,33 @@ export async function POST(request: NextRequest) {
     // Get raw body for signature verification
     const bodyText = await request.text();
 
-    // Verify signature if webhook secret is configured
+    // SECURITY: Webhook signature verification is MANDATORY
     const webhookSecret = process.env.LNBITS_WEBHOOK_SECRET;
     const signature = request.headers.get('x-lnbits-signature') ||
                      request.headers.get('x-webhook-signature');
 
-    if (webhookSecret) {
-      if (!signature) {
-        console.warn('[LNbits Webhook] Missing signature header');
-        return NextResponse.json(
-          { error: 'Missing webhook signature' },
-          { status: 401 }
-        );
-      }
+    if (!webhookSecret) {
+      console.error('[LNbits Webhook] SECURITY: LNBITS_WEBHOOK_SECRET not configured - rejecting request');
+      return NextResponse.json(
+        { error: 'Webhook not configured' },
+        { status: 503 }
+      );
+    }
 
-      if (!verifyWebhookSignature(bodyText, signature)) {
-        console.error('[LNbits Webhook] Signature verification failed');
-        return NextResponse.json(
-          { error: 'Invalid webhook signature' },
-          { status: 401 }
-        );
-      }
-    } else {
-      console.warn('[LNbits Webhook] No webhook secret configured - skipping verification');
+    if (!signature) {
+      console.warn('[LNbits Webhook] Missing signature header');
+      return NextResponse.json(
+        { error: 'Missing webhook signature' },
+        { status: 401 }
+      );
+    }
+
+    if (!verifyWebhookSignature(bodyText, signature)) {
+      console.error('[LNbits Webhook] Signature verification failed');
+      return NextResponse.json(
+        { error: 'Invalid webhook signature' },
+        { status: 401 }
+      );
     }
 
     // Parse the webhook payload

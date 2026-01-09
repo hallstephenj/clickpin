@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
-
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'clickpin-admin-2024';
+import { verifyAdminAuth } from '@/lib/admin-auth';
 
 function generateSlug(name: string): string {
   return name
@@ -12,10 +11,10 @@ function generateSlug(name: string): string {
 }
 
 export async function POST(request: NextRequest) {
-  // Check admin password
-  const password = request.headers.get('X-Admin-Password');
-  if (password !== ADMIN_PASSWORD) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  // Check admin auth (supports both Supabase and legacy password)
+  const auth = await verifyAdminAuth(request);
+  if (!auth.authenticated) {
+    return NextResponse.json({ error: auth.error }, { status: 401 });
   }
 
   try {

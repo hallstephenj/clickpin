@@ -2,11 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { getFeatureFlags } from '@/lib/featureFlags';
 import { verifyMerchantAuth, getMerchantSettings } from '@/lib/merchant';
+import { createSupabaseServerClient } from '@/lib/supabase-server';
+import { MerchantClaim } from '@/types';
 
 /**
  * GET /api/merchant/dashboard
  * Fetch merchant dashboard data including settings and basic stats
- * Query params: location_id, session_id
+ * Query params: location_id, session_id (optional if logged in via Supabase Auth)
  */
 export async function GET(request: NextRequest) {
   try {
@@ -14,9 +16,9 @@ export async function GET(request: NextRequest) {
     const location_id = searchParams.get('location_id');
     const session_id = searchParams.get('session_id');
 
-    if (!location_id || !session_id) {
+    if (!location_id) {
       return NextResponse.json(
-        { error: 'Missing location_id or session_id' },
+        { error: 'Missing location_id' },
         { status: 400 }
       );
     }
@@ -30,8 +32,32 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Verify merchant owns this location
-    const claim = await verifyMerchantAuth(location_id, session_id);
+    let claim: MerchantClaim | null = null;
+
+    // Try Supabase Auth first (for multi-device access)
+    const supabase = await createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (user) {
+      // Look up claim by user_id
+      const { data: userClaim } = await supabaseAdmin
+        .from('merchant_claims')
+        .select('*')
+        .eq('location_id', location_id)
+        .eq('user_id', user.id)
+        .eq('status', 'verified')
+        .single();
+
+      if (userClaim) {
+        claim = userClaim;
+      }
+    }
+
+    // Fall back to device session auth
+    if (!claim && session_id) {
+      claim = await verifyMerchantAuth(location_id, session_id);
+    }
+
     if (!claim) {
       return NextResponse.json(
         { error: 'Not authorized to manage this location' },
@@ -113,6 +139,8 @@ export async function GET(request: NextRequest) {
         id: claim.id,
         claimed_at: claim.claimed_at,
         verification_method: claim.verification_method,
+        user_id: claim.user_id || null,
+        linked_at: claim.linked_at || null,
       },
       stats: {
         pins_today: pinsToday || 0,

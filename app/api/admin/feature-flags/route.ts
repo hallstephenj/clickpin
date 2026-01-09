@@ -1,18 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
-
-const DEFAULT_ADMIN_PASSWORD = 'clickpin-admin-2024';
-
-function verifyAdminPassword(request: NextRequest): boolean {
-  const password = request.headers.get('X-Admin-Password');
-  const adminPassword = process.env.ADMIN_PASSWORD || DEFAULT_ADMIN_PASSWORD;
-  return password === adminPassword;
-}
+import { verifyAdminAuth } from '@/lib/admin-auth';
 
 // GET /api/admin/feature-flags - Get all flags with full details
 export async function GET(request: NextRequest) {
-  if (!verifyAdminPassword(request)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const auth = await verifyAdminAuth(request);
+  if (!auth.authenticated) {
+    return NextResponse.json({ error: auth.error }, { status: 401 });
   }
 
   try {
@@ -35,8 +29,9 @@ export async function GET(request: NextRequest) {
 
 // PATCH /api/admin/feature-flags - Toggle a flag
 export async function PATCH(request: NextRequest) {
-  if (!verifyAdminPassword(request)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const auth = await verifyAdminAuth(request);
+  if (!auth.authenticated) {
+    return NextResponse.json({ error: auth.error }, { status: 401 });
   }
 
   try {

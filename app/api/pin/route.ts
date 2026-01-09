@@ -4,6 +4,8 @@ import { verifyPresenceToken } from '@/lib/presence';
 import { config } from '@/lib/config';
 import { v4 as uuidv4 } from 'uuid';
 import { logGhostEvent } from '@/lib/ghostEvents';
+import { isValidEnum } from '@/lib/validation';
+import { BADGE_OPTIONS } from '@/types';
 
 // POST /api/pin - Create a new pin
 export async function POST(request: NextRequest) {
@@ -48,6 +50,14 @@ export async function POST(request: NextRequest) {
     if (doodle_data && doodle_data.length > config.pin.maxDoodleSize) {
       return NextResponse.json(
         { error: `Doodle data exceeds maximum size of ${config.pin.maxDoodleSize} bytes` },
+        { status: 400 }
+      );
+    }
+
+    // Validate badge if provided
+    if (badge && !isValidEnum(badge, BADGE_OPTIONS)) {
+      return NextResponse.json(
+        { error: 'Invalid badge type' },
         { status: 400 }
       );
     }

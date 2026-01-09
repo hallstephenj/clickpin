@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { getFeatureFlags } from '@/lib/featureFlags';
 import { verifyMerchantAuth } from '@/lib/merchant';
+import { isValidUUID } from '@/lib/validation';
 
 /**
  * GET /api/merchant/analytics
@@ -17,6 +18,14 @@ export async function GET(request: NextRequest) {
     if (!location_id || !session_id) {
       return NextResponse.json(
         { error: 'Missing location_id or session_id' },
+        { status: 400 }
+      );
+    }
+
+    // Validate UUID format for security
+    if (!isValidUUID(location_id) || !isValidUUID(session_id)) {
+      return NextResponse.json(
+        { error: 'Invalid location_id or session_id format' },
         { status: 400 }
       );
     }

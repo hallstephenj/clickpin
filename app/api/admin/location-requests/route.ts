@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
+import { verifyAdminAuth } from '@/lib/admin-auth';
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'clickpin-admin-2024';
 const GROUPING_RADIUS_M = 150;
 
 // Haversine distance in meters
@@ -37,10 +37,10 @@ interface GroupedRequest {
 }
 
 export async function GET(request: NextRequest) {
-  // Check admin password
-  const password = request.headers.get('X-Admin-Password');
-  if (password !== ADMIN_PASSWORD) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  // Check admin auth (supports both Supabase and legacy password)
+  const auth = await verifyAdminAuth(request);
+  if (!auth.authenticated) {
+    return NextResponse.json({ error: auth.error }, { status: 401 });
   }
 
   try {

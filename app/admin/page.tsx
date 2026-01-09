@@ -1,7 +1,12 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Lightning, Ghost, PencilSimple, Storefront, Broom, Trash } from '@phosphor-icons/react';
+import { Lightning, Ghost, PencilSimple, Storefront, Broom, Trash, SignOut } from '@phosphor-icons/react';
+import { useAuth } from '@/components/auth/AuthProvider';
+import { LoginForm } from '@/components/auth/LoginForm';
+
+// Supabase auth uses cookies, so no custom headers needed
+const getAuthHeaders = (): HeadersInit => ({});
 
 interface LocationRequest {
   id: string;
@@ -59,9 +64,7 @@ type Tab = 'requests' | 'locations' | 'flags';
 type View = 'list' | 'pins';
 
 export default function AdminPage() {
-  const [authenticated, setAuthenticated] = useState(false);
-  const [password, setPassword] = useState('');
-  const [authError, setAuthError] = useState<string | null>(null);
+  const { user, loading: authLoading, signOut } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>('locations');
   const [currentView, setCurrentView] = useState<View>('list');
 
@@ -90,7 +93,7 @@ export default function AdminPage() {
     setRequestsLoading(true);
     try {
       const response = await fetch('/api/admin/location-requests', {
-        headers: { 'X-Admin-Password': password },
+        headers: getAuthHeaders(),
       });
       if (response.ok) {
         const data = await response.json();
@@ -101,13 +104,13 @@ export default function AdminPage() {
     } finally {
       setRequestsLoading(false);
     }
-  }, [password]);
+  }, []);
 
   const fetchLocations = useCallback(async () => {
     setLocationsLoading(true);
     try {
       const response = await fetch('/api/admin/locations', {
-        headers: { 'X-Admin-Password': password },
+        headers: getAuthHeaders(),
       });
       if (response.ok) {
         const data = await response.json();
@@ -118,13 +121,13 @@ export default function AdminPage() {
     } finally {
       setLocationsLoading(false);
     }
-  }, [password]);
+  }, []);
 
   const fetchLocationPins = useCallback(async (locationId: string) => {
     setPinsLoading(true);
     try {
       const response = await fetch(`/api/admin/locations/${locationId}/pins`, {
-        headers: { 'X-Admin-Password': password },
+        headers: getAuthHeaders(),
       });
       if (response.ok) {
         const data = await response.json();
@@ -135,13 +138,13 @@ export default function AdminPage() {
     } finally {
       setPinsLoading(false);
     }
-  }, [password]);
+  }, []);
 
   const fetchFlags = useCallback(async () => {
     setFlagsLoading(true);
     try {
       const response = await fetch('/api/admin/feature-flags', {
-        headers: { 'X-Admin-Password': password },
+        headers: getAuthHeaders(),
       });
       if (response.ok) {
         const data = await response.json();
@@ -152,7 +155,7 @@ export default function AdminPage() {
     } finally {
       setFlagsLoading(false);
     }
-  }, [password]);
+  }, []);
 
   const handleToggleFlag = async (flag: FeatureFlag) => {
     setActionLoading(flag.id);
@@ -161,7 +164,7 @@ export default function AdminPage() {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'X-Admin-Password': password,
+          ...getAuthHeaders(),
         },
         body: JSON.stringify({ key: flag.key, enabled: !flag.enabled }),
       });
@@ -182,7 +185,7 @@ export default function AdminPage() {
   };
 
   useEffect(() => {
-    if (authenticated && currentView === 'list') {
+    if (user && currentView === 'list') {
       // Always fetch flags so we know which features are enabled
       if (featureFlags.length === 0) {
         fetchFlags();
@@ -195,7 +198,7 @@ export default function AdminPage() {
         fetchFlags();
       }
     }
-  }, [authenticated, activeTab, currentView, fetchRequests, fetchLocations, fetchFlags, featureFlags.length]);
+  }, [user, activeTab, currentView, fetchRequests, fetchLocations, fetchFlags, featureFlags.length]);
 
   // Helper to check if a feature flag is enabled
   const isFeatureEnabled = (key: string) => {
@@ -208,27 +211,6 @@ export default function AdminPage() {
       fetchLocationPins(selectedLocation.id);
     }
   }, [selectedLocation, currentView, fetchLocationPins]);
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setAuthError(null);
-
-    try {
-      const response = await fetch('/api/admin/auth', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
-      });
-
-      if (response.ok) {
-        setAuthenticated(true);
-      } else {
-        setAuthError('invalid password');
-      }
-    } catch {
-      setAuthError('authentication failed');
-    }
-  };
 
   const handleApprove = async (group: GroupedRequest) => {
     const name = newLocationName[`${group.center_lat}-${group.center_lng}`];
@@ -243,7 +225,7 @@ export default function AdminPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-Admin-Password': password,
+          ...getAuthHeaders(),
         },
         body: JSON.stringify({
           lat: group.center_lat,
@@ -279,7 +261,7 @@ export default function AdminPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-Admin-Password': password,
+          ...getAuthHeaders(),
         },
         body: JSON.stringify({
           request_ids: group.requests.map((r) => r.id),
@@ -341,7 +323,7 @@ export default function AdminPage() {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'X-Admin-Password': password,
+          ...getAuthHeaders(),
         },
         body: JSON.stringify({ name: editLocationName.trim(), radius_m: radius }),
       });
@@ -376,7 +358,7 @@ export default function AdminPage() {
     try {
       const response = await fetch(`/api/admin/locations/${location.id}`, {
         method: 'DELETE',
-        headers: { 'X-Admin-Password': password },
+        headers: getAuthHeaders(),
       });
 
       if (response.ok) {
@@ -399,7 +381,7 @@ export default function AdminPage() {
     try {
       const response = await fetch(`/api/admin/locations/${location.id}/clear-pins`, {
         method: 'DELETE',
-        headers: { 'X-Admin-Password': password },
+        headers: getAuthHeaders(),
       });
 
       if (response.ok) {
@@ -424,7 +406,7 @@ export default function AdminPage() {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'X-Admin-Password': password,
+          ...getAuthHeaders(),
         },
         body: JSON.stringify({ ghosts_enabled: !location.ghosts_enabled }),
       });
@@ -455,7 +437,7 @@ export default function AdminPage() {
     try {
       const response = await fetch(`/api/admin/pins/${pinId}`, {
         method: 'DELETE',
-        headers: { 'X-Admin-Password': password },
+        headers: getAuthHeaders(),
       });
 
       if (response.ok) {
@@ -476,7 +458,7 @@ export default function AdminPage() {
     try {
       const response = await fetch(`/api/admin/pins/${pin.id}/toggle-hidden`, {
         method: 'POST',
-        headers: { 'X-Admin-Password': password },
+        headers: getAuthHeaders(),
       });
 
       if (response.ok) {
@@ -509,7 +491,7 @@ export default function AdminPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-Admin-Password': password,
+          ...getAuthHeaders(),
         },
         body: JSON.stringify({ action }),
       });
@@ -543,7 +525,21 @@ export default function AdminPage() {
     }
   };
 
-  if (!authenticated) {
+  // Handle sign out
+  const handleSignOut = async () => {
+    await signOut();
+  };
+
+  // Show loading while checking auth
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-[#fafafa] dark:bg-[#0a0a0a] flex items-center justify-center p-4">
+        <p className="text-muted font-mono">loading...</p>
+      </div>
+    );
+  }
+
+  if (!user) {
     return (
       <div className="min-h-screen bg-[#fafafa] dark:bg-[#0a0a0a] flex items-center justify-center p-4">
         <div className="max-w-sm w-full">
@@ -554,28 +550,7 @@ export default function AdminPage() {
             <p className="text-muted text-sm font-mono">location management</p>
           </div>
 
-          <form onSubmit={handleLogin} className="border border-[var(--border)] p-6">
-            <div className="mb-4">
-              <label className="block text-xs text-muted font-mono mb-1">
-                admin password
-              </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full p-2 bg-[var(--bg-alt)] border border-[var(--border)] font-mono text-sm"
-                autoFocus
-              />
-            </div>
-
-            {authError && (
-              <p className="mb-4 text-xs text-danger font-mono">{authError}</p>
-            )}
-
-            <button type="submit" className="btn btn-primary w-full justify-center">
-              login
-            </button>
-          </form>
+          <LoginForm type="admin" redirectTo="/admin" />
         </div>
       </div>
     );
@@ -739,7 +714,18 @@ export default function AdminPage() {
             <h1 className="text-2xl font-bold inline-flex items-center gap-1">
               <Lightning size={24} weight="fill" className="text-accent" /> clickpin admin
             </h1>
+            {user?.email && (
+              <p className="text-xs text-muted font-mono mt-1">{user.email}</p>
+            )}
           </div>
+          <button
+            onClick={handleSignOut}
+            className="btn text-xs flex items-center gap-1"
+            title="Sign out"
+          >
+            <SignOut size={14} />
+            sign out
+          </button>
         </div>
 
         {/* Tabs */}

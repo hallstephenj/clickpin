@@ -3,9 +3,14 @@ import { supabaseAdmin } from '@/lib/supabase';
 import { verifyPresenceToken } from '@/lib/presence';
 import { config } from '@/lib/config';
 import { logGhostEvent } from '@/lib/ghostEvents';
+import { rateLimiters, checkRateLimit } from '@/lib/ratelimit';
 
 // POST /api/flag - Flag a pin
 export async function POST(request: NextRequest) {
+  // Rate limit: 20 flags per minute per IP
+  const rateLimitResponse = await checkRateLimit(request, rateLimiters.flag);
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     const body = await request.json();
     const { pin_id, presence_token } = body;

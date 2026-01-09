@@ -474,6 +474,9 @@ export function Board({
       <footer className="mt-8 pb-6 flex justify-center gap-6 text-xs text-faint">
         <a href={flags.PROXHOME_ADVANCED ? '/?view=nearby' : '/map'} className="hover:text-[var(--fg-muted)] transition-colors">nearby</a>
         <a href="/map" className="hover:text-[var(--fg-muted)] transition-colors">map</a>
+        {flags.MERCHANTS && (
+          <a href="/merchant" className="hover:text-[var(--fg-muted)] transition-colors">merchants</a>
+        )}
         <a href="/about" className="hover:text-[var(--fg-muted)] transition-colors">about</a>
         <a href="/terms" className="hover:text-[var(--fg-muted)] transition-colors">terms</a>
         <a href="/privacy" className="hover:text-[var(--fg-muted)] transition-colors">privacy</a>

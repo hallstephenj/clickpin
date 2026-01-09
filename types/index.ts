@@ -307,6 +307,9 @@ export interface MerchantClaim {
   status: MerchantClaimStatus;
   claimed_at: string | null;
   created_at: string;
+  // Supabase Auth integration for multi-device access
+  user_id?: string | null;
+  linked_at?: string | null;
 }
 
 export interface MerchantSettings {
