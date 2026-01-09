@@ -2,9 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { verifyPresenceToken } from '@/lib/presence';
 import { getLightningProvider, getPaymentAmount, getPaymentMemo } from '@/lib/lightning';
+import { rateLimiters, checkRateLimit } from '@/lib/ratelimit';
 
 // POST /api/boost/create-invoice - Create invoice for boosting a pin
 export async function POST(request: NextRequest) {
+  const rateLimitResponse = await checkRateLimit(request, rateLimiters.invoice);
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     const body = await request.json();
     const { pin_id, presence_token } = body;

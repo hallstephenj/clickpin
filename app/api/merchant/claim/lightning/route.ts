@@ -4,12 +4,16 @@ import { getFeatureFlags } from '@/lib/featureFlags';
 import { getLightningProvider } from '@/lib/lightning';
 import { generateClaimCode, createPendingClaim, isLocationClaimed } from '@/lib/merchant';
 import { config } from '@/lib/config';
+import { rateLimiters, checkRateLimit } from '@/lib/ratelimit';
 
 /**
  * POST /api/merchant/claim/lightning
  * Generate a Lightning invoice for merchant claim verification
  */
 export async function POST(request: NextRequest) {
+  const rateLimitResponse = await checkRateLimit(request, rateLimiters.invoice);
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     const body = await request.json();
     const { location_id, session_id, claim_code } = body;

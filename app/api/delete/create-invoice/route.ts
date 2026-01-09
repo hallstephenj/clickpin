@@ -3,9 +3,13 @@ import { supabaseAdmin } from '@/lib/supabase';
 import { verifyPresenceToken } from '@/lib/presence';
 import { getLightningProvider, getPaymentAmount, getPaymentMemo } from '@/lib/lightning';
 import { config } from '@/lib/config';
+import { rateLimiters, checkRateLimit } from '@/lib/ratelimit';
 
 // POST /api/delete/create-invoice - Create invoice for deleting a pin after grace window
 export async function POST(request: NextRequest) {
+  const rateLimitResponse = await checkRateLimit(request, rateLimiters.invoice);
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     const body = await request.json();
     const { pin_id, presence_token } = body;

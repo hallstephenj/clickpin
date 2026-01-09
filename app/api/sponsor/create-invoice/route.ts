@@ -3,6 +3,7 @@ import { supabaseAdmin } from '@/lib/supabase';
 import { verifyPresenceToken } from '@/lib/presence';
 import { getLightningProvider, getPaymentMemo } from '@/lib/lightning';
 import { config } from '@/lib/config';
+import { rateLimiters, checkRateLimit } from '@/lib/ratelimit';
 
 // Helper to get current active sponsor for a location
 async function getCurrentSponsor(locationId: string) {
@@ -23,6 +24,9 @@ async function getCurrentSponsor(locationId: string) {
 
 // POST /api/sponsor/create-invoice - Create invoice for sponsoring a location
 export async function POST(request: NextRequest) {
+  const rateLimitResponse = await checkRateLimit(request, rateLimiters.invoice);
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     const body = await request.json();
     const { presence_token, sponsor_label, sponsor_url, amount_sats } = body;
