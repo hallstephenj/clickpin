@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { v4 as uuidv4 } from 'uuid';
+import { isValidUUID } from '@/lib/validation';
 
 // POST /api/session - Create or return a device session
 export async function POST(request: NextRequest) {
@@ -9,8 +10,8 @@ export async function POST(request: NextRequest) {
     const existingSessionId = body.session_id;
     const userAgent = request.headers.get('user-agent') || null;
 
-    // If existing session ID provided, try to update last_seen
-    if (existingSessionId) {
+    // If existing session ID provided, validate and try to update last_seen
+    if (existingSessionId && isValidUUID(existingSessionId)) {
       const { data: existingSession, error: fetchError } = await supabaseAdmin
         .from('device_sessions')
         .select('id')
@@ -37,20 +38,12 @@ export async function POST(request: NextRequest) {
 
     if (insertError) {
       console.error('Error creating session:', insertError);
-      console.error('Insert error details:', JSON.stringify(insertError, null, 2));
-      return NextResponse.json({
-        error: 'Failed to create session',
-        details: insertError.message || 'Unknown database error'
-      }, { status: 500 });
+      return NextResponse.json({ error: 'Failed to create session' }, { status: 500 });
     }
 
     return NextResponse.json({ session_id: newSessionId });
   } catch (error) {
     console.error('Session error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json({
-      error: 'Internal server error',
-      details: errorMessage
-    }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
