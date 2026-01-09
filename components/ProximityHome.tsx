@@ -308,6 +308,7 @@ export function ProximityHome({ state, onRequestLocation, sessionId, currentLoca
         {/* Footer */}
         <div className="mt-6 flex justify-center gap-6 text-xs text-faint">
           <Link href="/map" className="hover:text-[var(--fg-muted)] transition-colors">map</Link>
+          <Link href="/merchant" className="hover:text-[var(--fg-muted)] transition-colors">merchants</Link>
           <Link href="/about" className="hover:text-[var(--fg-muted)] transition-colors">about</Link>
           <Link href="/terms" className="hover:text-[var(--fg-muted)] transition-colors">terms</Link>
           <Link href="/privacy" className="hover:text-[var(--fg-muted)] transition-colors">privacy</Link>

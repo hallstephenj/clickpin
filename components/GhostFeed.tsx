@@ -203,6 +203,10 @@ export function GhostFeed({ onRequestLocation }: GhostFeedProps) {
               nearby
             </Link>
             <span className="text-faint">|</span>
+            <Link href="/merchant" className="hover:text-[var(--fg)]">
+              merchants
+            </Link>
+            <span className="text-faint">|</span>
             <Link href="/about" className="hover:text-[var(--fg)]">
               about
             </Link>
