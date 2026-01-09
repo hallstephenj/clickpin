@@ -17,6 +17,10 @@ export async function GET(request: Request) {
     next = '/';
   }
 
+  // Use configured base URL or fall back to request origin
+  // This ensures correct redirects when behind a proxy (Railway, Vercel, etc.)
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || requestUrl.origin;
+
   if (code) {
     const supabase = await createSupabaseServerClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
@@ -24,10 +28,10 @@ export async function GET(request: Request) {
     if (error) {
       console.error('Auth callback error:', error);
       // Redirect to login with error
-      return NextResponse.redirect(new URL(`/admin?error=auth_failed`, requestUrl.origin));
+      return NextResponse.redirect(new URL(`/admin?error=auth_failed`, baseUrl));
     }
   }
 
   // Redirect to the specified destination
-  return NextResponse.redirect(new URL(next, requestUrl.origin));
+  return NextResponse.redirect(new URL(next, baseUrl));
 }

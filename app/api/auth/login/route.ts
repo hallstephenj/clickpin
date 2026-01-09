@@ -42,7 +42,9 @@ export async function POST(request: NextRequest) {
 
     const supabase = await createSupabaseServerClient();
 
-    const redirectUrl = `${request.nextUrl.origin}/api/auth/callback?next=${encodeURIComponent(redirect_to || '/')}`;
+    // Use configured base URL or fall back to request origin
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || request.nextUrl.origin;
+    const redirectUrl = `${baseUrl}/api/auth/callback?next=${encodeURIComponent(redirect_to || '/')}`;
 
     const { error } = await supabase.auth.signInWithOtp({
       email,
