@@ -1,19 +1,34 @@
 # Clickpin
 
-An anonymous, hyperlocal message board for Bitcoin merchants. Leave notes, plant seeds, and help grow the Bitcoin economy.
+**Galvanizing grassroots Bitcoin merchant adoption.**
+
+## The Mission
+
+Every retailer in the United States should accept Bitcoin. Every Bitcoin holder knows this. Clickpin is the coordination layer that makes it happen.
+
+This is not a passive app. This is infrastructure for Bitcoin warriors. Show up. Plant seeds. Flip merchants. Track progress. Win.
 
 ## What is Clickpin?
 
-Clickpin is a location-based social app where users can post anonymous notes that are only visible when physically present at a location. Originally designed as digital corkboards for any place, Clickpin has evolved to focus on **Bitcoin merchant advocacy** - helping users discover, review, and support businesses that accept Bitcoin.
+Clickpin is a location-based coordination tool for grassroots Bitcoin adoption. Anonymous message boards are locked to physical locations - you can only post when you're actually there. No accounts. No surveillance. Just boots on the ground.
+
+**The playbook is simple:**
+1. Walk into any business
+2. Have the conversation about accepting Bitcoin
+3. Log the outcome (seed planted)
+4. Coordinate with others who visit the same location
+5. Flip the merchant
+
+Every seed planted is tracked. Every merchant flipped is a victory. BTCMap integration means wins are visible globally.
 
 ### Core Features
 
-- **Location-locked posts**: Content is only visible when you're physically at a location
-- **Anonymous**: No accounts required - uses device-based identity
-- **Bitcoin-native**: Lightning Network payments for premium features
-- **Merchant claiming**: Business owners can verify and manage their boards
-- **Seed planting**: Track and encourage Bitcoin adoption conversations
-- **BTCMap integration**: Import Bitcoin-accepting merchants from BTCMap.org
+- **Location-locked boards**: Post only when physically present - no armchair activism
+- **Seed planting**: Log Bitcoin conversations with merchants, track outcomes (positive/neutral/negative)
+- **Anonymous coordination**: No accounts, device-based identity, plausible deniability
+- **BTCMap sync**: Import existing Bitcoin merchants, export new wins back to the ecosystem
+- **Merchant claiming**: Flipped merchants can claim their board and join the network
+- **Lightning-native**: Boosts, sponsorships, and donations keep the servers running
 
 ## Key Concepts
 
