@@ -1,0 +1,697 @@
+/* ==========================================================================
+   FORSTALL MODE - Skeuomorphic Design System
+   Inspired by pre-iOS7, Scott Forstall-era Apple design
+
+   Era: Pre-flat, pre-iOS7, early 2010s, original iPad era
+   Philosophy: Opinionated, confident, authoritative, designed not decorated
+   Materiality: Skeuomorphic, tactile, physical, material-rich
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   CSS Custom Properties - Skeuomorphic Palette
+   -------------------------------------------------------------------------- */
+:root.forstall-mode {
+  /* Leather & Wood */
+  --leather-brown: #5c3d2e;
+  --leather-dark: #3d2517;
+  --leather-stitch: #c9a86c;
+  --wood-light: #d4a574;
+  --wood-medium: #8b5a2b;
+  --wood-dark: #4a3728;
+  --wood-grain: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
+
+  /* Metal */
+  --metal-light: #e8e8e8;
+  --metal-medium: #c0c0c0;
+  --metal-dark: #808080;
+  --metal-shine: linear-gradient(180deg, #ffffff 0%, #e0e0e0 50%, #b0b0b0 100%);
+  --brushed-metal: linear-gradient(135deg, #d4d4d4 0%, #a8a8a8 25%, #c8c8c8 50%, #b0b0b0 75%, #d0d0d0 100%);
+
+  /* Cork & Paper */
+  --cork-light: #d4b896;
+  --cork-medium: #c4a882;
+  --cork-dark: #a08060;
+  --paper-cream: #f5f0e6;
+  --paper-white: #fdfbf7;
+  --paper-aged: #e8e0d0;
+  --paper-shadow: rgba(0, 0, 0, 0.15);
+
+  /* Felt & Fabric */
+  --felt-green: #2d5a3d;
+  --felt-dark: #1a3a28;
+
+  /* Bitcoin Gold */
+  --bitcoin-gold: #f7931a;
+  --bitcoin-dark: #c77813;
+  --bitcoin-light: #ffb84d;
+  --coin-shine: linear-gradient(135deg, #ffd700 0%, #f7931a 30%, #c77813 70%, #8b5a00 100%);
+  --coin-edge: #8b6914;
+
+  /* Shadows & Depth */
+  --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.2);
+  --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.25);
+  --shadow-hard: 0 6px 20px rgba(0, 0, 0, 0.35);
+  --shadow-inset: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+  --shadow-emboss: inset 0 1px 0 rgba(255, 255, 255, 0.3), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+
+  /* Text */
+  --text-emboss: #1a1a1a;
+  --text-light: #f5f0e6;
+  --text-muted: #6b5b4f;
+
+  /* Warm Lighting */
+  --warm-overlay: rgba(255, 248, 230, 0.05);
+  --warm-highlight: rgba(255, 220, 180, 0.15);
+}
+
+/* --------------------------------------------------------------------------
+   Base Styles - Cork Pinboard Background
+   -------------------------------------------------------------------------- */
+.forstall-mode body {
+  background:
+    /* Cork texture overlay */
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='cork'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.05' numOctaves='5' seed='15' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23cork)' opacity='0.15'/%3E%3C/svg%3E"),
+    /* Base cork gradient */
+    linear-gradient(180deg, #d4b896 0%, #c4a882 50%, #b89870 100%);
+  background-attachment: fixed;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  color: var(--text-emboss);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Dark mode cork - darker, richer */
+.forstall-mode.dark body,
+.forstall-mode body.dark {
+  background:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='cork'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.05' numOctaves='5' seed='15' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23cork)' opacity='0.1'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, #3d2a1a 0%, #2d1a0a 50%, #1d0a00 100%);
+}
+
+/* --------------------------------------------------------------------------
+   Typography - Engraved & Embossed
+   -------------------------------------------------------------------------- */
+.forstall-mode h1,
+.forstall-mode h2,
+.forstall-mode h3 {
+  font-family: 'Georgia', serif;
+  font-weight: 700;
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.4),
+    0 -1px 0 rgba(0, 0, 0, 0.2);
+  letter-spacing: -0.02em;
+}
+
+.forstall-mode .font-mono {
+  font-family: 'Courier New', 'Courier', monospace;
+  font-weight: 600;
+}
+
+/* Engraved text effect */
+.forstall-mode .text-engraved {
+  color: #4a3728;
+  text-shadow:
+    0 1px 1px rgba(255, 255, 255, 0.5),
+    0 -1px 1px rgba(0, 0, 0, 0.3);
+}
+
+/* --------------------------------------------------------------------------
+   Leather Header Bar
+   -------------------------------------------------------------------------- */
+.forstall-mode header {
+  background:
+    /* Leather grain */
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='leather'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.4' numOctaves='4'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23leather)' opacity='0.08'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, #6b4c3a 0%, #5c3d2e 20%, #4d2e20 80%, #3d2517 100%);
+  border-bottom: 3px solid #2a1810;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 4px 12px rgba(0, 0, 0, 0.4);
+  position: relative;
+}
+
+/* Stitching effect */
+.forstall-mode header::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  right: 12px;
+  height: 1px;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0px,
+    transparent 4px,
+    #c9a86c 4px,
+    #c9a86c 12px,
+    transparent 12px,
+    transparent 16px
+  );
+  opacity: 0.6;
+}
+
+.forstall-mode header::after {
+  content: '';
+  position: absolute;
+  bottom: 8px;
+  left: 12px;
+  right: 12px;
+  height: 1px;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0px,
+    transparent 4px,
+    #c9a86c 4px,
+    #c9a86c 12px,
+    transparent 12px,
+    transparent 16px
+  );
+  opacity: 0.6;
+}
+
+.forstall-mode header h1,
+.forstall-mode header .text-lg {
+  color: #f5f0e6;
+  text-shadow:
+    0 -1px 0 rgba(0, 0, 0, 0.5),
+    0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* --------------------------------------------------------------------------
+   Buttons - Brushed Metal with Emboss
+   -------------------------------------------------------------------------- */
+.forstall-mode .btn {
+  background: var(--brushed-metal);
+  border: 1px solid #888;
+  border-radius: 6px;
+  box-shadow:
+    var(--shadow-emboss),
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    0 1px 0 rgba(255, 255, 255, 0.5) inset;
+  color: #333;
+  font-family: 'Helvetica Neue', 'Helvetica', sans-serif;
+  font-weight: 600;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.forstall-mode .btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 100%);
+  pointer-events: none;
+}
+
+.forstall-mode .btn:hover {
+  background: linear-gradient(180deg, #e8e8e8 0%, #d0d0d0 50%, #c0c0c0 100%);
+}
+
+.forstall-mode .btn:active {
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.3),
+    0 1px 0 rgba(255, 255, 255, 0.3);
+  transform: translateY(1px);
+}
+
+/* Primary Button - Bitcoin Gold */
+.forstall-mode .btn-primary {
+  background: linear-gradient(180deg, #ffcc4d 0%, #f7931a 30%, #e07d00 70%, #c66a00 100%);
+  border: 1px solid #8b5a00;
+  color: #fff;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.4);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+    0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.forstall-mode .btn-primary:hover {
+  background: linear-gradient(180deg, #ffd866 0%, #ffa033 30%, #e88a00 70%, #d67700 100%);
+}
+
+.forstall-mode .btn-primary:active {
+  background: linear-gradient(180deg, #d67700 0%, #c66a00 50%, #b55d00 100%);
+}
+
+/* --------------------------------------------------------------------------
+   Cards / Pins - Paper Notes with Push Pins
+   -------------------------------------------------------------------------- */
+.forstall-mode .paperweight-pin,
+.forstall-mode .border {
+  background:
+    /* Paper texture */
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paper'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paper)' opacity='0.03'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, #fdfbf7 0%, #f5f0e6 100%);
+  border: none !important;
+  border-radius: 2px;
+  box-shadow:
+    /* Paper edge shadow */
+    2px 2px 8px rgba(0, 0, 0, 0.2),
+    -1px -1px 0 rgba(255, 255, 255, 0.5),
+    /* Slight curl effect */
+    inset 0 0 20px rgba(0, 0, 0, 0.02);
+  position: relative;
+  transform: rotate(-0.5deg);
+  margin: 16px 8px;
+}
+
+/* Push pin */
+.forstall-mode .paperweight-pin::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 24px;
+  background:
+    radial-gradient(circle at 30% 30%, #ff6b6b 0%, #cc4444 50%, #992222 100%);
+  border-radius: 50%;
+  box-shadow:
+    inset -2px -2px 4px rgba(0, 0, 0, 0.3),
+    inset 2px 2px 4px rgba(255, 255, 255, 0.3),
+    0 3px 6px rgba(0, 0, 0, 0.4);
+  z-index: 10;
+}
+
+/* Pin needle */
+.forstall-mode .paperweight-pin::after {
+  content: '';
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 3px;
+  height: 8px;
+  background: linear-gradient(180deg, #888 0%, #666 100%);
+  border-radius: 0 0 2px 2px;
+  z-index: 9;
+}
+
+/* Alternate pin rotations for variety */
+.forstall-mode .paperweight-pin:nth-child(odd) {
+  transform: rotate(0.8deg);
+}
+
+.forstall-mode .paperweight-pin:nth-child(3n) {
+  transform: rotate(-1.2deg);
+}
+
+.forstall-mode .paperweight-pin:nth-child(4n) {
+  transform: rotate(0.3deg);
+}
+
+/* --------------------------------------------------------------------------
+   Form Inputs - Inset Fields
+   -------------------------------------------------------------------------- */
+.forstall-mode input[type="text"],
+.forstall-mode input[type="email"],
+.forstall-mode input[type="number"],
+.forstall-mode input[type="url"],
+.forstall-mode textarea,
+.forstall-mode select {
+  background:
+    linear-gradient(180deg, #e8e4dc 0%, #f5f0e6 4px, #fdfbf7 100%);
+  border: 1px solid #a09080;
+  border-radius: 4px;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.15),
+    inset 0 1px 2px rgba(0, 0, 0, 0.1),
+    0 1px 0 rgba(255, 255, 255, 0.5);
+  padding: 10px 12px;
+  font-family: 'Georgia', serif;
+  color: #333;
+}
+
+.forstall-mode input:focus,
+.forstall-mode textarea:focus,
+.forstall-mode select:focus {
+  outline: none;
+  border-color: var(--bitcoin-gold);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.15),
+    0 0 0 3px rgba(247, 147, 26, 0.3);
+}
+
+/* --------------------------------------------------------------------------
+   Modals - Wooden Frame
+   -------------------------------------------------------------------------- */
+.forstall-mode .fixed.inset-0 > div:not(.bg-black\/60) {
+  background:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='wood'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.02 0.15' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23wood)' opacity='0.1'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, #f5f0e6 0%, #ebe5d8 100%);
+  border: 8px solid;
+  border-image: linear-gradient(180deg, #8b5a2b 0%, #6b4423 50%, #4a3218 100%) 1;
+  border-radius: 0;
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 255, 255, 0.2),
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* --------------------------------------------------------------------------
+   Bitcoin Elements - Coin Aesthetic
+   -------------------------------------------------------------------------- */
+.forstall-mode .text-\[\#f7931a\],
+.forstall-mode .text-accent {
+  color: var(--bitcoin-gold) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.forstall-mode .bg-\[\#f7931a\]\/10,
+.forstall-mode .border-\[\#f7931a\] {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(247, 147, 26, 0.2) 100%) !important;
+  border: 2px solid var(--bitcoin-gold) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Bitcoin badge - coin style */
+.forstall-mode .inline-flex.items-center.gap-1.text-xs.px-1\.5.py-0\.5.bg-\[\#f7931a\]\/10 {
+  background: var(--coin-shine) !important;
+  border: 2px solid var(--coin-edge) !important;
+  border-radius: 12px;
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.4),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.2),
+    0 2px 4px rgba(0, 0, 0, 0.3);
+  color: #fff !important;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.4);
+  padding: 4px 10px;
+}
+
+/* --------------------------------------------------------------------------
+   Links - Underlined with Ink Effect
+   -------------------------------------------------------------------------- */
+.forstall-mode a {
+  color: #4a6b8a;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(74, 107, 138, 0.4);
+  transition: all 0.2s ease;
+}
+
+.forstall-mode a:hover {
+  color: #2a4b6a;
+  border-bottom-color: rgba(42, 75, 106, 0.8);
+}
+
+/* --------------------------------------------------------------------------
+   Seed Badge Styles - Wax Seal Effect
+   -------------------------------------------------------------------------- */
+.forstall-mode .paperweight-badge {
+  background: radial-gradient(circle at 30% 30%, #8b2323 0%, #6b1a1a 50%, #4a1010 100%);
+  border-radius: 50%;
+  padding: 6px 12px;
+  box-shadow:
+    inset -2px -2px 6px rgba(0, 0, 0, 0.4),
+    inset 2px 2px 6px rgba(255, 255, 255, 0.2),
+    0 3px 8px rgba(0, 0, 0, 0.4);
+  color: #f5e6d3 !important;
+  font-family: 'Georgia', serif;
+  font-style: italic;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.5);
+  transform: rotate(-5deg);
+}
+
+.forstall-mode .paperweight-badge-seed-positive {
+  background: radial-gradient(circle at 30% 30%, #2d5a2d 0%, #1a4a1a 50%, #0a3a0a 100%);
+}
+
+.forstall-mode .paperweight-badge-seed-negative {
+  background: radial-gradient(circle at 30% 30%, #8b2323 0%, #6b1a1a 50%, #4a1010 100%);
+}
+
+.forstall-mode .paperweight-badge-seed-neutral {
+  background: radial-gradient(circle at 30% 30%, #5a5a2d 0%, #4a4a1a 50%, #3a3a0a 100%);
+}
+
+/* --------------------------------------------------------------------------
+   QR Codes - Photo Frame Effect
+   -------------------------------------------------------------------------- */
+.forstall-mode .bg-white.rounded {
+  background: #fff;
+  border: 8px solid;
+  border-image: linear-gradient(180deg, #f5f0e6 0%, #d4c8b8 50%, #a89888 100%) 1;
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.1),
+    0 4px 12px rgba(0, 0, 0, 0.3);
+  padding: 16px;
+}
+
+/* --------------------------------------------------------------------------
+   Loading States - Vintage Spinner
+   -------------------------------------------------------------------------- */
+.forstall-mode .loading-dots .dot {
+  background: var(--bitcoin-gold);
+  box-shadow: 0 0 8px rgba(247, 147, 26, 0.5);
+}
+
+/* --------------------------------------------------------------------------
+   Footer - Felt Lined
+   -------------------------------------------------------------------------- */
+.forstall-mode footer {
+  background:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='felt'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.6' numOctaves='4'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23felt)' opacity='0.1'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, #2d5a3d 0%, #1a3a28 100%);
+  border-top: 3px solid #0a2a18;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
+  padding: 24px !important;
+}
+
+.forstall-mode footer a {
+  color: #a8c8a8 !important;
+  border-bottom: none;
+}
+
+.forstall-mode footer a:hover {
+  color: #d8f0d8 !important;
+}
+
+/* --------------------------------------------------------------------------
+   Tabs - Leather Dividers
+   -------------------------------------------------------------------------- */
+.forstall-mode .flex.gap-1 button,
+.forstall-mode [role="tablist"] button {
+  background: linear-gradient(180deg, #6b4c3a 0%, #5c3d2e 50%, #4d2e20 100%);
+  border: 1px solid #3d2517;
+  color: #d4c4b4;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.5);
+  border-radius: 6px 6px 0 0;
+  margin-bottom: -1px;
+  padding: 10px 20px;
+}
+
+.forstall-mode .flex.gap-1 button.active,
+.forstall-mode [role="tablist"] button[aria-selected="true"] {
+  background: linear-gradient(180deg, #f5f0e6 0%, #ebe5d8 100%);
+  border-bottom-color: transparent;
+  color: #4a3728;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+/* --------------------------------------------------------------------------
+   Radio & Checkbox - Toggle Switches
+   -------------------------------------------------------------------------- */
+.forstall-mode input[type="radio"],
+.forstall-mode input[type="checkbox"] {
+  appearance: none;
+  width: 20px !important;
+  height: 20px !important;
+  background: linear-gradient(180deg, #e0dcd4 0%, #c8c4bc 100%);
+  border: 2px solid #888;
+  border-radius: 4px;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.2),
+    0 1px 0 rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  position: relative;
+}
+
+.forstall-mode input[type="radio"] {
+  border-radius: 50%;
+}
+
+.forstall-mode input[type="radio"]:checked,
+.forstall-mode input[type="checkbox"]:checked {
+  background: linear-gradient(180deg, #f7931a 0%, #e07d00 100%);
+  border-color: #8b5a00;
+}
+
+.forstall-mode input[type="checkbox"]:checked::after {
+  content: '\\2713';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.3);
+}
+
+.forstall-mode input[type="radio"]:checked::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* --------------------------------------------------------------------------
+   Scrollbars - Wooden Handles
+   -------------------------------------------------------------------------- */
+.forstall-mode ::-webkit-scrollbar {
+  width: 14px;
+  height: 14px;
+}
+
+.forstall-mode ::-webkit-scrollbar-track {
+  background: linear-gradient(90deg, #c4a882 0%, #d4b896 50%, #c4a882 100%);
+  border: 1px solid #a08060;
+}
+
+.forstall-mode ::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, #8b5a2b 0%, #6b4423 50%, #8b5a2b 100%);
+  border: 2px solid #4a3218;
+  border-radius: 4px;
+  box-shadow: inset 0 0 4px rgba(255, 255, 255, 0.2);
+}
+
+.forstall-mode ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(90deg, #9b6a3b 0%, #7b5433 50%, #9b6a3b 100%);
+}
+
+/* --------------------------------------------------------------------------
+   Animations - Elastic, Physics-Driven
+   -------------------------------------------------------------------------- */
+@keyframes forstall-bounce {
+  0% { transform: scale(1) translateY(0); }
+  30% { transform: scale(1.05) translateY(-4px); }
+  50% { transform: scale(0.98) translateY(2px); }
+  70% { transform: scale(1.02) translateY(-1px); }
+  100% { transform: scale(1) translateY(0); }
+}
+
+@keyframes forstall-press {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+.forstall-mode .btn:active {
+  animation: forstall-press 0.1s ease-out;
+}
+
+/* --------------------------------------------------------------------------
+   Live Indicator - Glowing Lamp
+   -------------------------------------------------------------------------- */
+.forstall-mode .live-dot {
+  width: 12px;
+  height: 12px;
+  background: radial-gradient(circle at 30% 30%, #4ade80 0%, #22c55e 50%, #16a34a 100%);
+  border-radius: 50%;
+  box-shadow:
+    inset -1px -1px 2px rgba(0, 0, 0, 0.3),
+    inset 1px 1px 2px rgba(255, 255, 255, 0.4),
+    0 0 8px rgba(34, 197, 94, 0.6);
+  animation: forstall-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes forstall-glow {
+  0% { box-shadow: inset -1px -1px 2px rgba(0, 0, 0, 0.3), inset 1px 1px 2px rgba(255, 255, 255, 0.4), 0 0 8px rgba(34, 197, 94, 0.4); }
+  100% { box-shadow: inset -1px -1px 2px rgba(0, 0, 0, 0.3), inset 1px 1px 2px rgba(255, 255, 255, 0.4), 0 0 16px rgba(34, 197, 94, 0.8); }
+}
+
+/* --------------------------------------------------------------------------
+   Verified Badge - Embossed Seal
+   -------------------------------------------------------------------------- */
+.forstall-mode .text-blue-500,
+.forstall-mode .text-accent {
+  color: #4a6b8a;
+}
+
+/* --------------------------------------------------------------------------
+   Error States - Red Wax Seal
+   -------------------------------------------------------------------------- */
+.forstall-mode .text-danger,
+.forstall-mode .text-red-500 {
+  color: #8b2323 !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.forstall-mode .border-danger,
+.forstall-mode .border-red-500 {
+  border-color: #8b2323 !important;
+  background: linear-gradient(135deg, rgba(139, 35, 35, 0.1) 0%, rgba(139, 35, 35, 0.05) 100%);
+}
+
+/* --------------------------------------------------------------------------
+   Map Elements - Antique Map Style
+   -------------------------------------------------------------------------- */
+.forstall-mode .leaflet-container {
+  border: 8px solid #8b5a2b;
+  box-shadow:
+    inset 0 0 20px rgba(0, 0, 0, 0.3),
+    0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* --------------------------------------------------------------------------
+   Overall Warmth Overlay
+   -------------------------------------------------------------------------- */
+.forstall-mode::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 248, 230, 0.03) 0%, rgba(255, 220, 180, 0.02) 100%);
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* --------------------------------------------------------------------------
+   Utility Overrides
+   -------------------------------------------------------------------------- */
+.forstall-mode .bg-\[var\(--bg\)\],
+.forstall-mode .bg-\[\#fafafa\] {
+  background: transparent !important;
+}
+
+.forstall-mode .border-\[var\(--border\)\] {
+  border-color: #a08060 !important;
+}
+
+.forstall-mode .text-muted,
+.forstall-mode .text-faint {
+  color: #6b5b4f !important;
+}
+
+/* Dark mode adjustments */
+.forstall-mode.dark .paperweight-pin,
+.forstall-mode.dark .border,
+.forstall-mode .dark .paperweight-pin,
+.forstall-mode .dark .border {
+  background:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paper'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paper)' opacity='0.05'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, #3d3830 0%, #2d2820 100%);
+  color: #d4c8b8;
+}
+
+.forstall-mode.dark,
+.forstall-mode .dark {
+  --text-emboss: #d4c8b8;
+}

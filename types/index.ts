@@ -208,6 +208,7 @@ export interface FeatureFlags {
   PROXHOME_ADVANCED: boolean;
   MERCHANTS: boolean;
   SEED_PLANTED: boolean;
+  FORSTALL_MODE: boolean;
 }
 
 // Badge types
