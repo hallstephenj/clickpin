@@ -29,7 +29,7 @@ export async function GET(
     // Get location
     const { data: location, error: locError } = await supabaseAdmin
       .from('locations')
-      .select('id, name, slug, city, lat, lng, ghosts_enabled')
+      .select('id, name, slug, city, address, lat, lng, ghosts_enabled')
       .eq('slug', slug)
       .eq('is_active', true)
       .single();
@@ -98,6 +98,7 @@ export async function GET(
       name: location.name,
       slug: location.slug,
       city: location.city,
+      address: location.address,
       activity_level: activityLevel,
       activity_score: activityScore,
       pins_today: pinsToday,
