@@ -40,6 +40,7 @@ export interface ProximityStatsResponse {
   user_lat: number;
   user_lng: number;
   expanded_search: boolean; // true if we expanded to 10km because nothing within 1 mile
+  nearest_board_anywhere?: { name: string; slug: string; distance_m: number } | null; // populated when no boards within 10km
 }
 
 // GET /api/proximity-stats?lat=xxx&lng=xxx
@@ -145,6 +146,16 @@ export async function GET(request: NextRequest) {
       ? nearbyWithStats.reduce((max, b) => b.active_sessions > max.active_sessions ? b : max)
       : null;
 
+    // Include the nearest board that's beyond 10km (for when user is at a location with no other nearby boards)
+    const boardsBeyond10km = locationsWithDistance.filter(loc => loc.distance_m > TEN_KM_METERS);
+    const nearestBoardAnywhere = boardsBeyond10km.length > 0
+      ? {
+          name: boardsBeyond10km[0].name,
+          slug: boardsBeyond10km[0].slug,
+          distance_m: Math.round(boardsBeyond10km[0].distance_m),
+        }
+      : null;
+
     const response: ProximityStatsResponse = {
       boards_within_mile: nearbyWithStats.length,
       total_pins_last_hour: totalPinsLastHour,
@@ -155,6 +166,7 @@ export async function GET(request: NextRequest) {
       user_lat: lat,
       user_lng: lng,
       expanded_search: expandedSearch,
+      nearest_board_anywhere: nearestBoardAnywhere,
     };
 
     return NextResponse.json(response);

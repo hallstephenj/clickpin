@@ -41,18 +41,20 @@ export async function GET(request: NextRequest) {
         is_hidden,
         locations (
           name,
-          city
+          city,
+          address
         )
       `)
       .eq('id', pinId)
       .is('parent_pin_id', null)
       .single();
 
-    const locationData = pin?.locations as unknown as { name: string; city: string | null } | { name: string; city: string | null }[] | null;
+    const locationData = pin?.locations as unknown as { name: string; city: string | null; address: string | null } | { name: string; city: string | null; address: string | null }[] | null;
     const location = Array.isArray(locationData) ? locationData[0] : locationData;
+    const locationLabel = location?.address || location?.city;
     const locationText = location
-      ? location.city
-        ? `${location.name}, ${location.city}`
+      ? locationLabel
+        ? `${location.name}, ${locationLabel}`
         : location.name
       : 'Unknown location';
 

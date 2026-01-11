@@ -12,6 +12,7 @@ interface ClaimModalProps {
   locationId: string;
   locationName: string;
   sessionId: string;
+  isBitcoinMerchant?: boolean;
 }
 
 type ClaimStep = 'start' | 'invoice' | 'paid' | 'error';
@@ -23,6 +24,7 @@ export function ClaimModal({
   locationId,
   locationName,
   sessionId,
+  isBitcoinMerchant = true,
 }: ClaimModalProps) {
   const [step, setStep] = useState<ClaimStep>('start');
   const [claimCode, setClaimCode] = useState<string>('');
@@ -199,6 +201,16 @@ export function ClaimModal({
                   Once verified, you can customize your board and moderate posts.
                 </p>
               </div>
+
+              {/* Warning for non-bitcoin merchants */}
+              {!isBitcoinMerchant && (
+                <div className="bg-amber-500/10 border border-amber-500/30 p-3 mb-4">
+                  <p className="text-xs text-amber-600 dark:text-amber-400 font-mono leading-relaxed">
+                    <strong>Note:</strong> By claiming this location, you are confirming that this business accepts Bitcoin.
+                    This location will be listed as a Bitcoin-accepting merchant.
+                  </p>
+                </div>
+              )}
 
               <div className="bg-[var(--bg-alt)] p-3 mb-4">
                 <div className="text-accent text-xl font-mono font-bold text-center flex items-center justify-center gap-1">

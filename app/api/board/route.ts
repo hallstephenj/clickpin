@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     // Get location by slug
     const { data: location, error: locationError } = await supabaseAdmin
       .from('locations')
-      .select('id, name, slug, category, city, lat, lng, radius_m, is_bitcoin_merchant, btcmap_id, is_claimed, merchant_settings, opening_hours')
+      .select('id, name, slug, category, city, address, phone, website, lat, lng, radius_m, is_bitcoin_merchant, btcmap_id, is_claimed, merchant_settings, opening_hours, location_type')
       .eq('slug', slug)
       .eq('is_active', true)
       .single();

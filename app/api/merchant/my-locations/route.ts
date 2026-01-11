@@ -53,7 +53,7 @@ export async function GET() {
     const locationIds = claims.map(c => c.location_id);
     const { data: locations, error: locationsError } = await supabaseAdmin
       .from('locations')
-      .select('id, name, slug, city')
+      .select('id, name, slug, city, address')
       .in('id', locationIds);
 
     if (locationsError) {
@@ -72,6 +72,7 @@ export async function GET() {
         name: location?.name || 'Unknown Location',
         slug: location?.slug || '',
         city: location?.city || null,
+        address: location?.address || null,
         claimed_at: claim.claimed_at,
       };
     }).filter(l => l.slug); // Filter out any without slugs

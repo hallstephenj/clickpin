@@ -34,10 +34,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify the location exists and is a merchant location
+    // Verify the location exists
     const { data: location, error: locationError } = await supabaseAdmin
       .from('locations')
-      .select('id, name, is_bitcoin_merchant, btcmap_id, is_claimed')
+      .select('id, name, is_bitcoin_merchant, btcmap_id, is_claimed, location_type')
       .eq('id', location_id)
       .single();
 
@@ -48,10 +48,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Only allow claiming merchant locations
-    if (!location.is_bitcoin_merchant && !location.btcmap_id) {
+    // Only allow claiming merchant-type locations (not community spaces)
+    if (location.location_type === 'community_space') {
       return NextResponse.json(
-        { error: 'Only merchant locations can be claimed' },
+        { error: 'Community spaces cannot be claimed as merchants' },
         { status: 400 }
       );
     }

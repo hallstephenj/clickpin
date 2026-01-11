@@ -74,11 +74,7 @@ export async function POST(request: NextRequest) {
     // Mark all requests as approved
     const { error: updateError } = await supabaseAdmin
       .from('location_requests')
-      .update({
-        status: 'approved',
-        reviewed_at: new Date().toISOString(),
-        admin_notes: `Created location: ${location.slug}`,
-      })
+      .update({ status: 'approved' })
       .in('id', request_ids);
 
     if (updateError) {

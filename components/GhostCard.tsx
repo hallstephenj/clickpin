@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { GhostCard as GhostCardType } from '@/types';
 import { Lightning } from '@phosphor-icons/react';
+import { parseCityFromAddress } from '@/lib/location-utils';
 
 interface GhostCardProps {
   ghost: GhostCardType;
@@ -37,8 +38,8 @@ export function GhostCard({ ghost, showDistance = false }: GhostCardProps) {
       <div className="flex items-start justify-between mb-3">
         <div>
           <h3 className="font-bold text-[var(--fg)]">{ghost.name}</h3>
-          {ghost.city && (
-            <p className="text-xs text-muted font-mono">{ghost.city}</p>
+          {(ghost.address || ghost.city) && (
+            <p className="text-xs text-muted font-mono">{parseCityFromAddress(ghost.address) || ghost.city}</p>
           )}
         </div>
 

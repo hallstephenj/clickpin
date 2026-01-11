@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { X, Lightning, CheckCircle } from '@phosphor-icons/react';
+import { X, Lightning, CheckCircle, Storefront, UsersThree } from '@phosphor-icons/react';
+import type { LocationType } from '@/types';
 
 interface RequestLocationModalProps {
   isOpen: boolean;
@@ -19,7 +20,7 @@ export function RequestLocationModal({
   sessionId,
 }: RequestLocationModalProps) {
   const [name, setName] = useState('');
-  const [isBitcoinMerchant, setIsBitcoinMerchant] = useState(false);
+  const [locationType, setLocationType] = useState<LocationType>('merchant');
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -53,7 +54,9 @@ export function RequestLocationModal({
           lng,
           suggested_name: name.trim(),
           session_id: sessionId,
-          is_bitcoin_merchant: isBitcoinMerchant,
+          location_type: locationType,
+          // Legacy field for backwards compatibility
+          is_bitcoin_merchant: locationType === 'bitcoin_merchant',
         }),
       });
 
@@ -73,7 +76,7 @@ export function RequestLocationModal({
 
   const handleClose = () => {
     setName('');
-    setIsBitcoinMerchant(false);
+    setLocationType('merchant');
     setSubmitted(false);
     setError(null);
     onClose();
@@ -136,18 +139,62 @@ export function RequestLocationModal({
                 </div>
               </div>
 
-              {/* Bitcoin merchant checkbox */}
-              <label className="flex items-center gap-3 mb-4 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={isBitcoinMerchant}
-                  onChange={(e) => setIsBitcoinMerchant(e.target.checked)}
-                  className="w-4 h-4 accent-[#f7931a]"
-                />
-                <span className="text-sm font-mono inline-flex items-center gap-1">
-                  this is a bitcoin merchant <Lightning size={14} weight="fill" className="text-[#f7931a]" />
-                </span>
-              </label>
+              {/* Location type selector */}
+              <div className="mb-4">
+                <label className="block text-xs text-muted font-mono mb-2">
+                  what type of location is this?
+                </label>
+                <div className="space-y-2">
+                  <label className={`flex items-center gap-2 p-2 border cursor-pointer transition-colors ${
+                    locationType === 'merchant'
+                      ? 'border-gray-500 bg-gray-50 dark:bg-gray-900'
+                      : 'border-[var(--border)]'
+                  }`}>
+                    <input
+                      type="radio"
+                      name="location_type"
+                      value="merchant"
+                      checked={locationType === 'merchant'}
+                      onChange={() => setLocationType('merchant')}
+                      className="w-4 h-4 m-0 p-0 !w-4"
+                    />
+                    <Storefront size={16} className="text-gray-500" />
+                    <span className="text-sm font-mono">business (doesn't accept bitcoin)</span>
+                  </label>
+                  <label className={`flex items-center gap-2 p-2 border cursor-pointer transition-colors ${
+                    locationType === 'bitcoin_merchant'
+                      ? 'border-[#f7931a] bg-orange-50 dark:bg-orange-950'
+                      : 'border-[var(--border)]'
+                  }`}>
+                    <input
+                      type="radio"
+                      name="location_type"
+                      value="bitcoin_merchant"
+                      checked={locationType === 'bitcoin_merchant'}
+                      onChange={() => setLocationType('bitcoin_merchant')}
+                      className="w-4 h-4 m-0 p-0 !w-4 accent-[#f7931a]"
+                    />
+                    <Lightning size={16} weight="fill" className="text-[#f7931a]" />
+                    <span className="text-sm font-mono">business (accepts bitcoin)</span>
+                  </label>
+                  <label className={`flex items-center gap-2 p-2 border cursor-pointer transition-colors ${
+                    locationType === 'community_space'
+                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-950'
+                      : 'border-[var(--border)]'
+                  }`}>
+                    <input
+                      type="radio"
+                      name="location_type"
+                      value="community_space"
+                      checked={locationType === 'community_space'}
+                      onChange={() => setLocationType('community_space')}
+                      className="w-4 h-4 m-0 p-0 !w-4 accent-blue-500"
+                    />
+                    <UsersThree size={16} className="text-blue-500" />
+                    <span className="text-sm font-mono">community space</span>
+                  </label>
+                </div>
+              </div>
 
               {/* Error */}
               {error && (

@@ -109,15 +109,24 @@ export async function updateMerchantSettings(
 }
 
 /**
- * Mark a location as claimed and update its status
+ * Mark a location as claimed and update its status.
+ * When claimed, also converts the location to a bitcoin_merchant.
  */
 export async function markLocationClaimed(
   locationId: string,
   claimed: boolean
 ): Promise<void> {
+  const updateData: Record<string, unknown> = { is_claimed: claimed };
+
+  // When claiming, convert to bitcoin_merchant (confirms they accept bitcoin)
+  if (claimed) {
+    updateData.location_type = 'bitcoin_merchant';
+    updateData.is_bitcoin_merchant = true;
+  }
+
   const { error } = await supabaseAdmin
     .from('locations')
-    .update({ is_claimed: claimed })
+    .update(updateData)
     .eq('id', locationId);
 
   if (error) throw error;

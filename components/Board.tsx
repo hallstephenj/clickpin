@@ -9,10 +9,15 @@ import { SponsorModal } from './SponsorModal';
 import { FancyBoard } from './FancyBoard';
 import { PromptCarousel } from './PromptCarousel';
 import { ClaimButton, ClaimModal, VerifiedBadge, WelcomeBanner } from './merchant';
+import { BoardBanner, bitcoinMerchantGlowClass } from './BoardBanner';
+import { SeedCounter } from './SeedCounter';
+import { SeedPlantedButton } from './SeedPlantedButton';
 import { useFeatureFlags } from '@/lib/hooks/useFeatureFlags';
 import { isFancyBoardActive } from '@/lib/featureFlags';
 import { config } from '@/lib/config';
-import { X } from '@phosphor-icons/react';
+import { X, Lightning, Storefront, UsersThree, Info } from '@phosphor-icons/react';
+import { BusinessInfoModal } from './BusinessInfoModal';
+import { getLocationLabel } from '@/lib/location-utils';
 
 // Stacked notes icon with post count
 function PostCountIndicator({ count }: { count: number }) {
@@ -69,9 +74,11 @@ export function Board({
   const [localPostsRemaining, setLocalPostsRemaining] = useState(postsRemaining);
   const [sponsorModalOpen, setSponsorModalOpen] = useState(false);
   const [claimModalOpen, setClaimModalOpen] = useState(false);
+  const [infoModalOpen, setInfoModalOpen] = useState(false);
 
   // Determine if this is a merchant location (can be claimed)
-  const isMerchantLocation = Boolean(location.is_bitcoin_merchant || location.btcmap_id);
+  // Any location that's not a community_space can be claimed
+  const isMerchantLocation = location.location_type !== 'community_space';
   const isClaimed = Boolean(location.is_claimed);
 
   const handleOpenCompose = (replyId: string | null = null) => {
@@ -289,32 +296,58 @@ export function Board({
     );
   }
 
+  // Determine location type for theming
+  const locationType = location.location_type || (location.is_bitcoin_merchant ? 'bitcoin_merchant' : 'merchant');
+  const isBitcoinMerchant = locationType === 'bitcoin_merchant';
+
   return (
-    <div className="min-h-screen bg-[#fafafa] dark:bg-[#0a0a0a]">
+    <div className={`min-h-screen bg-[#fafafa] dark:bg-[#0a0a0a] ${isBitcoinMerchant ? bitcoinMerchantGlowClass : ''}`}>
+      {/* Location type banner */}
+      {flags.SEED_PLANTED && (
+        <BoardBanner locationType={locationType} locationId={location.id} />
+      )}
+
       {/* Header */}
-      <header className="border-b border-[var(--border)] bg-[#fafafa] dark:bg-[#0a0a0a]">
+      <header className={`border-b border-[var(--border)] ${isBitcoinMerchant ? 'bg-transparent' : 'bg-[#fafafa] dark:bg-[#0a0a0a]'}`}>
         <div className="max-w-2xl mx-auto px-4 py-4">
           <div className="flex items-start justify-between">
             {/* Left: Identity */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
                 <h1 className="font-bold text-lg text-[var(--fg)] truncate">{location.name}</h1>
+                <button
+                  onClick={() => setInfoModalOpen(true)}
+                  className="text-muted hover:text-[var(--fg)] flex-shrink-0"
+                  title="Business info"
+                >
+                  <Info size={18} />
+                </button>
                 {isClaimed && <VerifiedBadge />}
                 <span className="live-dot" title="Live" />
               </div>
-              {location.city && (
-                <p className="text-sm text-muted mt-0.5">{location.city}</p>
-              )}
-
-              {/* Merchant claim button (only for unclaimed merchant locations) */}
-              {flags.MERCHANTS && isMerchantLocation && !isClaimed && (
-                <div className="mt-1">
-                  <ClaimButton
-                    onClick={() => setClaimModalOpen(true)}
-                    isMerchantLocation={isMerchantLocation}
-                  />
-                </div>
-              )}
+              <div className="flex items-center gap-2 mt-0.5">
+                {getLocationLabel(location) && (
+                  <span className="text-sm text-muted">{getLocationLabel(location)}</span>
+                )}
+                {locationType === 'bitcoin_merchant' && (
+                  <span className="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 bg-[#f7931a]/10 text-[#f7931a] rounded">
+                    <Lightning size={12} weight="fill" />
+                    bitcoin
+                  </span>
+                )}
+                {locationType === 'merchant' && (
+                  <span className="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 bg-gray-500/10 text-gray-500 rounded">
+                    <Storefront size={12} />
+                    merchant
+                  </span>
+                )}
+                {locationType === 'community_space' && (
+                  <span className="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 bg-blue-500/10 text-blue-500 rounded">
+                    <UsersThree size={12} />
+                    community
+                  </span>
+                )}
+              </div>
 
               {/* Merchant dashboard link (for claimed locations) */}
               {flags.MERCHANTS && isClaimed && (
@@ -354,28 +387,42 @@ export function Board({
                   sponsor this board →
                 </button>
               </div>
+
             </div>
 
             {/* Right: Actions + post count */}
-            <div className="flex items-center gap-3 ml-4">
-              {/* Post count indicator */}
-              <div className="flex items-center gap-1" title={`${pins.length} posts`}>
-                <PostCountIndicator count={pins.length} />
+            <div className="flex flex-col items-end gap-2 ml-4">
+              <div className="flex items-center gap-3">
+                {/* Post count indicator */}
+                <div className="flex items-center gap-1" title={`${pins.length} posts`}>
+                  <PostCountIndicator count={pins.length} />
+                </div>
+
+                <button
+                  onClick={onRefreshLocation}
+                  className="btn"
+                  title="Refresh location"
+                >
+                  ↻
+                </button>
+                <button
+                  onClick={() => handleOpenCompose(null)}
+                  className="btn btn-primary"
+                >
+                  + post
+                </button>
               </div>
 
-              <button
-                onClick={onRefreshLocation}
-                className="btn"
-                title="Refresh location"
-              >
-                ↻
-              </button>
-              <button
-                onClick={() => handleOpenCompose(null)}
-                className="btn btn-primary"
-              >
-                + post
-              </button>
+              {/* Seed Planted Button */}
+              {flags.SEED_PLANTED && (
+                <SeedPlantedButton
+                  locationId={location.id}
+                  locationType={locationType}
+                  presenceToken={presenceToken}
+                  seedPlantedEnabled={flags.SEED_PLANTED}
+                  onSeedPlanted={onRefreshBoard}
+                />
+              )}
             </div>
           </div>
         </div>
@@ -400,6 +447,11 @@ export function Board({
             locationName={location.name}
             openingHours={location.opening_hours}
           />
+        )}
+
+        {/* Seed Counter (for non-bitcoin merchant locations) */}
+        {flags.SEED_PLANTED && locationType === 'merchant' && (
+          <SeedCounter locationId={location.id} />
         )}
 
         {pins.length === 0 && hiddenPins.length === 0 ? (
@@ -471,7 +523,7 @@ export function Board({
       </main>
 
       {/* Footer */}
-      <footer className="mt-8 pb-6 flex justify-center gap-6 text-xs text-faint">
+      <footer className="mt-8 pb-6 px-8 flex flex-wrap justify-center gap-x-3 sm:gap-x-6 gap-y-2 text-xs text-faint">
         <a href={flags.PROXHOME_ADVANCED ? '/?view=nearby' : '/map'} className="hover:text-[var(--fg-muted)] transition-colors">nearby</a>
         <a href="/map" className="hover:text-[var(--fg-muted)] transition-colors">map</a>
         {flags.MERCHANTS && (
@@ -530,8 +582,18 @@ export function Board({
           locationId={location.id}
           locationName={location.name}
           sessionId={sessionId}
+          isBitcoinMerchant={Boolean(location.is_bitcoin_merchant || location.btcmap_id)}
         />
       )}
+
+      <BusinessInfoModal
+        isOpen={infoModalOpen}
+        onClose={() => setInfoModalOpen(false)}
+        location={location}
+        isClaimed={isClaimed}
+        onClaimClick={() => setClaimModalOpen(true)}
+        showClaimButton={flags.MERCHANTS && isMerchantLocation && Boolean(sessionId)}
+      />
     </div>
   );
 }

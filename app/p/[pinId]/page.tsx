@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { supabaseAdmin } from '@/lib/supabase';
 import { getFeatureFlags } from '@/lib/featureFlags';
 import { SharedPinView } from '@/components/SharedPinView';
+import { getLocationLabel } from '@/lib/location-utils';
 
 // Inline SVG for server component (can't use Phosphor client components)
 function LightningIcon() {
@@ -38,6 +39,7 @@ async function getPinData(pinId: string) {
         id,
         name,
         city,
+        address,
         slug,
         lat,
         lng
@@ -72,6 +74,7 @@ async function getPinData(pinId: string) {
     id: string;
     name: string;
     city: string | null;
+    address: string | null;
     slug: string;
     lat: number;
     lng: number;
@@ -107,8 +110,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const { pin, isRemoved, location } = data;
 
-  const locationText = location.city
-    ? `${location.name}, ${location.city}`
+  const locationLabel = getLocationLabel(location);
+  const locationText = locationLabel
+    ? `${location.name}, ${locationLabel}`
     : location.name;
 
   if (isRemoved) {
@@ -206,7 +210,7 @@ export default async function SharedPinPage({ params }: PageProps) {
 
         {/* Footer */}
         <footer className="border-t border-[var(--border)] mt-8">
-          <div className="max-w-2xl mx-auto px-4 py-6 flex justify-center gap-6 text-xs text-faint">
+          <div className="max-w-2xl mx-auto px-8 py-6 flex flex-wrap justify-center gap-x-3 sm:gap-x-6 gap-y-2 text-xs text-faint">
             <a href="/map" className="hover:text-[var(--fg-muted)] transition-colors">nearby</a>
             <a href="/about" className="hover:text-[var(--fg-muted)] transition-colors">about</a>
             <a href="/terms" className="hover:text-[var(--fg-muted)] transition-colors">terms</a>

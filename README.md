@@ -1,236 +1,223 @@
 # Clickpin
 
-Anonymous, location-locked pinboards for real physical places.
+An anonymous, hyperlocal message board for Bitcoin merchants. Leave notes, plant seeds, and help grow the Bitcoin economy.
 
-## Overview
+## What is Clickpin?
 
-Clickpin is a hyperlocal social app where users can post anonymous text notes (pins) that are only visible when you're physically at a specific location. Think of it as a digital corkboard for stadiums, parks, restaurants, and other public places.
+Clickpin is a location-based social app where users can post anonymous notes that are only visible when physically present at a location. Originally designed as digital corkboards for any place, Clickpin has evolved to focus on **Bitcoin merchant advocacy** - helping users discover, review, and support businesses that accept Bitcoin.
 
-### Key Features
+### Core Features
 
-- **Location-locked**: Posts are only visible when you're physically near a location
-- **Anonymous**: No accounts required - uses device-based soft identity
-- **Community moderated**: Flag inappropriate content
-- **Lightning payments**: Pay with Bitcoin Lightning for premium features
-- **Real-time updates**: See new pins appear instantly
+- **Location-locked posts**: Content is only visible when you're physically at a location
+- **Anonymous**: No accounts required - uses device-based identity
+- **Bitcoin-native**: Lightning Network payments for premium features
+- **Merchant claiming**: Business owners can verify and manage their boards
+- **Seed planting**: Track and encourage Bitcoin adoption conversations
+- **BTCMap integration**: Import Bitcoin-accepting merchants from BTCMap.org
+
+## Key Concepts
+
+### Boards
+Each physical location has a "board" - a collection of anonymous posts from people who have visited. Boards can be for Bitcoin merchants, regular businesses, or community spaces.
+
+### Seeds
+The "Seed Planted" feature lets users record when they've had a conversation about Bitcoin with a merchant. Track outcomes (positive, neutral, negative) and add optional commentary. This helps the community identify receptive businesses.
+
+### Merchant Claims
+Business owners can claim their location by paying a Lightning invoice. Once claimed, they can:
+- Customize their board appearance
+- Moderate posts
+- Add business information
+- Display a verified badge
+
+### Ghosts
+Top contributors at each location are displayed as "ghosts" - anonymous avatars that represent the most active community members.
 
 ## Tech Stack
 
-- **Frontend**: Next.js 15 (App Router) + Tailwind CSS
-- **Backend**: Next.js API Routes + Supabase (PostgreSQL + PostGIS + Realtime)
-- **Payments**: Lightning Network (DEV mode included for testing)
+- **Frontend**: Next.js 15 (App Router) + TypeScript + Tailwind CSS
+- **Backend**: Next.js API Routes + Supabase (PostgreSQL + PostGIS)
+- **Payments**: Lightning Network (Strike, LNbits, or test mode)
+- **Icons**: Phosphor Icons
+- **Data**: BTCMap API integration
 
 ## Quick Start
 
-### 1. Prerequisites
+### Prerequisites
 
 - Node.js 18+
 - npm
-- A Supabase account (free tier works)
+- Supabase account (free tier works)
 
-### 2. Create Supabase Project
+### Setup
 
-1. Go to [supabase.com](https://supabase.com) and create a new project
-2. Wait for the project to be provisioned
-3. Go to Project Settings > API and copy:
-   - Project URL → `NEXT_PUBLIC_SUPABASE_URL`
-   - `anon` public key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - `service_role` secret key → `SUPABASE_SERVICE_ROLE_KEY`
-
-### 3. Run Migrations
-
-1. Go to the Supabase Dashboard > SQL Editor
-2. Copy the contents of `supabase/migrations/001_initial_schema.sql`
-3. Paste and run the SQL to create all tables, indexes, and functions
-
-### 4. Configure Environment
-
-```bash
-# Copy the example environment file
-cp .env.example .env.local
-
-# Edit .env.local with your Supabase credentials
-```
-
-Required variables:
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `SUPABASE_SERVICE_ROLE_KEY`
-- `PRESENCE_TOKEN_SECRET` (generate with `openssl rand -hex 32`)
-
-### 5. Install Dependencies
-
-```bash
-npm install
-```
-
-### 6. Seed Locations
-
-```bash
-npx tsx scripts/seed.ts
-```
-
-This will add ~30 Austin, TX locations to your database.
-
-### 7. Run Development Server
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-## Usage
-
-1. **Allow location access** when prompted
-2. **Find a board** - If you're near a seeded location, you'll see its pinboard
-3. **Create a pin** - Click "+ Pin" to compose a new post
-4. **Add a doodle** - Optionally draw something with the pen tool
-5. **Reply to pins** - Click "Reply" on any pin
-6. **Flag inappropriate content** - Click "Flag" to report
-7. **Boost pins** - Pay Lightning to boost a pin to the top
-8. **Delete your pins** - Free within 10 minutes, paid after
-
-## Testing Without Being at a Location
-
-For development/testing, you can:
-
-1. **Modify your browser's geolocation** using DevTools:
-   - Chrome: DevTools > Sensors > Geolocation > Override
-   - Use coordinates from `scripts/austin-locations.json`
-
-2. **Add a test location near you**:
-   ```sql
-   INSERT INTO locations (name, slug, category, lat, lng, radius_m, is_active)
-   VALUES ('Test Location', 'test-location', 'test', YOUR_LAT, YOUR_LNG, 500, true);
+1. **Clone and install**
+   ```bash
+   git clone https://github.com/hallstephenj/clickpin.git
+   cd clickpin
+   npm install
    ```
 
-## Payment Testing (DEV Mode)
+2. **Configure Supabase**
+   - Create a project at [supabase.com](https://supabase.com)
+   - Run migrations from `supabase/migrations/` in the SQL Editor
+   - Copy your API credentials
 
-With `DEV_MODE=true`, you can simulate Lightning payments:
+3. **Environment variables**
+   ```bash
+   cp .env.example .env.local
+   # Edit .env.local with your credentials
+   ```
 
-1. Create an invoice (boost, delete, etc.)
-2. Copy the `invoice_id` from the modal
-3. Call the DEV endpoint to mark it paid:
+   Required:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+   - `PRESENCE_TOKEN_SECRET` (generate with `openssl rand -hex 32`)
 
-```bash
-curl -X POST http://localhost:3000/api/dev/mark-paid \
-  -H "Content-Type: application/json" \
-  -d '{"invoice_id": "dev_xxx..."}'
-```
+4. **Import BTCMap locations** (optional)
+   ```bash
+   npx tsx scripts/import-btcmap.ts import --lat=30.2672 --lon=-97.7431 --radius=50
+   ```
 
-Or click "Simulate Payment" in the payment modal.
+5. **Run development server**
+   ```bash
+   npm run dev
+   ```
+
+## Feature Flags
+
+Clickpin uses feature flags to enable/disable functionality:
+
+| Flag | Description |
+|------|-------------|
+| `MERCHANTS` | Merchant claiming and management |
+| `PAID_PINS` | Lightning payments for posts |
+| `BOOSTS` | Pin boosting with Lightning |
+| `SPONSORSHIPS` | Location sponsorship |
+| `GHOSTS` | Ghost avatars for top contributors |
+| `SEED_PLANTED` | Seed planting feature |
+| `SHARENOTES` | Shareable pin links |
+| `DOODLES` | Drawing on posts |
+| `REPLIES` | Reply threads |
+| `FLAGS` | Community flagging |
+| `PROXIMITY_NEARBY` | Nearby boards view |
+
+## Admin Panel
+
+Access the admin panel at `/admin` to:
+
+- **Stats**: View posts, seeds, sessions, and merchant metrics
+- **Locations**: Manage all locations, edit details, view posts
+- **Requests**: Approve/reject new location requests
+- **Flags**: Toggle feature flags
+- **Controls**: Global actions (reset seeds, clear sessions, BTCMap sync)
 
 ## API Endpoints
 
+### Core
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/api/session` | POST | Create/refresh device session |
+| `/api/session` | POST | Create device session |
 | `/api/resolve-location` | POST | Find nearest location |
-| `/api/board` | GET | Get pins for a location |
-| `/api/pin` | POST | Create a new pin |
-| `/api/pin` | DELETE | Delete a pin |
+| `/api/board` | GET | Get board data and pins |
+| `/api/pin` | POST/DELETE | Create or delete pins |
 | `/api/reply` | POST | Reply to a pin |
-| `/api/flag` | POST | Flag a pin |
-| `/api/boost/create-invoice` | POST | Create boost invoice |
-| `/api/delete/create-invoice` | POST | Create deletion invoice |
-| `/api/post/create-invoice` | POST | Create paid post invoice |
-| `/api/sponsor/create-invoice` | POST | Create sponsorship invoice |
+
+### Seeds
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/seed/plant` | POST | Plant a seed at location |
+| `/api/seed/count` | GET | Get seed counts |
+
+### Merchants
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/merchant/claim/start` | POST | Start claim process |
+| `/api/merchant/claim/lightning` | POST | Generate claim invoice |
+| `/api/merchant/settings` | GET/POST | Manage merchant settings |
+
+### Lightning
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/boost/create-invoice` | POST | Boost a pin |
+| `/api/sponsor/create-invoice` | POST | Sponsor a location |
 | `/api/lightning/webhook` | POST | Payment webhook |
-| `/api/dev/mark-paid` | POST | DEV: Simulate payment |
 
 ## Configuration
 
-All settings can be customized via environment variables:
-
-### Geolocation
-- `MAX_ACCURACY_M` (default: 100) - Maximum GPS accuracy allowed
-- `MAX_DISTANCE_M` (default: 200) - Maximum distance to a board
+### Payments (satoshis)
+- `POST_PRICE_SATS` - Price for paid posts (default: 100)
+- `BOOST_PRICE_SATS` - Price to boost a pin (default: 500)
+- `CLAIM_PRICE_SATS` - Merchant claim fee (default: 10000)
+- `SPONSOR_PRICE_SATS` - Location sponsorship (default: 10000)
 
 ### Rate Limiting
-- `FREE_POSTS_PER_DAY` (default: 3) - Free posts per location per day
-- `POST_COOLDOWN_MS` (default: 120000) - Cooldown between posts (2 min)
+- `FREE_POSTS_PER_DAY` - Free posts per location (default: 3)
+- `POST_COOLDOWN_MS` - Cooldown between posts (default: 120000)
 
-### Moderation
-- `FLAG_THRESHOLD` (default: 5) - Flags needed to hide a pin
+### Geolocation
+- `MAX_ACCURACY_M` - Maximum GPS accuracy (default: 100)
+- `MAX_DISTANCE_M` - Maximum distance to board (default: 200)
 
-### Payments (in satoshis)
-- `POST_PRICE_SATS` (default: 100) - Price for paid posts
-- `BOOST_PRICE_SATS` (default: 500) - Price to boost a pin
-- `DELETE_PRICE_SATS` (default: 200) - Price for late deletion
-- `SPONSOR_PRICE_SATS` (default: 10000) - Price to sponsor a location
+## Lightning Integration
 
-### Timing
-- `FREE_DELETE_WINDOW_MS` (default: 600000) - Free delete window (10 min)
-- `BOOST_DURATION_HOURS` (default: 24) - How long boosts last
-- `SPONSOR_DURATION_DAYS` (default: 30) - How long sponsorships last
-
-## Anti-Spam Knobs
-
-To combat abuse, adjust these settings:
-
-1. **Increase cooldown**: Set `POST_COOLDOWN_MS=300000` (5 minutes)
-2. **Reduce free posts**: Set `FREE_POSTS_PER_DAY=1`
-3. **Require payment for all posts**: Set `FREE_POSTS_PER_DAY=0`
-4. **Lower flag threshold**: Set `FLAG_THRESHOLD=3`
-5. **Tighten location accuracy**: Set `MAX_ACCURACY_M=50`
-
-## Deploying to Vercel
-
-1. Push your code to GitHub
-2. Import the project in Vercel
-3. Add all environment variables from `.env.local`
-4. Deploy!
-
-For production:
-- Set `DEV_MODE=false`
-- Configure a real Lightning provider (Strike or LNbits)
-- Set a strong `PRESENCE_TOKEN_SECRET`
-- Configure `LIGHTNING_WEBHOOK_SECRET`
-
-## Database Schema
-
-### Tables
-- `locations` - Physical locations with PostGIS geography
-- `device_sessions` - Anonymous device identities
-- `pins` - User posts (text + optional doodle)
-- `pin_flags` - Community flags for moderation
-- `pin_boosts` - Lightning payments for boosting
-- `location_sponsorships` - Location sponsorship payments
-- `pin_deletion_payments` - Paid deletion payments
-- `post_quota_ledger` - Daily post tracking
-- `post_payments` - Paid post invoices
-
-### PostGIS Features
-- Spatial index on location geography
-- `find_nearest_location()` function for efficient proximity queries
-- Automatic geography column generation from lat/lng
-
-## Production Lightning Integration
-
-To use real Lightning payments, set up:
-
-### Strike (Recommended)
+### Test Mode (Development)
 ```bash
+DEV_MODE=true
+LIGHTNING_TEST_MODE=true
+```
+Use "Simulate Payment" in modals or the test wallet at `/test-wallet`.
+
+### Production
+```bash
+# Strike
 LIGHTNING_PROVIDER=strike
 STRIKE_API_KEY=your-api-key
-```
 
-### LNbits
-```bash
+# LNbits
 LIGHTNING_PROVIDER=lnbits
-LNBITS_URL=https://your-lnbits-instance
+LNBITS_URL=https://your-instance
 LNBITS_API_KEY=your-api-key
 ```
 
-Then implement the provider methods in `lib/lightning.ts`.
+## Deployment
+
+### Vercel (Recommended)
+1. Push to GitHub
+2. Import in Vercel
+3. Add environment variables
+4. Deploy
+
+### Production Checklist
+- Set `DEV_MODE=false`
+- Configure real Lightning provider
+- Set strong `PRESENCE_TOKEN_SECRET`
+- Configure `LIGHTNING_WEBHOOK_SECRET`
+- Enable appropriate feature flags
+
+## Database
+
+### Key Tables
+- `locations` - Physical locations with PostGIS geography
+- `device_sessions` - Anonymous device identities
+- `pins` - User posts with optional doodles
+- `seed_plantings` - Bitcoin advocacy tracking
+- `merchant_claims` - Verified business claims
+- `location_requests` - User-submitted location requests
+
+### PostGIS
+Uses PostGIS for efficient spatial queries:
+- Geographic distance calculations
+- Nearest location lookups
+- Radius-based filtering
 
 ## Contributing
 
-Pull requests welcome! Please ensure:
+Pull requests welcome. Please ensure:
 - TypeScript types are correct
-- Code is formatted with Prettier
-- No security vulnerabilities introduced
+- No security vulnerabilities
+- Test on mobile (primary use case)
 
 ## License
 

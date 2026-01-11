@@ -8,6 +8,7 @@ import { config } from '@/lib/config';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { LoginForm } from '@/components/auth/LoginForm';
 import { Envelope, CheckCircle, Link as LinkIcon } from '@phosphor-icons/react';
+import { parseCityFromAddress } from '@/lib/location-utils';
 
 interface DashboardData {
   location: {
@@ -585,16 +586,10 @@ export default function MerchantDashboardPage() {
               <span className="text-muted">slug</span>
               <span>/{dashboard.location.slug}</span>
             </div>
-            {dashboard.location.city && (
+            {(dashboard.location.address || dashboard.location.city) && (
               <div className="flex justify-between">
-                <span className="text-muted">city</span>
-                <span>{dashboard.location.city}</span>
-              </div>
-            )}
-            {dashboard.location.address && (
-              <div className="flex justify-between">
-                <span className="text-muted">address</span>
-                <span className="text-right max-w-xs">{dashboard.location.address}</span>
+                <span className="text-muted">location</span>
+                <span className="text-right max-w-xs">{parseCityFromAddress(dashboard.location.address) || dashboard.location.city}</span>
               </div>
             )}
             {dashboard.location.phone && (
@@ -626,7 +621,7 @@ export default function MerchantDashboardPage() {
 
       {/* Footer */}
       <footer className="fixed bottom-0 left-0 right-0 border-t border-[var(--border)] bg-[#fafafa] dark:bg-[#0a0a0a]">
-        <div className="max-w-2xl mx-auto px-4 py-3 flex justify-center gap-6 text-xs text-faint">
+        <div className="max-w-2xl mx-auto px-8 py-3 flex flex-wrap justify-center gap-x-3 sm:gap-x-6 gap-y-2 text-xs text-faint">
           <a href={`/b/${slug}`} className="hover:text-[var(--fg-muted)] transition-colors">board</a>
           <a href="/" className="hover:text-[var(--fg-muted)] transition-colors">home</a>
           <a href="/about" className="hover:text-[var(--fg-muted)] transition-colors">about</a>

@@ -8,6 +8,7 @@ import { ComposeModal } from './ComposeModal';
 import { PaymentModal } from './PaymentModal';
 import { SponsorModal } from './SponsorModal';
 import { config } from '@/lib/config';
+import { getLocationLabel } from '@/lib/location-utils';
 import { X } from '@phosphor-icons/react';
 
 // Stacked notes icon with post count
@@ -327,8 +328,8 @@ export function FancyBoard({
                 <h1 className="fancy-board-title">{location.name}</h1>
                 <span className="live-dot" title="Live" />
               </div>
-              {location.city && (
-                <p className="text-sm text-muted mt-0.5">{location.city}</p>
+              {getLocationLabel(location) && (
+                <p className="text-sm text-muted mt-0.5">{getLocationLabel(location)}</p>
               )}
 
               {/* Sponsorship row */}
@@ -428,7 +429,7 @@ export function FancyBoard({
 
       {/* Footer */}
       <footer className="fancy-board-footer">
-        <div className="flex justify-center gap-6 text-xs text-faint">
+        <div className="px-8 flex flex-wrap justify-center gap-x-3 sm:gap-x-6 gap-y-2 text-xs text-faint">
           <a href={flags.PROXHOME_ADVANCED ? '/?view=nearby' : '/map'} className="hover:text-[var(--fg-muted)] transition-colors">nearby</a>
           <a href="/map" className="hover:text-[var(--fg-muted)] transition-colors">map</a>
           <a href="/about" className="hover:text-[var(--fg-muted)] transition-colors">about</a>

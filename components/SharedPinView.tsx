@@ -3,6 +3,7 @@
 import { useMemo } from 'react';
 import Link from 'next/link';
 import { Lightning } from '@phosphor-icons/react';
+import { getLocationLabel } from '@/lib/location-utils';
 
 interface SharedPinData {
   pin: {
@@ -18,6 +19,7 @@ interface SharedPinData {
     id: string;
     name: string;
     city: string | null;
+    address: string | null;
     slug: string;
     lat: number;
     lng: number;
@@ -56,8 +58,9 @@ export function SharedPinView({ data }: { data: SharedPinData }) {
     [pin]
   );
 
-  const locationText = location.city
-    ? `${location.name}, ${location.city}`
+  const locationLabel = getLocationLabel(location);
+  const locationText = locationLabel
+    ? `${location.name}, ${locationLabel}`
     : location.name;
 
   return (
@@ -202,7 +205,7 @@ export function SharedPinView({ data }: { data: SharedPinData }) {
 
       {/* Footer */}
       <footer className="border-t border-[var(--border)] mt-8">
-        <div className="max-w-2xl mx-auto px-4 py-6 flex justify-center gap-6 text-xs text-faint">
+        <div className="max-w-2xl mx-auto px-8 py-6 flex flex-wrap justify-center gap-x-3 sm:gap-x-6 gap-y-2 text-xs text-faint">
           <Link href="/map" className="hover:text-[var(--fg-muted)] transition-colors">nearby</Link>
           <Link href="/about" className="hover:text-[var(--fg-muted)] transition-colors">about</Link>
           <Link href="/terms" className="hover:text-[var(--fg-muted)] transition-colors">terms</Link>

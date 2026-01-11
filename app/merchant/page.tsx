@@ -5,12 +5,14 @@ import { useRouter } from 'next/navigation';
 import { Lightning, Storefront, ArrowRight, SignOut } from '@phosphor-icons/react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { LoginForm } from '@/components/auth/LoginForm';
+import { parseCityFromAddress } from '@/lib/location-utils';
 
 interface ClaimedLocation {
   id: string;
   name: string;
   slug: string;
   city: string | null;
+  address: string | null;
   claimed_at: string;
 }
 
@@ -152,7 +154,7 @@ export default function MerchantPortalPage() {
                   <div>
                     <div className="font-mono font-medium">{loc.name}</div>
                     <div className="text-xs text-muted font-mono">
-                      {loc.city && <span>{loc.city} · </span>}
+                      {(loc.address || loc.city) && <span>{parseCityFromAddress(loc.address) || loc.city} · </span>}
                       /{loc.slug}
                     </div>
                   </div>
@@ -169,7 +171,7 @@ export default function MerchantPortalPage() {
 
       {/* Footer */}
       <footer className="fixed bottom-0 left-0 right-0 border-t border-[var(--border)] bg-[#fafafa] dark:bg-[#0a0a0a]">
-        <div className="max-w-2xl mx-auto px-4 py-3 flex justify-center gap-6 text-xs text-faint">
+        <div className="max-w-2xl mx-auto px-8 py-3 flex flex-wrap justify-center gap-x-3 sm:gap-x-6 gap-y-2 text-xs text-faint">
           <a href="/" className="hover:text-[var(--fg-muted)] transition-colors">home</a>
           <a href="/about" className="hover:text-[var(--fg-muted)] transition-colors">about</a>
         </div>

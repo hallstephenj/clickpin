@@ -133,7 +133,7 @@ export function LocationGate({ state, error, onRequestLocation, sessionId }: Loc
         </div>
 
         {/* Footer */}
-        <div className="mt-6 flex justify-center gap-6 text-xs text-faint">
+        <div className="mt-6 px-8 flex flex-wrap justify-center gap-x-3 sm:gap-x-6 gap-y-2 text-xs text-faint">
           <a href="/map" className="hover:text-[var(--fg-muted)] transition-colors">nearby</a>
           <a href="/merchant" className="hover:text-[var(--fg-muted)] transition-colors">merchants</a>
           <a href="/about" className="hover:text-[var(--fg-muted)] transition-colors">about</a>

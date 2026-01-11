@@ -44,6 +44,7 @@ interface ProximityStats {
   user_lat: number;
   user_lng: number;
   expanded_search: boolean;
+  nearest_board_anywhere?: { name: string; slug: string; distance_m: number } | null;
 }
 
 interface ProximityHomeProps {
@@ -122,9 +123,13 @@ export function ProximityHome({ state, onRequestLocation, sessionId, currentLoca
                   <span>go to board</span>
                   <span>→</span>
                 </Link>
-                {boardsCount > 0 && (
+                {boardsCount > 0 ? (
                   <div className="text-muted text-sm mt-4">
                     {boardsCount} other board{boardsCount !== 1 ? 's' : ''} nearby
+                  </div>
+                ) : stats?.nearest_board_anywhere && (
+                  <div className="text-muted text-xs font-mono mt-4">
+                    the next-nearest board is {(stats.nearest_board_anywhere.distance_m / 1609.34).toFixed(1)} miles away
                   </div>
                 )}
               </>
@@ -141,6 +146,15 @@ export function ProximityHome({ state, onRequestLocation, sessionId, currentLoca
                     <span className="text-accent font-semibold">{boardsCount} board{boardsCount !== 1 ? 's' : ''}</span>{' '}
                     nearby
                   </div>
+                ) : stats?.nearest_board_anywhere ? (
+                  <>
+                    <div className="text-muted text-sm">
+                      no boards nearby
+                    </div>
+                    <div className="text-muted text-xs font-mono mt-2">
+                      the nearest board is {(stats.nearest_board_anywhere.distance_m / 1609.34).toFixed(1)} miles away
+                    </div>
+                  </>
                 ) : (
                   <div className="text-muted text-sm">
                     no boards nearby yet — be the first to start one
@@ -306,7 +320,7 @@ export function ProximityHome({ state, onRequestLocation, sessionId, currentLoca
         </div>
 
         {/* Footer */}
-        <div className="mt-6 flex justify-center gap-6 text-xs text-faint">
+        <div className="mt-6 px-8 flex flex-wrap justify-center gap-x-3 sm:gap-x-6 gap-y-2 text-xs text-faint">
           <Link href="/map" className="hover:text-[var(--fg-muted)] transition-colors">map</Link>
           <Link href="/merchant" className="hover:text-[var(--fg-muted)] transition-colors">merchants</Link>
           <Link href="/about" className="hover:text-[var(--fg-muted)] transition-colors">about</Link>

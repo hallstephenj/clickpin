@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, ReactNode } from 'react';
+import { Plant } from '@phosphor-icons/react';
 import { Pin } from '@/types';
 import { config } from '@/lib/config';
 
@@ -180,11 +181,14 @@ export function PaperweightPin({
   }
 
   // Main pin rendering
+  const isSeedPost = pin.badge?.startsWith('Seed');
+  const seedOutcome = isSeedPost ? (pin.badge?.split(':')[1] || 'neutral').trim().toLowerCase() : null;
   const pinClasses = [
     'paperweight-pin',
     `paperweight-age-${ageClass}`,
     sizeClass,
     isBoosted ? 'paperweight-boosted' : '',
+    isSeedPost ? `paperweight-seed paperweight-seed-${seedOutcome}` : '',
   ].filter(Boolean).join(' ');
 
   return (
@@ -202,7 +206,14 @@ export function PaperweightPin({
 
         {/* Body - with optional badge at start */}
         <p className="paperweight-body">
-          {pin.badge && <span className="paperweight-badge">{pin.badge}</span>}
+          {isSeedPost ? (
+            <span className={`paperweight-badge paperweight-badge-seed paperweight-badge-seed-${seedOutcome}`}>
+              <Plant size={14} weight="fill" />
+              seed
+            </span>
+          ) : (
+            pin.badge && <span className="paperweight-badge">{pin.badge}</span>
+          )}
           {linkifyText(pin.body)}
         </p>
 

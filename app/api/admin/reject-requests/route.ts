@@ -19,10 +19,7 @@ export async function POST(request: NextRequest) {
     // Mark all requests as rejected
     const { error } = await supabaseAdmin
       .from('location_requests')
-      .update({
-        status: 'rejected',
-        reviewed_at: new Date().toISOString(),
-      })
+      .update({ status: 'rejected' })
       .in('id', request_ids);
 
     if (error) {

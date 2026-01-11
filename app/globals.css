@@ -37,6 +37,24 @@
   animation: jiggle 3s ease-in-out infinite;
 }
 
+/* Bitcoin merchant glow effect */
+.bitcoin-merchant-glow {
+  box-shadow: inset 0 0 60px rgba(247, 147, 26, 0.15),
+              inset 0 0 120px rgba(247, 147, 26, 0.1);
+  animation: bitcoin-glow 3s ease-in-out infinite alternate;
+}
+
+@keyframes bitcoin-glow {
+  from {
+    box-shadow: inset 0 0 60px rgba(247, 147, 26, 0.1),
+                inset 0 0 120px rgba(247, 147, 26, 0.05);
+  }
+  to {
+    box-shadow: inset 0 0 80px rgba(247, 147, 26, 0.2),
+                inset 0 0 150px rgba(247, 147, 26, 0.12);
+  }
+}
+
 :root {
   --bg: #fafafa;
   --bg-alt: #f5f5f5;
@@ -248,6 +266,11 @@ textarea {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--fg-faint);
+}
+
+/* Hide scrollbar utility */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
 
 /* Prevent iOS zoom on input focus */
@@ -942,6 +965,79 @@ textarea {
   margin-right: 6px;
   border-radius: 2px;
   vertical-align: baseline;
+}
+
+/* Seed badge - base styles */
+.paperweight-badge-seed {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  vertical-align: middle;
+}
+
+/* Seed badge - positive (green) */
+.paperweight-badge.paperweight-badge-seed-positive {
+  color: #16a34a;
+  background: rgba(22, 163, 74, 0.1);
+}
+
+/* Seed badge - neutral (yellow) */
+.paperweight-badge.paperweight-badge-seed-neutral {
+  color: #ca8a04;
+  background: rgba(202, 138, 4, 0.1);
+}
+
+/* Seed badge - negative (red) */
+.paperweight-badge.paperweight-badge-seed-negative {
+  color: #dc2626;
+  background: rgba(220, 38, 38, 0.1);
+}
+
+/* Seed post backgrounds - positive (green) */
+.paperweight-pin.paperweight-seed-positive {
+  background: #f0fdf4;
+  border-color: rgba(22, 163, 74, 0.2);
+}
+
+/* Seed post backgrounds - neutral (yellow) */
+.paperweight-pin.paperweight-seed-neutral {
+  background: #fefce8;
+  border-color: rgba(202, 138, 4, 0.2);
+}
+
+/* Seed post backgrounds - negative (red) */
+.paperweight-pin.paperweight-seed-negative {
+  background: #fef2f2;
+  border-color: rgba(220, 38, 38, 0.15);
+}
+
+@media (prefers-color-scheme: dark) {
+  .paperweight-pin.paperweight-seed-positive {
+    background: #052e16;
+    border-color: rgba(22, 163, 74, 0.25);
+  }
+
+  .paperweight-pin.paperweight-seed-neutral {
+    background: #1c1a00;
+    border-color: rgba(202, 138, 4, 0.25);
+  }
+
+  .paperweight-pin.paperweight-seed-negative {
+    background: #1f0a0a;
+    border-color: rgba(220, 38, 38, 0.2);
+  }
+
+  .paperweight-badge.paperweight-badge-seed-positive {
+    background: rgba(22, 163, 74, 0.15);
+  }
+
+  .paperweight-badge.paperweight-badge-seed-neutral {
+    background: rgba(202, 138, 4, 0.15);
+  }
+
+  .paperweight-badge.paperweight-badge-seed-negative {
+    background: rgba(220, 38, 38, 0.15);
+  }
 }
 
 /* Short posts feel compact */

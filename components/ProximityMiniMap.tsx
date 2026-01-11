@@ -12,6 +12,7 @@ interface Location {
   radius_m: number;
   btcmap_id?: number | null;
   is_bitcoin_merchant?: boolean;
+  location_type?: 'bitcoin_merchant' | 'merchant' | 'community_space';
 }
 
 interface ProximityMiniMapProps {
@@ -39,9 +40,18 @@ const createIcon = (color: string, size: number = 16) => {
   });
 };
 
-const bitcoinMerchantIcon = createIcon('#f7931a', 14);
-const communityIcon = createIcon('#6b7280', 14);
-const userIcon = createIcon('#3b82f6', 18);
+// Pin colors matching the SEED_PLANTED spec
+const PIN_COLORS = {
+  bitcoin_merchant: '#F7931A', // Orange
+  merchant: '#6B7280',         // Gray (non-bitcoin merchants)
+  community_space: '#3B82F6',  // Blue
+  user_location: '#EF4444',    // Red
+};
+
+const bitcoinMerchantIcon = createIcon(PIN_COLORS.bitcoin_merchant, 14);
+const merchantIcon = createIcon(PIN_COLORS.merchant, 14);
+const communitySpaceIcon = createIcon(PIN_COLORS.community_space, 14);
+const userIcon = createIcon(PIN_COLORS.user_location, 18);
 
 // Auto-fit map to show all markers
 function MapFitter({ userLat, userLng, locations }: { userLat: number; userLng: number; locations: Location[] }) {
@@ -87,8 +97,9 @@ export function ProximityMiniMap({ userLat, userLng, locations }: ProximityMiniM
 
         {/* Location radius circles */}
         {locations.map((loc) => {
-          const isBitcoinMerchant = !!loc.btcmap_id || !!loc.is_bitcoin_merchant;
-          const color = isBitcoinMerchant ? '#f7931a' : '#6b7280';
+          const locationType = loc.location_type ||
+            (loc.btcmap_id || loc.is_bitcoin_merchant ? 'bitcoin_merchant' : 'merchant');
+          const color = PIN_COLORS[locationType] || PIN_COLORS.merchant;
           return (
             <Circle
               key={`circle-${loc.id}`}
@@ -107,12 +118,23 @@ export function ProximityMiniMap({ userLat, userLng, locations }: ProximityMiniM
 
         {/* Location markers */}
         {locations.map((loc) => {
-          const isBitcoinMerchant = !!loc.btcmap_id || !!loc.is_bitcoin_merchant;
+          const locationType = loc.location_type ||
+            (loc.btcmap_id || loc.is_bitcoin_merchant ? 'bitcoin_merchant' : 'merchant');
+
+          let icon;
+          if (locationType === 'bitcoin_merchant') {
+            icon = bitcoinMerchantIcon;
+          } else if (locationType === 'community_space') {
+            icon = communitySpaceIcon;
+          } else {
+            icon = merchantIcon;
+          }
+
           return (
             <Marker
               key={loc.id}
               position={[loc.lat, loc.lng]}
-              icon={isBitcoinMerchant ? bitcoinMerchantIcon : communityIcon}
+              icon={icon}
             />
           );
         })}

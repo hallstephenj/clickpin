@@ -1,5 +1,8 @@
 // Core database types
 
+// Location type categories
+export type LocationType = 'bitcoin_merchant' | 'merchant' | 'community_space';
+
 export interface Location {
   id: string;
   name: string;
@@ -12,6 +15,7 @@ export interface Location {
   is_active: boolean;
   is_bitcoin_merchant?: boolean;
   is_claimed?: boolean;
+  location_type?: LocationType;
   merchant_settings?: MerchantSettings;
   created_at: string;
   sponsor_label?: string | null;
@@ -203,6 +207,7 @@ export interface FeatureFlags {
   PROXHOME: boolean;
   PROXHOME_ADVANCED: boolean;
   MERCHANTS: boolean;
+  SEED_PLANTED: boolean;
 }
 
 // Badge types
@@ -275,6 +280,7 @@ export interface GhostCard {
   name: string;
   slug: string;
   city: string | null;
+  address: string | null;
   activity_level: ActivityLevel;
   activity_score: number;
   pins_today: number;
@@ -330,4 +336,39 @@ export interface MerchantDashboardData {
     replies_7d: number;
     views_7d: number;
   };
+}
+
+// Seed Planted Types (Bitcoin Advocacy)
+export type SeedOutcome = 'positive' | 'neutral' | 'negative';
+
+export interface SeedPlanting {
+  id: string;
+  location_id: string;
+  device_session_id: string;
+  outcome: SeedOutcome;
+  commentary?: string;
+  pin_id?: string;
+  created_at: string;
+}
+
+export interface SeedCount {
+  total: number;
+  outcomes: {
+    positive: number;
+    neutral: number;
+    negative: number;
+  };
+}
+
+export interface PlantSeedRequest {
+  presence_token: string;
+  outcome: SeedOutcome;
+  commentary?: string;
+}
+
+export interface PlantSeedResponse {
+  success: boolean;
+  seed_id: string;
+  pin_id?: string;
+  total_seeds: number;
 }

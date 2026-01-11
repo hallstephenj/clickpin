@@ -56,6 +56,7 @@ export async function GET(request: NextRequest) {
         name,
         slug,
         city,
+        address,
         lat,
         lng,
         ghosts_enabled
@@ -148,6 +149,7 @@ export async function GET(request: NextRequest) {
         name: loc.name,
         slug: loc.slug,
         city: loc.city,
+        address: loc.address,
         activity_level: activityLevel,
         activity_score: activityScore,
         pins_today: pinsToday,
