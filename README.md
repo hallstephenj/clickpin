@@ -1,20 +1,20 @@
 # Clickpin
 
-**Galvanizing grassroots Bitcoin merchant adoption.**
+**Galvanizing grassroots bitcoin merchant adoption.**
 
 ## The Mission
 
-Every retailer in the United States should accept Bitcoin. Every Bitcoin holder knows this. Clickpin is the coordination layer that makes it happen.
+Every retailer in the United States should accept bitcoin. Every bitcoin holder knows this. Clickpin is the coordination layer that makes it happen.
 
-This is not a passive app. This is infrastructure for Bitcoin warriors. Show up. Plant seeds. Flip merchants. Track progress. Win.
+This is not a passive app. This is infrastructure for bitcoin warriors. Show up. Plant seeds. Flip merchants. Track progress. Win.
 
 ## What is Clickpin?
 
-Clickpin is a location-based coordination tool for grassroots Bitcoin adoption. Anonymous message boards are locked to physical locations - you can only post when you're actually there. No accounts. No surveillance. Just boots on the ground.
+Clickpin is a location-based coordination tool for grassroots bitcoin adoption. Anonymous message boards are locked to physical locations - you can only post when you're actually there. No accounts. No surveillance. Just boots on the ground.
 
 **The playbook is simple:**
 1. Walk into any business
-2. Have the conversation about accepting Bitcoin
+2. Have the conversation about accepting bitcoin
 3. Log the outcome (seed planted)
 4. Coordinate with others who visit the same location
 5. Flip the merchant
@@ -24,19 +24,19 @@ Every seed planted is tracked. Every merchant flipped is a victory. BTCMap integ
 ### Core Features
 
 - **Location-locked boards**: Post only when physically present - no armchair activism
-- **Seed planting**: Log Bitcoin conversations with merchants, track outcomes (positive/neutral/negative)
+- **Seed planting**: Log bitcoin conversations with merchants, track outcomes (positive/neutral/negative)
 - **Anonymous coordination**: No accounts, device-based identity, plausible deniability
-- **BTCMap sync**: Import existing Bitcoin merchants, export new wins back to the ecosystem
+- **BTCMap sync**: Import existing bitcoin merchants, export new wins back to the ecosystem
 - **Merchant claiming**: Flipped merchants can claim their board and join the network
 - **Lightning-native**: Boosts, sponsorships, and donations keep the servers running
 
 ## Key Concepts
 
 ### Boards
-Each physical location has a "board" - a collection of anonymous posts from people who have visited. Boards can be for Bitcoin merchants, regular businesses, or community spaces.
+Each physical location has a "board" - a collection of anonymous posts from people who have visited. Boards can be for bitcoin merchants, regular businesses, or community spaces.
 
 ### Seeds
-The "Seed Planted" feature lets users record when they've had a conversation about Bitcoin with a merchant. Track outcomes (positive, neutral, negative) and add optional commentary. This helps the community identify receptive businesses.
+The "Seed Planted" feature lets users record when they've had a conversation about bitcoin with a merchant. Track outcomes (positive, neutral, negative) and add optional commentary. This helps the community identify receptive businesses.
 
 ### Merchant Claims
 Business owners can claim their location by paying a Lightning invoice. Once claimed, they can:
@@ -217,7 +217,7 @@ LNBITS_API_KEY=your-api-key
 - `locations` - Physical locations with PostGIS geography
 - `device_sessions` - Anonymous device identities
 - `pins` - User posts with optional doodles
-- `seed_plantings` - Bitcoin advocacy tracking
+- `seed_plantings` - bitcoin advocacy tracking
 - `merchant_claims` - Verified business claims
 - `location_requests` - User-submitted location requests
 
