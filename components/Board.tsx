@@ -352,17 +352,13 @@ export function Board({
 
               {/* Merchant dashboard link (for claimed locations) */}
               {flags.MERCHANTS && isClaimed && (
-                <div className="mt-1 flex items-center gap-3">
+                <div className="mt-1">
                   <a
                     href={`/merchant/${location.slug}`}
                     className="text-xs font-mono text-accent hover:underline"
                   >
                     manage board →
                   </a>
-                  {/* Tip Jar Button */}
-                  {location.merchant_settings?.tip_jar_enabled && location.merchant_settings?.tip_jar_address && (
-                    <TipJarButton onClick={() => setTipModalOpen(true)} />
-                  )}
                 </div>
               )}
 
@@ -427,6 +423,11 @@ export function Board({
                   seedPlantedEnabled={flags.SEED_PLANTED}
                   onSeedPlanted={onRefreshBoard}
                 />
+              )}
+
+              {/* Tip Jar Button (for claimed locations with tips enabled) */}
+              {flags.MERCHANTS && isClaimed && location.merchant_settings?.tip_jar_enabled && location.merchant_settings?.tip_jar_address && (
+                <TipJarButton onClick={() => setTipModalOpen(true)} />
               )}
             </div>
           </div>
