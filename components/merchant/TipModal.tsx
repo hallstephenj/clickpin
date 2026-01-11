@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
-import { X } from '@phosphor-icons/react';
+import { X, Lightning } from '@phosphor-icons/react';
 
 interface TipModalProps {
   isOpen: boolean;
@@ -74,6 +74,13 @@ export function TipModal({ isOpen, onClose, lightningAddress, locationName }: Ti
                 {copied ? 'copied' : 'copy'}
               </button>
             </div>
+            <a
+              href={`lightning:${lightningAddress}`}
+              className="btn w-full mt-2 justify-center text-xs"
+            >
+              <Lightning size={14} weight="fill" className="mr-1" />
+              open in wallet
+            </a>
           </div>
 
           <p className="text-xs text-faint font-mono text-center">

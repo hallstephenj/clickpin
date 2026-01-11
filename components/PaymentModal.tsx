@@ -185,6 +185,13 @@ export function PaymentModal({
                       {copied ? 'copied' : 'copy'}
                     </button>
                   </div>
+                  <a
+                    href={`lightning:${paymentRequest}`}
+                    className="btn w-full mt-2 justify-center text-xs"
+                  >
+                    <Lightning size={14} weight="fill" className="mr-1" />
+                    open in wallet
+                  </a>
                 </div>
               )}
 
