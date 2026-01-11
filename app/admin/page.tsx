@@ -764,7 +764,7 @@ export default function AdminPage() {
       <div className="flex items-center gap-2 py-2 border-b border-[var(--border)]">
         <label className="text-xs text-muted font-mono w-28 flex-shrink-0">
           {label}
-          {isBtcmapField && <MapPin size={12} weight="fill" className="text-[#f7931a] ml-1 inline" title="Imported from BTCMap" />}
+          {isBtcmapField && <span title="Imported from BTCMap"><MapPin size={12} weight="fill" className="text-[#f7931a] ml-1 inline" /></span>}
         </label>
         {isReadonly ? (
           <div className="flex-1 flex items-center gap-2">
