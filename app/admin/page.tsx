@@ -1892,28 +1892,60 @@ export default function AdminPage() {
                           <label className="block text-xs text-muted font-mono mb-1">
                             location type:
                           </label>
-                          <div className="flex gap-2">
-                            {(['bitcoin_merchant', 'merchant', 'community_space'] as LocationType[]).map((type) => {
+                          <div className="space-y-2">
+                            {(() => {
                               const defaultType = group.requests.some(r => r.is_bitcoin_merchant) ? 'bitcoin_merchant' : 'merchant';
-                              const isSelected = (newLocationType[key] || defaultType) === type;
+                              const selectedType = newLocationType[key] || defaultType;
                               return (
-                                <button
-                                  key={type}
-                                  onClick={() => setNewLocationType((prev) => ({ ...prev, [key]: type }))}
-                                  className={`flex-1 p-2 text-xs font-mono border ${
-                                    isSelected
-                                      ? type === 'bitcoin_merchant'
-                                        ? 'border-[#f7931a] bg-[#f7931a]/10 text-[#f7931a]'
-                                        : type === 'community_space'
-                                          ? 'border-blue-500 bg-blue-500/10 text-blue-500'
-                                          : 'border-[var(--accent)] bg-[var(--accent)]/10 text-[var(--accent)]'
-                                      : 'border-[var(--border)] text-muted hover:border-[var(--fg-muted)]'
-                                  }`}
-                                >
-                                  {type === 'bitcoin_merchant' ? '₿ bitcoin' : type === 'community_space' ? '👥 community' : '🏪 merchant'}
-                                </button>
+                                <>
+                                  <label className={`flex items-center gap-2 p-2 border cursor-pointer transition-colors ${
+                                    selectedType === 'merchant'
+                                      ? 'border-gray-500 bg-gray-50 dark:bg-gray-900'
+                                      : 'border-[var(--border)]'
+                                  }`}>
+                                    <input
+                                      type="radio"
+                                      name={`location_type_${key}`}
+                                      checked={selectedType === 'merchant'}
+                                      onChange={() => setNewLocationType((prev) => ({ ...prev, [key]: 'merchant' }))}
+                                      className="w-4 h-4 m-0 p-0 !w-4"
+                                    />
+                                    <Storefront size={16} className="text-gray-500" />
+                                    <span className="text-sm font-mono">business (doesn't accept bitcoin)</span>
+                                  </label>
+                                  <label className={`flex items-center gap-2 p-2 border cursor-pointer transition-colors ${
+                                    selectedType === 'bitcoin_merchant'
+                                      ? 'border-[#f7931a] bg-orange-50 dark:bg-orange-950'
+                                      : 'border-[var(--border)]'
+                                  }`}>
+                                    <input
+                                      type="radio"
+                                      name={`location_type_${key}`}
+                                      checked={selectedType === 'bitcoin_merchant'}
+                                      onChange={() => setNewLocationType((prev) => ({ ...prev, [key]: 'bitcoin_merchant' }))}
+                                      className="w-4 h-4 m-0 p-0 !w-4 accent-[#f7931a]"
+                                    />
+                                    <Lightning size={16} weight="fill" className="text-[#f7931a]" />
+                                    <span className="text-sm font-mono">business (accepts bitcoin)</span>
+                                  </label>
+                                  <label className={`flex items-center gap-2 p-2 border cursor-pointer transition-colors ${
+                                    selectedType === 'community_space'
+                                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-950'
+                                      : 'border-[var(--border)]'
+                                  }`}>
+                                    <input
+                                      type="radio"
+                                      name={`location_type_${key}`}
+                                      checked={selectedType === 'community_space'}
+                                      onChange={() => setNewLocationType((prev) => ({ ...prev, [key]: 'community_space' }))}
+                                      className="w-4 h-4 m-0 p-0 !w-4 accent-blue-500"
+                                    />
+                                    <UsersThree size={16} className="text-blue-500" />
+                                    <span className="text-sm font-mono">community space</span>
+                                  </label>
+                                </>
                               );
-                            })}
+                            })()}
                           </div>
                         </div>
                         <div className="flex gap-2">
