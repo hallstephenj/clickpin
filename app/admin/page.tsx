@@ -106,6 +106,7 @@ export default function AdminPage() {
   const [requestsLoading, setRequestsLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [newLocationName, setNewLocationName] = useState<Record<string, string>>({});
+  const [newLocationType, setNewLocationType] = useState<Record<string, LocationType>>({});
 
   // Locations state
   const [locations, setLocations] = useState<Location[]>([]);
@@ -282,13 +283,18 @@ export default function AdminPage() {
   };
 
   const handleApprove = async (group: GroupedRequest) => {
-    const name = newLocationName[`${group.center_lat}-${group.center_lng}`];
+    const key = `${group.center_lat}-${group.center_lng}`;
+    const name = newLocationName[key];
     if (!name?.trim()) {
       alert('Please enter a location name');
       return;
     }
 
-    setActionLoading(`${group.center_lat}-${group.center_lng}`);
+    // Default to merchant if not selected, or bitcoin_merchant if any request marked it
+    const defaultType = group.requests.some(r => r.is_bitcoin_merchant) ? 'bitcoin_merchant' : 'merchant';
+    const locationType = newLocationType[key] || defaultType;
+
+    setActionLoading(key);
     try {
       const response = await fetch('/api/admin/approve-location', {
         method: 'POST',
@@ -300,6 +306,7 @@ export default function AdminPage() {
           lat: group.center_lat,
           lng: group.center_lng,
           name: name.trim(),
+          location_type: locationType,
           request_ids: group.requests.map((r) => r.id),
         }),
       });
@@ -1880,6 +1887,34 @@ export default function AdminPage() {
                             placeholder="Enter location name to approve"
                             className="w-full p-2 bg-[var(--bg-alt)] border border-[var(--border)] font-mono text-sm"
                           />
+                        </div>
+                        <div className="mb-3">
+                          <label className="block text-xs text-muted font-mono mb-1">
+                            location type:
+                          </label>
+                          <div className="flex gap-2">
+                            {(['bitcoin_merchant', 'merchant', 'community_space'] as LocationType[]).map((type) => {
+                              const defaultType = group.requests.some(r => r.is_bitcoin_merchant) ? 'bitcoin_merchant' : 'merchant';
+                              const isSelected = (newLocationType[key] || defaultType) === type;
+                              return (
+                                <button
+                                  key={type}
+                                  onClick={() => setNewLocationType((prev) => ({ ...prev, [key]: type }))}
+                                  className={`flex-1 p-2 text-xs font-mono border ${
+                                    isSelected
+                                      ? type === 'bitcoin_merchant'
+                                        ? 'border-[#f7931a] bg-[#f7931a]/10 text-[#f7931a]'
+                                        : type === 'community_space'
+                                          ? 'border-blue-500 bg-blue-500/10 text-blue-500'
+                                          : 'border-[var(--accent)] bg-[var(--accent)]/10 text-[var(--accent)]'
+                                      : 'border-[var(--border)] text-muted hover:border-[var(--fg-muted)]'
+                                  }`}
+                                >
+                                  {type === 'bitcoin_merchant' ? '₿ bitcoin' : type === 'community_space' ? '👥 community' : '🏪 merchant'}
+                                </button>
+                              );
+                            })}
+                          </div>
                         </div>
                         <div className="flex gap-2">
                           <button

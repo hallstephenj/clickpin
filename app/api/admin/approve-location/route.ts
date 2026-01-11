@@ -18,19 +18,27 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { lat, lng, name, request_ids } = await request.json();
+    const { lat, lng, name, location_type, request_ids } = await request.json();
 
     if (!lat || !lng || !name || !request_ids?.length) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // Check if any of the requests marked this as a bitcoin merchant
-    const { data: requests } = await supabaseAdmin
-      .from('location_requests')
-      .select('is_bitcoin_merchant')
-      .in('id', request_ids);
+    // Validate location_type if provided, otherwise infer from requests
+    const validTypes = ['bitcoin_merchant', 'merchant', 'community_space'];
+    let finalLocationType = location_type;
 
-    const isBitcoinMerchant = requests?.some(r => r.is_bitcoin_merchant) || false;
+    if (!finalLocationType || !validTypes.includes(finalLocationType)) {
+      // Fallback: Check if any of the requests marked this as a bitcoin merchant
+      const { data: requests } = await supabaseAdmin
+        .from('location_requests')
+        .select('is_bitcoin_merchant')
+        .in('id', request_ids);
+
+      finalLocationType = requests?.some(r => r.is_bitcoin_merchant) ? 'bitcoin_merchant' : 'merchant';
+    }
+
+    const isBitcoinMerchant = finalLocationType === 'bitcoin_merchant';
 
     // Generate unique slug
     let slug = generateSlug(name);
@@ -61,6 +69,7 @@ export async function POST(request: NextRequest) {
         lat,
         lng,
         radius_m: 200, // Default radius
+        location_type: finalLocationType,
         is_bitcoin_merchant: isBitcoinMerchant,
       })
       .select()
