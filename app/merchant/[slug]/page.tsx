@@ -541,7 +541,7 @@ export default function MerchantDashboardPage() {
                   type="checkbox"
                   checked={tipJarEnabled}
                   onChange={(e) => setTipJarEnabled(e.target.checked)}
-                  className="w-4 h-4"
+                  className="w-4 h-4 m-0 p-0 !w-4"
                 />
                 <span className="text-sm font-mono">enable tip jar</span>
               </label>
