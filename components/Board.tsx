@@ -8,7 +8,7 @@ import { PaymentModal } from './PaymentModal';
 import { SponsorModal } from './SponsorModal';
 import { FancyBoard } from './FancyBoard';
 import { PromptCarousel } from './PromptCarousel';
-import { ClaimButton, ClaimModal, VerifiedBadge, WelcomeBanner } from './merchant';
+import { ClaimButton, ClaimModal, VerifiedBadge, WelcomeBanner, TipJarButton, TipModal } from './merchant';
 import { BoardBanner, bitcoinMerchantGlowClass } from './BoardBanner';
 import { SeedCounter } from './SeedCounter';
 import { SeedPlantedButton } from './SeedPlantedButton';
@@ -75,6 +75,7 @@ export function Board({
   const [sponsorModalOpen, setSponsorModalOpen] = useState(false);
   const [claimModalOpen, setClaimModalOpen] = useState(false);
   const [infoModalOpen, setInfoModalOpen] = useState(false);
+  const [tipModalOpen, setTipModalOpen] = useState(false);
 
   // Determine if this is a merchant location (can be claimed)
   // Any location that's not a community_space can be claimed
@@ -351,13 +352,17 @@ export function Board({
 
               {/* Merchant dashboard link (for claimed locations) */}
               {flags.MERCHANTS && isClaimed && (
-                <div className="mt-1">
+                <div className="mt-1 flex items-center gap-3">
                   <a
                     href={`/merchant/${location.slug}`}
                     className="text-xs font-mono text-accent hover:underline"
                   >
                     manage board →
                   </a>
+                  {/* Tip Jar Button */}
+                  {location.merchant_settings?.tip_jar_enabled && location.merchant_settings?.tip_jar_address && (
+                    <TipJarButton onClick={() => setTipModalOpen(true)} />
+                  )}
                 </div>
               )}
 
@@ -594,6 +599,15 @@ export function Board({
         onClaimClick={() => setClaimModalOpen(true)}
         showClaimButton={flags.MERCHANTS && isMerchantLocation && Boolean(sessionId)}
       />
+
+      {location.merchant_settings?.tip_jar_enabled && location.merchant_settings?.tip_jar_address && (
+        <TipModal
+          isOpen={tipModalOpen}
+          onClose={() => setTipModalOpen(false)}
+          lightningAddress={location.merchant_settings.tip_jar_address}
+          locationName={location.name}
+        />
+      )}
     </div>
   );
 }
