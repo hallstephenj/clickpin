@@ -11,7 +11,6 @@ export const DEFAULT_FLAGS: FeatureFlags = {
   fancy_stacking: false,
   fancy_aging: false,
   fancy_dig_mode: false,
-  GHOSTS: false,
   BADGES: false,
   SHARENOTES: false,
   ROTATONATOR: false,
@@ -19,7 +18,6 @@ export const DEFAULT_FLAGS: FeatureFlags = {
   PROXHOME_ADVANCED: false,
   MERCHANTS: false,
   SEED_PLANTED: false,
-  FORSTALL_MODE: false,
 };
 
 // All feature flag keys
@@ -32,7 +30,6 @@ export const FEATURE_FLAG_KEYS = [
   'fancy_stacking',
   'fancy_aging',
   'fancy_dig_mode',
-  'GHOSTS',
   'BADGES',
   'SHARENOTES',
   'ROTATONATOR',
@@ -40,7 +37,6 @@ export const FEATURE_FLAG_KEYS = [
   'PROXHOME_ADVANCED',
   'MERCHANTS',
   'SEED_PLANTED',
-  'FORSTALL_MODE',
 ] as const;
 
 // Server-side: Fetch all flags from database

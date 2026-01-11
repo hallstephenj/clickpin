@@ -3,7 +3,6 @@ import { supabaseAdmin } from '@/lib/supabase';
 import { verifyPresenceToken } from '@/lib/presence';
 import { config } from '@/lib/config';
 import { v4 as uuidv4 } from 'uuid';
-import { logGhostEvent } from '@/lib/ghostEvents';
 import { isValidEnum } from '@/lib/validation';
 import { BADGE_OPTIONS } from '@/types';
 
@@ -159,9 +158,6 @@ export async function POST(request: NextRequest) {
       console.error('Insert data:', { pinId, location_id, device_session_id, body: pinBody.trim(), x, y, rotation, template, size, z_seed });
       return NextResponse.json({ error: `Failed to create pin: ${insertError.message}` }, { status: 500 });
     }
-
-    // Log ghost event (fire-and-forget)
-    logGhostEvent(location_id, 'pin_created');
 
     // Update quota ledger
     if (quotaExceeded) {

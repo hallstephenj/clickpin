@@ -200,7 +200,6 @@ export interface FeatureFlags {
   fancy_stacking: boolean;
   fancy_aging: boolean;
   fancy_dig_mode: boolean;
-  GHOSTS: boolean;
   BADGES: boolean;
   SHARENOTES: boolean;
   ROTATONATOR: boolean;
@@ -208,7 +207,13 @@ export interface FeatureFlags {
   PROXHOME_ADVANCED: boolean;
   MERCHANTS: boolean;
   SEED_PLANTED: boolean;
-  FORSTALL_MODE: boolean;
+}
+
+// App Settings
+export type DesignTheme = 'mono' | 'forstall' | 'neo2026';
+
+export interface AppSettings {
+  design_theme: DesignTheme;
 }
 
 // Badge types
@@ -235,69 +240,6 @@ export interface FancyPin extends Pin {
   template?: PinTemplate | null;
   size?: PinSize | null;
   z_seed?: number | null;
-}
-
-// Ghost Types (Activity Signals)
-export type GhostEventType =
-  | 'pin_created'
-  | 'reply_created'
-  | 'pin_boosted'
-  | 'pin_deleted_paid'
-  | 'sponsor_bid_paid'
-  | 'sponsor_activated'
-  | 'pin_flagged'
-  | 'merchant_claimed';
-
-export interface LocationActivityEvent {
-  id: string;
-  location_id: string;
-  event_type: GhostEventType;
-  occurred_at: string;
-  coarse_bucket: string;
-  metadata: Record<string, unknown>;
-  privacy_version: number;
-  created_at: string;
-}
-
-export interface LocationActivityRollup {
-  location_id: string;
-  updated_at: string;
-  pins_last_24h: number;
-  replies_last_24h: number;
-  boosts_last_24h: number;
-  flags_last_24h: number;
-  sponsorship_active: boolean;
-  sponsor_expires_at: string | null;
-  activity_score: number;
-  last_activity_bucket: string | null;
-  min_k_threshold_met: boolean;
-  total_events_last_24h: number;
-}
-
-export type ActivityLevel = 'quiet' | 'warm' | 'busy';
-
-export interface GhostCard {
-  location_id: string;
-  name: string;
-  slug: string;
-  city: string | null;
-  address: string | null;
-  activity_level: ActivityLevel;
-  activity_score: number;
-  pins_today: number;
-  boosts_today: number;
-  sponsorship_active: boolean;
-  sponsor_label: string | null;
-  last_activity_text: string;
-  signal_text: string;
-  distance_m?: number | null;
-}
-
-export interface GhostFeedResponse {
-  nearby: GhostCard[];
-  city_wide: GhostCard[];
-  sponsored: GhostCard[];
-  ghosts_enabled: boolean;
 }
 
 // Merchant Types

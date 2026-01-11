@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Lightning, Ghost, PencilSimple, Storefront, Broom, Trash, SignOut, UsersThree, Plant, ArrowLeft, Copy, Check, MapPin } from '@phosphor-icons/react';
+import { Lightning, PencilSimple, Storefront, Broom, Trash, SignOut, UsersThree, Plant, ArrowLeft, Copy, Check, MapPin, Palette } from '@phosphor-icons/react';
 import { parseCityFromAddress } from '@/lib/location-utils';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { LoginForm } from '@/components/auth/LoginForm';
@@ -38,7 +38,6 @@ interface Location {
   lng: number;
   radius_m: number;
   is_active: boolean;
-  ghosts_enabled: boolean;
   created_at: string;
   pin_count?: number;
   seed_count?: number;
@@ -130,6 +129,10 @@ export default function AdminPage() {
   const [featureFlags, setFeatureFlags] = useState<FeatureFlag[]>([]);
   const [flagsLoading, setFlagsLoading] = useState(false);
 
+  // App settings state (design theme)
+  const [designTheme, setDesignTheme] = useState<'mono' | 'forstall' | 'neo2026'>('mono');
+  const [themeLoading, setThemeLoading] = useState(false);
+
   // Stats state
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [statsLoading, setStatsLoading] = useState(false);
@@ -219,6 +222,45 @@ export default function AdminPage() {
     }
   }, []);
 
+  const fetchDesignTheme = useCallback(async () => {
+    try {
+      const response = await fetch('/api/app-settings', {
+        headers: getAuthHeaders(),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        if (data.settings?.design_theme) {
+          setDesignTheme(data.settings.design_theme);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch design theme:', err);
+    }
+  }, []);
+
+  const handleSetDesignTheme = async (theme: 'mono' | 'forstall' | 'neo2026') => {
+    setThemeLoading(true);
+    try {
+      const response = await fetch('/api/admin/app-settings', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeaders(),
+        },
+        body: JSON.stringify({ key: 'design_theme', value: theme }),
+      });
+      if (response.ok) {
+        setDesignTheme(theme);
+        // Force reload to apply theme change
+        window.location.reload();
+      }
+    } catch (err) {
+      console.error('Failed to update design theme:', err);
+    } finally {
+      setThemeLoading(false);
+    }
+  };
+
   const handleToggleFlag = async (flag: FeatureFlag) => {
     setActionLoading(flag.id);
     try {
@@ -252,6 +294,8 @@ export default function AdminPage() {
       if (featureFlags.length === 0) {
         fetchFlags();
       }
+      // Fetch design theme for controls tab
+      fetchDesignTheme();
       if (activeTab === 'stats') {
         fetchStats();
       } else if (activeTab === 'requests') {
@@ -262,7 +306,7 @@ export default function AdminPage() {
         fetchFlags();
       }
     }
-  }, [user, activeTab, currentView, fetchRequests, fetchLocations, fetchFlags, fetchStats, featureFlags.length]);
+  }, [user, activeTab, currentView, fetchRequests, fetchLocations, fetchFlags, fetchStats, fetchDesignTheme, featureFlags.length]);
 
   // Helper to check if a feature flag is enabled
   const isFeatureEnabled = (key: string) => {
@@ -593,37 +637,6 @@ export default function AdminPage() {
       }
     } catch {
       alert('Failed to clear posts');
-    } finally {
-      setActionLoading(null);
-    }
-  };
-
-  const handleToggleGhosts = async (location: Location) => {
-    setActionLoading(`ghosts-${location.id}`);
-    try {
-      const response = await fetch(`/api/admin/locations/${location.id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          ...getAuthHeaders(),
-        },
-        body: JSON.stringify({ ghosts_enabled: !location.ghosts_enabled }),
-      });
-
-      if (response.ok) {
-        setLocations((prev) =>
-          prev.map((loc) =>
-            loc.id === location.id
-              ? { ...loc, ghosts_enabled: !loc.ghosts_enabled }
-              : loc
-          )
-        );
-      } else {
-        const data = await response.json();
-        alert(data.error || 'Failed to toggle ghosts');
-      }
-    } catch {
-      alert('Failed to toggle ghosts');
     } finally {
       setActionLoading(null);
     }
@@ -991,25 +1004,6 @@ export default function AdminPage() {
                       {actionLoading === 'save-is_active' ? '...' : loc.is_active ? 'ON' : 'OFF'}
                     </button>
                   </div>
-                  {isFeatureEnabled('GHOSTS') && (
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="font-mono text-sm flex items-center gap-1">
-                          <Ghost size={16} /> ghosts_enabled
-                        </div>
-                        <div className="text-xs text-muted">activity signals visible</div>
-                      </div>
-                      <button
-                        onClick={() => handleSaveField('ghosts_enabled', String(!loc.ghosts_enabled))}
-                        disabled={actionLoading === 'save-ghosts_enabled'}
-                        className={`px-4 py-2 font-mono text-sm ${
-                          loc.ghosts_enabled ? 'bg-[var(--accent)] text-black' : 'bg-[var(--bg-alt)] border border-[var(--border)]'
-                        }`}
-                      >
-                        {actionLoading === 'save-ghosts_enabled' ? '...' : loc.ghosts_enabled ? 'ON' : 'OFF'}
-                      </button>
-                    </div>
-                  )}
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="font-mono text-sm">is_claimed</div>
@@ -1685,21 +1679,6 @@ export default function AdminPage() {
                             <span className="text-xs text-muted font-mono">
                               {loc.radius_m}m · {loc.pin_count || 0}
                             </span>
-                            {isFeatureEnabled('GHOSTS') && (
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleToggleGhosts(loc);
-                                }}
-                                disabled={actionLoading === `ghosts-${loc.id}`}
-                                className={`p-1.5 rounded hover:bg-[var(--bg-alt)] ${
-                                  loc.ghosts_enabled ? 'text-accent' : 'text-muted hover:text-[var(--fg)]'
-                                }`}
-                                title={loc.ghosts_enabled ? 'Ghosts enabled - click to disable' : 'Ghosts disabled - click to enable'}
-                              >
-                                <Ghost size={16} weight={loc.ghosts_enabled ? 'fill' : 'regular'} />
-                              </button>
-                            )}
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -1911,7 +1890,7 @@ export default function AdminPage() {
                                       className="w-4 h-4 m-0 p-0 !w-4"
                                     />
                                     <Storefront size={16} className="text-gray-500" />
-                                    <span className="text-sm font-mono">business (doesn't accept bitcoin)</span>
+                                    <span className="text-sm font-mono">business (no bitcoin)</span>
                                   </label>
                                   <label className={`flex items-center gap-2 p-2 border cursor-pointer transition-colors ${
                                     selectedType === 'bitcoin_merchant'
@@ -2119,10 +2098,84 @@ export default function AdminPage() {
           <>
             <div className="mb-4">
               <h2 className="font-mono text-sm text-muted">global controls</h2>
-              <p className="text-xs text-faint font-mono mt-1">danger zone — these actions affect all data</p>
+              <p className="text-xs text-faint font-mono mt-1">app settings and danger zone controls</p>
             </div>
 
             <div className="space-y-6">
+              {/* Design Theme Selector */}
+              <div className="border border-[var(--border)]">
+                <div className="px-4 py-2 border-b border-[var(--border)] bg-[var(--bg-alt)]">
+                  <h3 className="font-mono text-sm font-bold flex items-center gap-2">
+                    <Palette size={16} /> design theme
+                  </h3>
+                </div>
+                <div className="p-4">
+                  <p className="text-xs text-muted mb-3">choose the app&apos;s visual style</p>
+                  <div className="flex flex-col gap-2">
+                    <label className={`flex items-center gap-3 p-3 border rounded cursor-pointer transition-colors ${
+                      designTheme === 'mono'
+                        ? 'border-[var(--accent)] bg-[var(--accent)]/5'
+                        : 'border-[var(--border)] hover:border-[var(--accent)]/50'
+                    }`}>
+                      <input
+                        type="radio"
+                        name="design_theme"
+                        value="mono"
+                        checked={designTheme === 'mono'}
+                        onChange={() => handleSetDesignTheme('mono')}
+                        disabled={themeLoading}
+                        className="m-0 p-0 !w-4"
+                      />
+                      <div>
+                        <div className="font-mono text-sm font-bold">mono</div>
+                        <div className="text-xs text-muted">clean, minimal, modern design (default)</div>
+                      </div>
+                    </label>
+                    <label className={`flex items-center gap-3 p-3 border rounded cursor-pointer transition-colors ${
+                      designTheme === 'forstall'
+                        ? 'border-[var(--accent)] bg-[var(--accent)]/5'
+                        : 'border-[var(--border)] hover:border-[var(--accent)]/50'
+                    }`}>
+                      <input
+                        type="radio"
+                        name="design_theme"
+                        value="forstall"
+                        checked={designTheme === 'forstall'}
+                        onChange={() => handleSetDesignTheme('forstall')}
+                        disabled={themeLoading}
+                        className="m-0 p-0 !w-4"
+                      />
+                      <div>
+                        <div className="font-mono text-sm font-bold">forstall</div>
+                        <div className="text-xs text-muted">skeuomorphic, pre-iOS7 style with cork, leather, and brushed metal</div>
+                      </div>
+                    </label>
+                    <label className={`flex items-center gap-3 p-3 border rounded cursor-pointer transition-colors ${
+                      designTheme === 'neo2026'
+                        ? 'border-[var(--accent)] bg-[var(--accent)]/5'
+                        : 'border-[var(--border)] hover:border-[var(--accent)]/50'
+                    }`}>
+                      <input
+                        type="radio"
+                        name="design_theme"
+                        value="neo2026"
+                        checked={designTheme === 'neo2026'}
+                        onChange={() => handleSetDesignTheme('neo2026')}
+                        disabled={themeLoading}
+                        className="m-0 p-0 !w-4"
+                      />
+                      <div>
+                        <div className="font-mono text-sm font-bold">neo2026</div>
+                        <div className="text-xs text-muted">2026 neoskeuomorphism — warm porcelain surfaces, soft shadows, amber accents</div>
+                      </div>
+                    </label>
+                  </div>
+                  {themeLoading && (
+                    <div className="mt-2 text-xs text-muted font-mono">applying theme...</div>
+                  )}
+                </div>
+              </div>
+
               {/* Seed Controls */}
               <div className="border border-[var(--border)]">
                 <div className="px-4 py-2 border-b border-[var(--border)] bg-[var(--bg-alt)]">

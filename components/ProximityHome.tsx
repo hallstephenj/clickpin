@@ -52,6 +52,7 @@ interface ProximityHomeProps {
   onRequestLocation: () => void;
   sessionId: string | null;
   currentLocation?: Location;
+  prefetchedStats?: ProximityStats | unknown;
 }
 
 function formatDistance(meters: number): string {
@@ -61,8 +62,10 @@ function formatDistance(meters: number): string {
   return `${(meters / 1000).toFixed(1)}km`;
 }
 
-export function ProximityHome({ state, onRequestLocation, sessionId, currentLocation }: ProximityHomeProps) {
-  const [stats, setStats] = useState<ProximityStats | null>(null);
+export function ProximityHome({ state, onRequestLocation, sessionId, currentLocation, prefetchedStats }: ProximityHomeProps) {
+  const [stats, setStats] = useState<ProximityStats | null>(
+    prefetchedStats as ProximityStats | null
+  );
   const [loading, setLoading] = useState(false);
   const [showRequestModal, setShowRequestModal] = useState(false);
 
@@ -71,9 +74,10 @@ export function ProximityHome({ state, onRequestLocation, sessionId, currentLoca
   const userLng = state.position?.coords.longitude;
   const isAtLocation = !!currentLocation;
 
-  // Fetch proximity stats when we have a position
+  // Fetch proximity stats when we have a position (skip if prefetched)
   useEffect(() => {
     if (!userLat || !userLng) return;
+    if (prefetchedStats) return; // Already have prefetched data
 
     setLoading(true);
     fetch(`/api/proximity-stats?lat=${userLat}&lng=${userLng}`)
@@ -85,7 +89,7 @@ export function ProximityHome({ state, onRequestLocation, sessionId, currentLoca
       })
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [userLat, userLng]);
+  }, [userLat, userLng, prefetchedStats]);
 
   // Filter out current location from nearby boards if at a location
   const allNearbyBoards = stats?.nearby_boards || [];

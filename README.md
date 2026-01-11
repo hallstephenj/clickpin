@@ -45,9 +45,6 @@ Business owners can claim their location by paying a Lightning invoice. Once cla
 - Add business information
 - Display a verified badge
 
-### Ghosts
-Top contributors at each location are displayed as "ghosts" - anonymous avatars that represent the most active community members.
-
 ## Tech Stack
 
 - **Frontend**: Next.js 15 (App Router) + TypeScript + Tailwind CSS
@@ -110,7 +107,6 @@ Clickpin uses feature flags to enable/disable functionality:
 | `PAID_PINS` | Lightning payments for posts |
 | `BOOSTS` | Pin boosting with Lightning |
 | `SPONSORSHIPS` | Location sponsorship |
-| `GHOSTS` | Ghost avatars for top contributors |
 | `SEED_PLANTED` | Seed planting feature |
 | `SHARENOTES` | Shareable pin links |
 | `DOODLES` | Drawing on posts |

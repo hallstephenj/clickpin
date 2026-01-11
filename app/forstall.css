@@ -243,13 +243,16 @@
 /* --------------------------------------------------------------------------
    Cards / Pins - Paper Notes with Push Pins
    -------------------------------------------------------------------------- */
+/* Note cards - paper style */
 .forstall-mode .paperweight-pin,
-.forstall-mode .border {
+.forstall-mode article.border,
+.forstall-mode div.border.rounded-lg,
+.forstall-mode [data-note-card] {
   background:
     /* Paper texture */
     url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paper'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paper)' opacity='0.03'/%3E%3C/svg%3E"),
-    linear-gradient(180deg, #fdfbf7 0%, #f5f0e6 100%);
-  border: none !important;
+    linear-gradient(180deg, #fdfbf7 0%, #f5f0e6 100%) !important;
+  border: 1px solid #c4a882 !important;
   border-radius: 2px;
   box-shadow:
     /* Paper edge shadow */
@@ -258,12 +261,24 @@
     /* Slight curl effect */
     inset 0 0 20px rgba(0, 0, 0, 0.02);
   position: relative;
-  transform: rotate(-0.5deg);
-  margin: 16px 8px;
+  color: #333 !important;
 }
 
-/* Push pin */
-.forstall-mode .paperweight-pin::before {
+/* Note card text */
+.forstall-mode .paperweight-pin p,
+.forstall-mode article.border p,
+.forstall-mode div.border.rounded-lg p {
+  color: #333 !important;
+}
+
+.forstall-mode .paperweight-pin .text-xs,
+.forstall-mode article.border .text-xs,
+.forstall-mode div.border.rounded-lg .text-xs {
+  color: #6b5b4f !important;
+}
+
+/* Push pin - only on elements specifically marked */
+.forstall-mode [data-pushpin]::before {
   content: '';
   position: absolute;
   top: -8px;
@@ -282,7 +297,7 @@
 }
 
 /* Pin needle */
-.forstall-mode .paperweight-pin::after {
+.forstall-mode [data-pushpin]::after {
   content: '';
   position: absolute;
   top: 12px;
@@ -293,19 +308,6 @@
   background: linear-gradient(180deg, #888 0%, #666 100%);
   border-radius: 0 0 2px 2px;
   z-index: 9;
-}
-
-/* Alternate pin rotations for variety */
-.forstall-mode .paperweight-pin:nth-child(odd) {
-  transform: rotate(0.8deg);
-}
-
-.forstall-mode .paperweight-pin:nth-child(3n) {
-  transform: rotate(-1.2deg);
-}
-
-.forstall-mode .paperweight-pin:nth-child(4n) {
-  transform: rotate(0.3deg);
 }
 
 /* --------------------------------------------------------------------------
@@ -343,17 +345,44 @@
 /* --------------------------------------------------------------------------
    Modals - Wooden Frame
    -------------------------------------------------------------------------- */
-.forstall-mode .fixed.inset-0 > div:not(.bg-black\/60) {
+/* Modal backdrop - ensure proper dark overlay */
+.forstall-mode [data-modal-backdrop],
+.forstall-mode .bg-black\/60 {
+  background: rgba(0, 0, 0, 0.7) !important;
+}
+
+/* Modal content wrapper - paper background with wood frame */
+.forstall-mode [data-modal-content],
+.forstall-mode .fixed.inset-0.flex > div.bg-white,
+.forstall-mode .fixed.inset-0.flex > div.bg-\[var\(--bg\)\],
+.forstall-mode .fixed.inset-0 > div.flex > div.bg-white,
+.forstall-mode .fixed.inset-0 > div.flex > div.bg-\[var\(--bg\)\] {
   background:
     url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='wood'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.02 0.15' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23wood)' opacity='0.1'/%3E%3C/svg%3E"),
-    linear-gradient(180deg, #f5f0e6 0%, #ebe5d8 100%);
-  border: 8px solid;
-  border-image: linear-gradient(180deg, #8b5a2b 0%, #6b4423 50%, #4a3218 100%) 1;
-  border-radius: 0;
+    linear-gradient(180deg, #f5f0e6 0%, #ebe5d8 100%) !important;
+  border: 8px solid #6b4423 !important;
+  border-radius: 4px !important;
   box-shadow:
     inset 0 0 0 2px rgba(255, 255, 255, 0.2),
     0 8px 32px rgba(0, 0, 0, 0.5),
-    0 2px 8px rgba(0, 0, 0, 0.3);
+    0 2px 8px rgba(0, 0, 0, 0.3) !important;
+  color: #333 !important;
+}
+
+/* Modal text colors */
+.forstall-mode [data-modal-content] *,
+.forstall-mode .fixed.inset-0.flex > div.bg-white *,
+.forstall-mode .fixed.inset-0 > div.flex > div.bg-white * {
+  color: inherit;
+}
+
+.forstall-mode [data-modal-content] h1,
+.forstall-mode [data-modal-content] h2,
+.forstall-mode [data-modal-content] h3,
+.forstall-mode .fixed.inset-0 h1,
+.forstall-mode .fixed.inset-0 h2,
+.forstall-mode .fixed.inset-0 h3 {
+  color: #2d1810 !important;
 }
 
 /* --------------------------------------------------------------------------
@@ -388,20 +417,7 @@
   padding: 4px 10px;
 }
 
-/* --------------------------------------------------------------------------
-   Links - Underlined with Ink Effect
-   -------------------------------------------------------------------------- */
-.forstall-mode a {
-  color: #4a6b8a;
-  text-decoration: none;
-  border-bottom: 1px solid rgba(74, 107, 138, 0.4);
-  transition: all 0.2s ease;
-}
-
-.forstall-mode a:hover {
-  color: #2a4b6a;
-  border-bottom-color: rgba(42, 75, 106, 0.8);
-}
+/* Links styling moved to Utility Overrides section for better specificity */
 
 /* --------------------------------------------------------------------------
    Seed Badge Styles - Wax Seal Effect
@@ -434,16 +450,14 @@
 }
 
 /* --------------------------------------------------------------------------
-   QR Codes - Photo Frame Effect
+   QR Codes - Photo Frame Effect (for rounded QR containers)
    -------------------------------------------------------------------------- */
-.forstall-mode .bg-white.rounded {
-  background: #fff;
-  border: 8px solid;
-  border-image: linear-gradient(180deg, #f5f0e6 0%, #d4c8b8 50%, #a89888 100%) 1;
+.forstall-mode .bg-white.rounded:not(.rounded-full) {
+  background: #fff !important;
+  border: 4px solid #8b5a2b;
   box-shadow:
     inset 0 0 0 1px rgba(0, 0, 0, 0.1),
     0 4px 12px rgba(0, 0, 0, 0.3);
-  padding: 16px;
 }
 
 /* --------------------------------------------------------------------------
@@ -478,22 +492,21 @@
 /* --------------------------------------------------------------------------
    Tabs - Leather Dividers
    -------------------------------------------------------------------------- */
-.forstall-mode .flex.gap-1 button,
 .forstall-mode [role="tablist"] button {
   background: linear-gradient(180deg, #6b4c3a 0%, #5c3d2e 50%, #4d2e20 100%);
   border: 1px solid #3d2517;
-  color: #d4c4b4;
+  color: #d4c4b4 !important;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.5);
   border-radius: 6px 6px 0 0;
   margin-bottom: -1px;
   padding: 10px 20px;
 }
 
-.forstall-mode .flex.gap-1 button.active,
-.forstall-mode [role="tablist"] button[aria-selected="true"] {
+.forstall-mode [role="tablist"] button[aria-selected="true"],
+.forstall-mode [role="tablist"] button.active {
   background: linear-gradient(180deg, #f5f0e6 0%, #ebe5d8 100%);
   border-bottom-color: transparent;
-  color: #4a3728;
+  color: #4a3728 !important;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
@@ -618,9 +631,8 @@
 /* --------------------------------------------------------------------------
    Verified Badge - Embossed Seal
    -------------------------------------------------------------------------- */
-.forstall-mode .text-blue-500,
-.forstall-mode .text-accent {
-  color: #4a6b8a;
+.forstall-mode .text-blue-500 {
+  color: #4a6b8a !important;
 }
 
 /* --------------------------------------------------------------------------
@@ -649,26 +661,27 @@
 }
 
 /* --------------------------------------------------------------------------
-   Overall Warmth Overlay
+   Overall Warmth Overlay - subtle warm tint
    -------------------------------------------------------------------------- */
-.forstall-mode::after {
+.forstall-mode body::after {
   content: '';
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(255, 248, 230, 0.03) 0%, rgba(255, 220, 180, 0.02) 100%);
+  background: linear-gradient(135deg, rgba(255, 248, 230, 0.02) 0%, rgba(255, 220, 180, 0.01) 100%);
   pointer-events: none;
-  z-index: 9999;
+  z-index: 1;
 }
 
 /* --------------------------------------------------------------------------
    Utility Overrides
    -------------------------------------------------------------------------- */
-.forstall-mode .bg-\[var\(--bg\)\],
-.forstall-mode .bg-\[\#fafafa\] {
-  background: transparent !important;
+/* Main content area background */
+.forstall-mode main,
+.forstall-mode .min-h-screen {
+  background: transparent;
 }
 
 .forstall-mode .border-\[var\(--border\)\] {
@@ -676,22 +689,235 @@
 }
 
 .forstall-mode .text-muted,
-.forstall-mode .text-faint {
+.forstall-mode .text-faint,
+.forstall-mode .text-gray-500,
+.forstall-mode .text-gray-600 {
   color: #6b5b4f !important;
 }
 
-/* Dark mode adjustments */
-.forstall-mode.dark .paperweight-pin,
-.forstall-mode.dark .border,
-.forstall-mode .dark .paperweight-pin,
-.forstall-mode .dark .border {
-  background:
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paper'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paper)' opacity='0.05'/%3E%3C/svg%3E"),
-    linear-gradient(180deg, #3d3830 0%, #2d2820 100%);
-  color: #d4c8b8;
+/* Ensure white/light backgrounds get paper treatment */
+.forstall-mode .bg-white:not(.fixed *) {
+  background: linear-gradient(180deg, #fdfbf7 0%, #f5f0e6 100%) !important;
 }
 
-.forstall-mode.dark,
-.forstall-mode .dark {
-  --text-emboss: #d4c8b8;
+/* Header text in leather bar */
+.forstall-mode header *,
+.forstall-mode header a,
+.forstall-mode header span,
+.forstall-mode header button {
+  color: #f5f0e6 !important;
+  border-bottom: none !important;
+}
+
+/* Ensure buttons in header have proper styling */
+.forstall-mode header .btn {
+  color: #333 !important;
+}
+
+/* Fix icon colors */
+.forstall-mode header svg {
+  color: #f5f0e6 !important;
+}
+
+/* Links should be readable */
+.forstall-mode a:not(header a):not(footer a) {
+  color: #4a6b8a !important;
+  border-bottom: 1px solid rgba(74, 107, 138, 0.4);
+}
+
+.forstall-mode a:not(header a):not(footer a):hover {
+  color: #2a4b6a !important;
+  border-bottom-color: rgba(42, 75, 106, 0.8);
+}
+
+/* Default text color for content */
+.forstall-mode p,
+.forstall-mode span:not(header span):not(.text-xs),
+.forstall-mode div:not(header div):not(.fixed div) {
+  color: #333;
+}
+
+/* Seed/tip type posts - orange accent */
+.forstall-mode .bg-orange-50,
+.forstall-mode .bg-amber-50 {
+  background: linear-gradient(180deg, #fff8f0 0%, #fff0e0 100%) !important;
+  border-left: 3px solid var(--bitcoin-gold) !important;
+}
+
+/* Green success states */
+.forstall-mode .text-green-500,
+.forstall-mode .text-green-600 {
+  color: #2d5a2d !important;
+}
+
+.forstall-mode .bg-green-50,
+.forstall-mode .bg-green-100 {
+  background: linear-gradient(180deg, #f0fff0 0%, #e0f8e0 100%) !important;
+}
+
+/* --------------------------------------------------------------------------
+   Additional Text Color Fixes
+   -------------------------------------------------------------------------- */
+/* Ensure all text in main content is readable */
+.forstall-mode main * {
+  --text-primary: #333;
+  --text-secondary: #6b5b4f;
+}
+
+/* Button text - ensure proper contrast */
+.forstall-mode button:not(header button) {
+  color: #333;
+}
+
+.forstall-mode button.bg-\[\#f7931a\],
+.forstall-mode button.btn-primary {
+  color: #fff !important;
+}
+
+/* Labels and small text */
+.forstall-mode label {
+  color: #4a3728 !important;
+}
+
+/* Placeholder text */
+.forstall-mode input::placeholder,
+.forstall-mode textarea::placeholder {
+  color: #9a8a7e !important;
+  opacity: 1;
+}
+
+/* Badge/pill elements - only text pills, not icons */
+.forstall-mode span.rounded-full,
+.forstall-mode div.rounded-full:not(:empty) {
+  border: 1px solid #c4a882;
+}
+
+/* Location name/title in cards */
+.forstall-mode .font-semibold,
+.forstall-mode .font-bold {
+  color: #2d1810;
+}
+
+/* Timestamps and metadata */
+.forstall-mode time,
+.forstall-mode .text-xs.text-gray-500 {
+  color: #8a7a6e !important;
+}
+
+/* QR code container - ensure white background for scannability */
+.forstall-mode .bg-white.p-4,
+.forstall-mode [data-qr-container] {
+  background: #fff !important;
+  border: 4px solid #8b5a2b;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+/* Admin panel specific */
+.forstall-mode .space-y-4 > div {
+  background: linear-gradient(180deg, #fdfbf7 0%, #f5f0e6 100%);
+  border: 1px solid #c4a882;
+  border-radius: 4px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+/* Tab content panels */
+.forstall-mode [role="tabpanel"] {
+  background: linear-gradient(180deg, #f5f0e6 0%, #ebe5d8 100%);
+  border: 1px solid #a08060;
+  border-top: none;
+  padding: 16px;
+}
+
+/* Dropdown/select styling */
+.forstall-mode select option {
+  background: #f5f0e6;
+  color: #333;
+}
+
+/* --------------------------------------------------------------------------
+   Icon Buttons & Action Buttons
+   -------------------------------------------------------------------------- */
+/* Round icon buttons (post button, close buttons, etc.) */
+.forstall-mode button.rounded-full {
+  background: var(--brushed-metal) !important;
+  border: 1px solid #888 !important;
+  box-shadow:
+    var(--shadow-emboss),
+    0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.forstall-mode button.rounded-full:hover {
+  background: linear-gradient(180deg, #e8e8e8 0%, #d0d0d0 50%, #c0c0c0 100%) !important;
+}
+
+/* Bitcoin orange action buttons */
+.forstall-mode button.bg-\[\#f7931a\].rounded-full,
+.forstall-mode button.rounded-full.bg-\[\#f7931a\] {
+  background: linear-gradient(180deg, #ffcc4d 0%, #f7931a 30%, #e07d00 70%, #c66a00 100%) !important;
+  border: 1px solid #8b5a00 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+    0 2px 6px rgba(0, 0, 0, 0.3) !important;
+}
+
+.forstall-mode button.bg-\[\#f7931a\].rounded-full svg,
+.forstall-mode button.rounded-full.bg-\[\#f7931a\] svg {
+  color: #fff !important;
+}
+
+/* Close/X buttons in modals */
+.forstall-mode button[aria-label="Close"],
+.forstall-mode .fixed button.absolute {
+  background: linear-gradient(180deg, #c0c0c0 0%, #a0a0a0 100%) !important;
+  border: 1px solid #666 !important;
+  color: #333 !important;
+}
+
+/* Seed/tip button styling */
+.forstall-mode .text-\[\#f7931a\] svg {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+}
+
+/* --------------------------------------------------------------------------
+   Location Type Selector (Admin Panel)
+   -------------------------------------------------------------------------- */
+.forstall-mode .flex.flex-col.gap-2 label {
+  background: linear-gradient(180deg, #f5f0e6 0%, #ebe5d8 100%);
+  border: 1px solid #c4a882;
+  border-radius: 4px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.forstall-mode .flex.flex-col.gap-2 label:hover {
+  background: linear-gradient(180deg, #fff8f0 0%, #f5ebe0 100%);
+  border-color: #a08060;
+}
+
+.forstall-mode .flex.flex-col.gap-2 label:has(input:checked) {
+  background: linear-gradient(180deg, #fff8f0 0%, #ffe8d0 100%);
+  border-color: var(--bitcoin-gold);
+  box-shadow: 0 0 0 2px rgba(247, 147, 26, 0.2);
+}
+
+/* --------------------------------------------------------------------------
+   Copy Button Styling
+   -------------------------------------------------------------------------- */
+.forstall-mode button.btn:has(svg) {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Tooltip styling */
+.forstall-mode [role="tooltip"] {
+  background: linear-gradient(180deg, #4a3728 0%, #3d2a1a 100%);
+  color: #f5f0e6;
+  border: 1px solid #2d1a0a;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }

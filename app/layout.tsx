@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "./forstall.css";
+import "./neo2026.css";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { ForstallModeProvider } from "@/components/ForstallModeProvider";
 
@@ -62,13 +63,30 @@ export const viewport: Viewport = {
   themeColor: "#92400e",
 };
 
+// Blocking script to apply theme before paint
+const themeScript = `
+(function() {
+  try {
+    var theme = localStorage.getItem('clickpin_theme');
+    if (theme === 'forstall') {
+      document.documentElement.classList.add('forstall-mode');
+    } else if (theme === 'neo2026') {
+      document.documentElement.classList.add('neo2026-mode');
+    }
+  } catch (e) {}
+})();
+`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

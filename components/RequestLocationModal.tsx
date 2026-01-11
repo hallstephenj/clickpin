@@ -159,7 +159,7 @@ export function RequestLocationModal({
                       className="w-4 h-4 m-0 p-0 !w-4"
                     />
                     <Storefront size={16} className="text-gray-500" />
-                    <span className="text-sm font-mono">business (doesn't accept bitcoin)</span>
+                    <span className="text-sm font-mono">business (no bitcoin)</span>
                   </label>
                   <label className={`flex items-center gap-2 p-2 border cursor-pointer transition-colors ${
                     locationType === 'bitcoin_merchant'

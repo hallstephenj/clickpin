@@ -37,6 +37,20 @@
   animation: jiggle 3s ease-in-out infinite;
 }
 
+/* Fade-in animation for page transitions */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
 /* Bitcoin merchant glow effect */
 .bitcoin-merchant-glow {
   box-shadow: inset 0 0 60px rgba(247, 147, 26, 0.15),
