@@ -40,14 +40,10 @@ export async function GET(request: NextRequest) {
     const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 100);
     const offset = parseInt(searchParams.get('offset') || '0');
 
-    // Build query
+    // Build query - first try simple query to check if reports exist
     let query = supabaseAdmin
       .from('sprout_reports')
-      .select(`
-        *,
-        location:locations(id, name, address, lat, lng, location_type),
-        identity:lnurl_identities(id, display_name, anon_nym)
-      `, { count: 'exact' })
+      .select('*', { count: 'exact' })
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
 
@@ -56,14 +52,46 @@ export async function GET(request: NextRequest) {
       query = query.eq('status', status);
     }
 
-    const { data: reports, count, error } = await query;
+    const { data: rawReports, count, error } = await query;
 
     if (error) {
-      console.error('Error fetching sprout reports:', error);
+      console.error('[Sprouts] Error fetching sprout reports:', error);
       return NextResponse.json(
         { error: 'Failed to fetch reports' },
         { status: 500 }
       );
+    }
+
+    console.log('[Sprouts] Found reports:', rawReports?.length, 'total:', count);
+
+    // Now fetch with joins for any found reports
+    const reports = [];
+    if (rawReports && rawReports.length > 0) {
+      for (const report of rawReports) {
+        // Fetch location
+        const { data: location } = await supabaseAdmin
+          .from('locations')
+          .select('id, name, address, lat, lng, location_type')
+          .eq('id', report.location_id)
+          .single();
+
+        // Fetch identity if linked
+        let identity = null;
+        if (report.lnurl_identity_id) {
+          const { data: identityData } = await supabaseAdmin
+            .from('lnurl_identities')
+            .select('id, display_name, anon_nym')
+            .eq('id', report.lnurl_identity_id)
+            .single();
+          identity = identityData;
+        }
+
+        reports.push({
+          ...report,
+          location,
+          identity,
+        });
+      }
     }
 
     return NextResponse.json({
