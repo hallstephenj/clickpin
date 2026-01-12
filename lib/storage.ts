@@ -4,6 +4,30 @@ import { v4 as uuidv4 } from 'uuid';
 const SPROUT_PHOTOS_BUCKET = 'sprout-photos';
 
 /**
+ * Ensure the sprout-photos bucket exists
+ * Creates it if it doesn't exist
+ */
+async function ensureBucketExists(): Promise<void> {
+  const { data: buckets } = await supabaseAdmin.storage.listBuckets();
+
+  const bucketExists = buckets?.some(b => b.name === SPROUT_PHOTOS_BUCKET);
+
+  if (!bucketExists) {
+    console.log('[Storage] Creating sprout-photos bucket...');
+    const { error } = await supabaseAdmin.storage.createBucket(SPROUT_PHOTOS_BUCKET, {
+      public: true,
+      fileSizeLimit: 5 * 1024 * 1024, // 5MB
+    });
+
+    if (error) {
+      console.error('[Storage] Failed to create bucket:', error);
+      throw new Error(`Failed to create storage bucket: ${error.message}`);
+    }
+    console.log('[Storage] Bucket created successfully');
+  }
+}
+
+/**
  * Upload a sprout report photo to Supabase Storage
  *
  * @param base64Data - Base64-encoded image data (with or without data URL prefix)
@@ -43,6 +67,9 @@ export async function uploadSproutPhoto(
   // Generate unique filename
   const filename = `${reportId}/${uuidv4()}.${extension}`;
 
+  // Ensure bucket exists before upload
+  await ensureBucketExists();
+
   // Upload to Supabase Storage
   const { error: uploadError } = await supabaseAdmin.storage
     .from(SPROUT_PHOTOS_BUCKET)
@@ -53,8 +80,8 @@ export async function uploadSproutPhoto(
     });
 
   if (uploadError) {
-    console.error('Error uploading sprout photo:', uploadError);
-    throw new Error('Failed to upload photo');
+    console.error('[Storage] Error uploading sprout photo:', uploadError);
+    throw new Error(`Failed to upload photo: ${uploadError.message}`);
   }
 
   // Get public URL
