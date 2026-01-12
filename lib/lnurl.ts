@@ -40,13 +40,13 @@ export function generateK1(): string {
  */
 export function createLnurlAuth(k1: string, baseUrl?: string): string {
   const base = baseUrl || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-  // Per LUD-04 spec: only tag=login and k1 should be in the URL
-  // The 'action' parameter is optionally sent BY the wallet, not preset
-  const callbackUrl = `${base}/api/lnurl/callback?tag=login&k1=${k1}`;
+  // Include tag=login, k1, and action=login per LNURL-auth best practices
+  const callbackUrl = `${base}/api/lnurl/callback?tag=login&k1=${k1}&action=login`;
 
   // Convert URL to bytes and encode with bech32
+  // LNURL spec uses 1023 character limit (bech32 with checksum)
   const words = bech32.toWords(Buffer.from(callbackUrl, 'utf8'));
-  return bech32.encode('lnurl', words, 2000); // Use high limit for long URLs
+  return bech32.encode('lnurl', words, 1023);
 }
 
 /**
@@ -55,7 +55,7 @@ export function createLnurlAuth(k1: string, baseUrl?: string): string {
  * @returns The decoded callback URL
  */
 export function decodeLnurl(lnurl: string): string {
-  const { words } = bech32.decode(lnurl, 2000);
+  const { words } = bech32.decode(lnurl, 1023);
   const bytes = bech32.fromWords(words);
   return Buffer.from(bytes).toString('utf8');
 }

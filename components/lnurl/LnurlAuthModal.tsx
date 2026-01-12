@@ -58,7 +58,8 @@ export function LnurlAuthModal({ isOpen, onClose, sessionId, onSuccess }: LnurlA
   const handleCopy = async () => {
     if (!lnurl) return;
     try {
-      await navigator.clipboard.writeText(lnurl);
+      // Include lightning: prefix for better wallet compatibility
+      await navigator.clipboard.writeText(`lightning:${lnurl.toUpperCase()}`);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
