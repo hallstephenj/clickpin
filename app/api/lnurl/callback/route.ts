@@ -50,11 +50,16 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    if (!k1 || !sig || !key) {
-      return NextResponse.json(
-        { status: 'ERROR', reason: 'Missing required parameters (k1, sig, key)' },
-        { status: 200 }
-      );
+    // If sig/key are missing, this might be a discovery request
+    // Return LNURL-auth metadata so wallets know this is a valid auth endpoint
+    if (!sig || !key) {
+      console.log('[LNURL] Discovery request (no sig/key), returning metadata');
+      return NextResponse.json({
+        tag: 'login',
+        k1: k1 || '',
+        callback: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://clickpin.io'}/api/lnurl/callback`,
+        action: 'login',
+      }, { status: 200 });
     }
 
     // Validate linking key format
