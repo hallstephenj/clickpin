@@ -194,56 +194,88 @@ export function LnurlAuthModal({ isOpen, onClose, sessionId, onSuccess }: LnurlA
             </>
           )}
 
-          {status === 'verified' && identity && (
-            <>
-              <div className="text-center mb-4">
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 mb-3">
-                  <Check size={24} weight="bold" className="text-green-600" />
+          {status === 'verified' && identity && (() => {
+            // Check if this is a returning user (account created more than 10 seconds ago)
+            const createdAt = new Date(identity.created_at).getTime();
+            const now = Date.now();
+            const isReturningUser = (now - createdAt) > 10000;
+
+            if (isReturningUser) {
+              // Returning user - show welcome back message
+              return (
+                <>
+                  <div className="text-center mb-6">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 mb-3">
+                      <Check size={32} weight="bold" className="text-green-600" />
+                    </div>
+                    <p className="text-lg font-mono text-[var(--fg)]">welcome back!</p>
+                    <p className="text-sm text-muted font-mono mt-2">
+                      signed in as @{identity.display_name || identity.anon_nym}
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={handleSkipName}
+                    className="btn btn-primary text-xs w-full"
+                  >
+                    continue
+                  </button>
+                </>
+              );
+            }
+
+            // New user - show display name setup
+            return (
+              <>
+                <div className="text-center mb-4">
+                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 mb-3">
+                    <Check size={24} weight="bold" className="text-green-600" />
+                  </div>
+                  <p className="text-sm font-mono text-[var(--fg)]">wallet linked!</p>
+                  <p className="text-xs text-muted font-mono mt-1">
+                    you&apos;re now @{identity.anon_nym}
+                  </p>
                 </div>
-                <p className="text-sm font-mono text-[var(--fg)]">wallet linked!</p>
-                <p className="text-xs text-muted font-mono mt-1">
-                  you&apos;re now @{identity.anon_nym}
-                </p>
-              </div>
 
-              {/* Display name input */}
-              <div className="mb-4">
-                <label className="text-xs text-muted font-mono block mb-1">
-                  choose a display name (optional)
-                </label>
-                <input
-                  type="text"
-                  value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value.slice(0, 30))}
-                  placeholder={identity.anon_nym}
-                  className="w-full p-2 border border-[var(--border)] bg-[var(--bg-alt)] text-[var(--fg)] focus:border-[var(--accent)] focus:outline-none font-mono text-sm"
-                />
-                <p className="text-xs text-faint font-mono mt-1">
-                  1-30 chars, letters, numbers, underscores
-                </p>
-              </div>
+                {/* Display name input */}
+                <div className="mb-4">
+                  <label className="text-xs text-muted font-mono block mb-1">
+                    choose a display name (optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value.slice(0, 30))}
+                    placeholder={identity.anon_nym}
+                    className="w-full p-2 border border-[var(--border)] bg-[var(--bg-alt)] text-[var(--fg)] focus:border-[var(--accent)] focus:outline-none font-mono text-sm"
+                  />
+                  <p className="text-xs text-faint font-mono mt-1">
+                    1-30 chars, letters, numbers, underscores
+                  </p>
+                </div>
 
-              {nameError && (
-                <p className="mb-3 text-xs text-danger font-mono">{nameError}</p>
-              )}
+                {nameError && (
+                  <p className="mb-3 text-xs text-danger font-mono">{nameError}</p>
+                )}
 
-              <div className="flex gap-2">
-                <button
-                  onClick={handleSkipName}
-                  className="btn text-xs flex-1"
-                >
-                  skip
-                </button>
-                <button
-                  onClick={handleSaveDisplayName}
-                  disabled={savingName}
-                  className="btn btn-primary text-xs flex-1"
-                >
-                  {savingName ? 'saving...' : 'save'}
-                </button>
-              </div>
-            </>
-          )}
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleSkipName}
+                    className="btn text-xs flex-1"
+                  >
+                    skip
+                  </button>
+                  <button
+                    onClick={handleSaveDisplayName}
+                    disabled={savingName}
+                    className="btn btn-primary text-xs flex-1"
+                  >
+                    {savingName ? 'saving...' : 'save'}
+                  </button>
+                </div>
+              </>
+            );
+          })()}
 
           {status === 'expired' && (
             <div className="text-center">
