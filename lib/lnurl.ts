@@ -25,7 +25,9 @@ export function generateK1(): string {
  */
 export function createLnurlAuth(k1: string, baseUrl?: string): string {
   const base = baseUrl || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-  const callbackUrl = `${base}/api/lnurl/callback?tag=login&k1=${k1}&action=login`;
+  // Per LUD-04 spec: only tag=login and k1 should be in the URL
+  // The 'action' parameter is optionally sent BY the wallet, not preset
+  const callbackUrl = `${base}/api/lnurl/callback?tag=login&k1=${k1}`;
 
   // Convert URL to bytes and encode with bech32
   const words = bech32.toWords(Buffer.from(callbackUrl, 'utf8'));
