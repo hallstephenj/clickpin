@@ -94,23 +94,41 @@ export async function PATCH(
       );
     }
 
-    // Get the report
+    // Get the report (simple query first, then fetch relations)
     const { data: report, error: reportError } = await supabaseAdmin
       .from('sprout_reports')
-      .select(`
-        *,
-        location:locations(id, name, address, lat, lng, location_type),
-        identity:lnurl_identities(id, display_name, anon_nym)
-      `)
+      .select('*')
       .eq('id', id)
       .single();
 
     if (reportError || !report) {
+      console.log('[Sprout Action] Report not found:', id, reportError);
       return NextResponse.json(
         { error: 'Report not found' },
         { status: 404 }
       );
     }
+
+    // Fetch location
+    const { data: location } = await supabaseAdmin
+      .from('locations')
+      .select('id, name, address, lat, lng, location_type')
+      .eq('id', report.location_id)
+      .single();
+
+    // Fetch identity if linked
+    let identity = null;
+    if (report.lnurl_identity_id) {
+      const { data: identityData } = await supabaseAdmin
+        .from('lnurl_identities')
+        .select('id, display_name, anon_nym')
+        .eq('id', report.lnurl_identity_id)
+        .single();
+      identity = identityData;
+    }
+
+    // Attach relations to report
+    const reportWithRelations = { ...report, location, identity };
 
     if (report.status === 'approved') {
       return NextResponse.json(
@@ -128,7 +146,7 @@ export async function PATCH(
         status: newStatus,
         reviewer_notes: notes || null,
         reviewed_at: new Date().toISOString(),
-        reviewed_by: auth.admin.id || null,
+        reviewed_by: auth.admin?.id || null,
       })
       .eq('id', id);
 
@@ -145,9 +163,7 @@ export async function PATCH(
     // If approved, update location and create celebratory pin
     let celebratoryPinId: string | null = null;
 
-    if (action === 'approve') {
-      const location = report.location as { id: string; name: string; address: string; lat: number; lng: number; location_type: string };
-      const identity = report.identity as { id: string; display_name: string | null; anon_nym: string } | null;
+    if (action === 'approve' && location) {
 
       // Update location to bitcoin_merchant
       const { error: locationError } = await supabaseAdmin
