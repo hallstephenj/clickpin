@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { Trophy, Plant, Storefront, MapPin, Lightning, Spinner } from '@phosphor-icons/react';
+import { Trophy, Plant, Storefront, MapPin, Lightning, Spinner, Medal } from '@phosphor-icons/react';
 import { LeaderboardResponse, LeaderboardType, LeaderboardPeriod, LeaderboardEntry } from '@/types';
 import { useSession } from '@/lib/hooks/useSession';
 
@@ -240,19 +240,19 @@ function LeaderboardRow({
       }`}
     >
       {/* Rank */}
-      <div className="w-10 text-center">
+      <div className="w-10 flex justify-center">
         {entry.rank <= 3 ? (
-          <span
-            className={`text-lg ${
+          <Medal
+            size={24}
+            weight="fill"
+            className={
               entry.rank === 1
                 ? 'text-yellow-500'
                 : entry.rank === 2
                 ? 'text-gray-400'
                 : 'text-amber-700'
-            }`}
-          >
-            {entry.rank === 1 ? '🥇' : entry.rank === 2 ? '🥈' : '🥉'}
-          </span>
+            }
+          />
         ) : (
           <span className="text-sm text-muted font-mono">#{entry.rank}</span>
         )}
