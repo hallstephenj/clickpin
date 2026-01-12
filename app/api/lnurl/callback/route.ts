@@ -19,10 +19,15 @@ import { getFeatureFlags } from '@/lib/featureFlags';
  * Error: { status: 'ERROR', reason: 'error message' }
  */
 export async function GET(request: NextRequest) {
+  console.log('[LNURL] Callback received:', request.url);
+
   try {
     // Check if feature is enabled
     const flags = await getFeatureFlags();
+    console.log('[LNURL] Feature flag LNURL_AUTH:', flags.LNURL_AUTH);
+
     if (!flags.LNURL_AUTH) {
+      console.log('[LNURL] Feature disabled, returning error');
       return NextResponse.json(
         { status: 'ERROR', reason: 'LNURL-auth feature is not enabled' },
         { status: 200 } // LNURL spec requires 200 even for errors
@@ -34,6 +39,8 @@ export async function GET(request: NextRequest) {
     const k1 = searchParams.get('k1');
     const sig = searchParams.get('sig');
     const key = searchParams.get('key');
+
+    console.log('[LNURL] Params:', { tag, k1: k1?.slice(0, 16) + '...', sig: sig?.slice(0, 16) + '...', key: key?.slice(0, 16) + '...' });
 
     // Validate required parameters
     if (tag !== 'login') {
@@ -88,9 +95,21 @@ export async function GET(request: NextRequest) {
     }
 
     // Verify the signature
-    const signatureValid = verifyLnurlSignature(k1, sig, key);
+    console.log('[LNURL] Verifying signature...');
+    let signatureValid = false;
+    try {
+      signatureValid = verifyLnurlSignature(k1, sig, key);
+      console.log('[LNURL] Signature verification result:', signatureValid);
+    } catch (sigError) {
+      console.error('[LNURL] Signature verification threw:', sigError);
+      return NextResponse.json(
+        { status: 'ERROR', reason: 'Signature verification failed' },
+        { status: 200 }
+      );
+    }
 
     if (!signatureValid) {
+      console.log('[LNURL] Signature invalid');
       return NextResponse.json(
         { status: 'ERROR', reason: 'Invalid signature' },
         { status: 200 }
