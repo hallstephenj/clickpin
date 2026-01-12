@@ -50,10 +50,10 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // If sig/key are missing, this might be a discovery request
+    // If k1, sig, or key are missing, this might be a discovery request
     // Return LNURL-auth metadata so wallets know this is a valid auth endpoint
-    if (!sig || !key) {
-      console.log('[LNURL] Discovery request (no sig/key), returning metadata');
+    if (!k1 || !sig || !key) {
+      console.log('[LNURL] Discovery request (missing params), returning metadata');
       return NextResponse.json({
         tag: 'login',
         k1: k1 || '',
