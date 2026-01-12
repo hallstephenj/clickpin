@@ -70,23 +70,29 @@ export default function LeaderboardPage() {
     <div className="min-h-screen bg-[#fafafa] dark:bg-[#0a0a0a]">
       {/* Header */}
       <header className="border-b border-[var(--border)]">
-        <div className="max-w-2xl mx-auto px-4 py-6">
-          <div className="flex items-center gap-3 mb-4">
-            <Trophy size={32} weight="fill" className="text-[var(--accent)]" />
-            <h1 className="text-2xl font-bold text-[var(--fg)]">Leaderboard</h1>
-          </div>
-          <p className="text-sm text-muted max-w-lg">
-            Track the top Bitcoin advocates in the community. Rankings are based on
-            real-world actions: planting seeds (starting conversations about Bitcoin),
-            confirming sprouts (reporting merchants that now accept Bitcoin), and
-            reaching new locations.
-          </p>
+        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2 hover:opacity-80">
+            <Lightning size={20} weight="fill" className="text-[#f7931a]" />
+            <span className="font-bold">clickpin</span>
+          </Link>
+          <Link href="/" className="btn">
+            ← back
+          </Link>
         </div>
       </header>
 
       {/* Main content */}
-      <main className="max-w-2xl mx-auto px-4 py-6">
-        {/* Explanation cards */}
+      <main className="max-w-2xl mx-auto px-4 py-8">
+        {/* Hero */}
+        <div className="text-center mb-8">
+          <Trophy size={64} weight="fill" className="text-[var(--accent)] mx-auto mb-4" />
+          <h1 className="text-3xl font-bold mb-2">leaderboard</h1>
+          <p className="text-[var(--fg-muted)] font-mono max-w-md mx-auto">
+            track the top bitcoin advocates. rankings based on real-world actions.
+          </p>
+        </div>
+
+        {/* Type selector cards */}
         <div className="grid gap-3 mb-6">
           {TYPE_OPTIONS.map((option) => {
             const Icon = option.icon;
