@@ -212,6 +212,7 @@ export default async function SharedPinPage({ params }: PageProps) {
         <footer className="border-t border-[var(--border)] mt-8">
           <div className="max-w-2xl mx-auto px-8 py-6 flex flex-wrap justify-center gap-x-3 sm:gap-x-6 gap-y-2 text-xs text-faint">
             <a href="/map" className="hover:text-[var(--fg-muted)] transition-colors">nearby</a>
+            <a href="/leaderboard" className="hover:text-[var(--fg-muted)] transition-colors">leaderboard</a>
             <a href="/about" className="hover:text-[var(--fg-muted)] transition-colors">about</a>
             <a href="/terms" className="hover:text-[var(--fg-muted)] transition-colors">terms</a>
             <a href="/privacy" className="hover:text-[var(--fg-muted)] transition-colors">privacy</a>

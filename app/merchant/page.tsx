@@ -173,6 +173,7 @@ export default function MerchantPortalPage() {
       <footer className="fixed bottom-0 left-0 right-0 border-t border-[var(--border)] bg-[#fafafa] dark:bg-[#0a0a0a]">
         <div className="max-w-2xl mx-auto px-8 py-3 flex flex-wrap justify-center gap-x-3 sm:gap-x-6 gap-y-2 text-xs text-faint">
           <a href="/" className="hover:text-[var(--fg-muted)] transition-colors">home</a>
+          <a href="/leaderboard" className="hover:text-[var(--fg-muted)] transition-colors">leaderboard</a>
           <a href="/about" className="hover:text-[var(--fg-muted)] transition-colors">about</a>
         </div>
       </footer>

@@ -624,6 +624,7 @@ export default function MerchantDashboardPage() {
         <div className="max-w-2xl mx-auto px-8 py-3 flex flex-wrap justify-center gap-x-3 sm:gap-x-6 gap-y-2 text-xs text-faint">
           <a href={`/b/${slug}`} className="hover:text-[var(--fg-muted)] transition-colors">board</a>
           <a href="/" className="hover:text-[var(--fg-muted)] transition-colors">home</a>
+          <a href="/leaderboard" className="hover:text-[var(--fg-muted)] transition-colors">leaderboard</a>
           <a href="/about" className="hover:text-[var(--fg-muted)] transition-colors">about</a>
         </div>
       </footer>

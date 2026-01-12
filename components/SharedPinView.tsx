@@ -207,6 +207,7 @@ export function SharedPinView({ data }: { data: SharedPinData }) {
       <footer className="border-t border-[var(--border)] mt-8">
         <div className="max-w-2xl mx-auto px-8 py-6 flex flex-wrap justify-center gap-x-3 sm:gap-x-6 gap-y-2 text-xs text-faint">
           <Link href="/map" className="hover:text-[var(--fg-muted)] transition-colors">nearby</Link>
+          <Link href="/leaderboard" className="hover:text-[var(--fg-muted)] transition-colors">leaderboard</Link>
           <Link href="/about" className="hover:text-[var(--fg-muted)] transition-colors">about</Link>
           <Link href="/terms" className="hover:text-[var(--fg-muted)] transition-colors">terms</Link>
           <Link href="/privacy" className="hover:text-[var(--fg-muted)] transition-colors">privacy</Link>

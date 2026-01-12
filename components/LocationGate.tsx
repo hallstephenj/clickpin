@@ -180,6 +180,7 @@ export function LocationGate({ state, error, onRequestLocation, sessionId }: Loc
         {/* Footer */}
         <div className="mt-4 px-8 flex flex-wrap justify-center gap-x-3 sm:gap-x-6 gap-y-2 text-xs text-faint">
           <a href="/map" className="hover:text-[var(--fg-muted)] transition-colors">nearby</a>
+          <a href="/leaderboard" className="hover:text-[var(--fg-muted)] transition-colors">leaderboard</a>
           <a href="/merchant" className="hover:text-[var(--fg-muted)] transition-colors">merchants</a>
           <a href="/about" className="hover:text-[var(--fg-muted)] transition-colors">about</a>
           <a href="/terms" className="hover:text-[var(--fg-muted)] transition-colors">terms</a>

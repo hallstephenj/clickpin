@@ -212,6 +212,7 @@ export default function AboutPage() {
         <div className="max-w-2xl mx-auto px-8 py-6 flex flex-wrap justify-center gap-x-3 sm:gap-x-6 gap-y-2 text-xs text-faint">
           <a href="/?view=nearby" className="hover:text-[var(--fg-muted)] transition-colors">nearby</a>
           <a href="/map" className="hover:text-[var(--fg-muted)] transition-colors">map</a>
+          <a href="/leaderboard" className="hover:text-[var(--fg-muted)] transition-colors">leaderboard</a>
           <a href="/merchant" className="hover:text-[var(--fg-muted)] transition-colors">merchants</a>
           <a href="/about" className="hover:text-[var(--fg-muted)] transition-colors">about</a>
           <a href="/terms" className="hover:text-[var(--fg-muted)] transition-colors">terms</a>
