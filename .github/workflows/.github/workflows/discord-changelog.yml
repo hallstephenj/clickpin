@@ -1,0 +1,37 @@
+name: Discord Changelog
+on:
+  release:
+    types: [published]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post release to Discord
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          NAME: ${{ github.event.release.name }}
+          TAG: ${{ github.event.release.tag_name }}
+          URL: ${{ github.event.release.html_url }}
+          BODY: ${{ github.event.release.body }}
+          REPO: ${{ github.repository }}
+        run: |
+          python - <<'PY'
+          import json, os, urllib.request
+          body = (os.environ.get("BODY") or "").strip()
+          if len(body) > 1500: body = body[:1500] + "…"
+          payload = {
+            "embeds": [{
+              "title": f"{os.environ['REPO']} • {os.environ.get('NAME') or os.environ['TAG']}",
+              "url": os.environ["URL"],
+              "description": body or "(no release notes)"
+            }]
+          }
+          req = urllib.request.Request(
+            os.environ["DISCORD_WEBHOOK"],
+            data=json.dumps(payload).encode("utf-8"),
+            headers={"Content-Type":"application/json"},
+            method="POST",
+          )
+          urllib.request.urlopen(req).read()
+          PY
