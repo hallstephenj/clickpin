@@ -6,23 +6,11 @@
 
 import crypto from 'crypto';
 import { bech32 } from 'bech32';
-import * as secp256k1 from '@noble/secp256k1';
+import { ec as EC } from 'elliptic';
 import { LnurlIdentity } from '@/types';
 
-// Configure sha256 for @noble/secp256k1 v3 using Node's built-in crypto
-// This is required for sync signature verification
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-(secp256k1.hashes as any).sha256 = (message: Uint8Array): Uint8Array => {
-  return new Uint8Array(crypto.createHash('sha256').update(message).digest());
-};
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-(secp256k1.hashes as any).hmacSha256 = (key: Uint8Array, ...messages: Uint8Array[]): Uint8Array => {
-  const hmac = crypto.createHmac('sha256', key);
-  for (const msg of messages) {
-    hmac.update(msg);
-  }
-  return new Uint8Array(hmac.digest());
-};
+// Use elliptic library for secp256k1 signature verification
+const secp256k1 = new EC('secp256k1');
 
 /**
  * Generate a random k1 challenge (32 bytes as hex string)
@@ -64,102 +52,28 @@ export function decodeLnurl(lnurl: string): string {
  * Verify an LNURL-auth signature
  * The wallet signs the k1 challenge using its linking key (secp256k1)
  *
- * @param k1 - The original challenge (hex string)
+ * @param k1 - The original challenge (hex string, 64 chars = 32 bytes)
  * @param sig - The DER-encoded signature from the wallet (hex string)
  * @param key - The wallet's public key / linking key (hex string, 66 chars compressed)
  * @returns boolean indicating if signature is valid
  */
 export function verifyLnurlSignature(k1: string, sig: string, key: string): boolean {
   try {
-    // Convert hex strings to Uint8Arrays
-    const k1Bytes = hexToBytes(k1);
-    const signature = hexToBytes(sig);
-    const publicKey = hexToBytes(key);
+    // Create key from public key hex
+    const pubKey = secp256k1.keyFromPublic(key, 'hex');
 
-    // The signature should be in DER format, we need to convert to compact format
-    // secp256k1.verify expects a 64-byte compact signature
-    const compactSig = derToCompact(signature);
-    if (!compactSig) {
-      console.error('Failed to parse DER signature');
-      return false;
-    }
+    // The k1 is the message (32 bytes as hex)
+    // Wallets sign the raw k1 bytes, not a hash of it
+    const k1Bytes = Buffer.from(k1, 'hex');
+
+    // Signature is in DER format - elliptic handles this directly
+    const sigBuffer = Buffer.from(sig, 'hex');
 
     // Verify the signature
-    return secp256k1.verify(compactSig, k1Bytes, publicKey);
+    return pubKey.verify(k1Bytes, sigBuffer);
   } catch (error) {
     console.error('Signature verification error:', error);
     return false;
-  }
-}
-
-/**
- * Convert hex string to Uint8Array
- */
-function hexToBytes(hex: string): Uint8Array {
-  const bytes = new Uint8Array(hex.length / 2);
-  for (let i = 0; i < bytes.length; i++) {
-    bytes[i] = parseInt(hex.substr(i * 2, 2), 16);
-  }
-  return bytes;
-}
-
-/**
- * Convert a DER-encoded signature to compact format (64 bytes)
- * DER format: 0x30 [total-length] 0x02 [r-length] [r] 0x02 [s-length] [s]
- */
-function derToCompact(der: Uint8Array): Uint8Array | null {
-  try {
-    // Check DER prefix
-    if (der[0] !== 0x30) {
-      return null;
-    }
-
-    let offset = 2; // Skip 0x30 and length byte
-
-    // Parse r
-    if (der[offset] !== 0x02) return null;
-    offset++;
-    const rLen = der[offset];
-    offset++;
-    let rStart = offset;
-    let rActualLen = rLen;
-
-    // Skip leading zero padding
-    if (der[rStart] === 0x00 && rLen > 32) {
-      rStart++;
-      rActualLen--;
-    }
-
-    offset += rLen;
-
-    // Parse s
-    if (der[offset] !== 0x02) return null;
-    offset++;
-    const sLen = der[offset];
-    offset++;
-    let sStart = offset;
-    let sActualLen = sLen;
-
-    // Skip leading zero padding
-    if (der[sStart] === 0x00 && sLen > 32) {
-      sStart++;
-      sActualLen--;
-    }
-
-    // Create 64-byte compact signature
-    const compact = new Uint8Array(64);
-
-    // Copy r, right-aligned to 32 bytes
-    const rBytes = der.slice(rStart, rStart + rActualLen);
-    compact.set(rBytes, 32 - rActualLen);
-
-    // Copy s, right-aligned to 32 bytes
-    const sBytes = der.slice(sStart, sStart + sActualLen);
-    compact.set(sBytes, 64 - sActualLen);
-
-    return compact;
-  } catch {
-    return null;
   }
 }
 
@@ -229,14 +143,9 @@ export function isValidLinkingKey(key: string): boolean {
       return false;
     }
 
-    // Validate by attempting to get the public key point
-    // In v3, we can use getPublicKey with a private key or validate via Point
-    const pubkeyBytes = hexToBytes(key);
-
-    // Simple validation: check it's the right length and has valid prefix
-    // Full curve validation would require more complex checks
-    // The verify function will fail anyway if the key is invalid
-    return pubkeyBytes.length === 33 && (pubkeyBytes[0] === 0x02 || pubkeyBytes[0] === 0x03);
+    // Try to parse as a public key - elliptic will throw if invalid
+    secp256k1.keyFromPublic(key, 'hex');
+    return true;
   } catch {
     return false;
   }
