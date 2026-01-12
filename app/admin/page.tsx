@@ -222,9 +222,14 @@ export default function AdminPage() {
         // Refresh the list
         fetchSprouts(sproutsFilter);
         setSelectedReport(null);
+      } else {
+        const data = await response.json();
+        console.error('Failed to update sprout report:', data.error);
+        alert(`Failed to ${action} report: ${data.error || 'Unknown error'}`);
       }
     } catch (err) {
       console.error('Failed to update sprout report:', err);
+      alert(`Failed to ${action} report: Network error`);
     } finally {
       setReportActionLoading(null);
     }

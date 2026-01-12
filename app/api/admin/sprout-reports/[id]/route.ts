@@ -83,8 +83,11 @@ export async function PATCH(
     const body = await request.json();
     const { action, notes } = body;
 
+    console.log('[Sprout Action] Report:', id, 'Action:', action);
+
     // Validate action
     if (!['approve', 'reject', 'needs_info'].includes(action)) {
+      console.log('[Sprout Action] Invalid action:', action);
       return NextResponse.json(
         { error: 'Invalid action' },
         { status: 400 }
@@ -130,12 +133,14 @@ export async function PATCH(
       .eq('id', id);
 
     if (updateError) {
-      console.error('Error updating sprout report:', updateError);
+      console.error('[Sprout Action] Error updating sprout report:', updateError);
       return NextResponse.json(
         { error: 'Failed to update report' },
         { status: 500 }
       );
     }
+
+    console.log('[Sprout Action] Report updated to status:', newStatus);
 
     // If approved, update location and create celebratory pin
     let celebratoryPinId: string | null = null;
