@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { GeolocationState } from '@/types';
 import { RequestLocationModal } from './RequestLocationModal';
-import { LnurlAuthModal } from './lnurl';
+import { LnurlAuthModal, ProfileModal } from './lnurl';
 import { useLnurlIdentity } from '@/lib/hooks/useLnurlIdentity';
 import { useFeatureFlags } from '@/lib/hooks/useFeatureFlags';
 import { Lightning } from '@phosphor-icons/react';
@@ -40,12 +40,14 @@ interface LocationGateProps {
 export function LocationGate({ state, error, onRequestLocation, sessionId }: LocationGateProps) {
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
 
   const { flags } = useFeatureFlags();
   const {
     identity: lnurlIdentity,
     isLinked: isLnurlLinked,
     refetch: refetchIdentity,
+    unlink: unlinkIdentity,
   } = useLnurlIdentity(sessionId, flags.LNURL_AUTH || false);
 
   const isLoading = state.status === 'requesting';
@@ -152,7 +154,12 @@ export function LocationGate({ state, error, onRequestLocation, sessionId }: Loc
                 <>
                   <Lightning size={14} weight="fill" className="text-[var(--accent)]" />
                   <span className="text-muted">signed in as</span>
-                  <span className="text-[var(--fg)]">@{lnurlIdentity?.display_name || lnurlIdentity?.anon_nym}</span>
+                  <button
+                    onClick={() => setProfileModalOpen(true)}
+                    className="text-[var(--fg)] hover:text-[var(--accent)] hover:underline"
+                  >
+                    @{lnurlIdentity?.display_name || lnurlIdentity?.anon_nym}
+                  </button>
                 </>
               ) : (
                 <>
@@ -198,6 +205,18 @@ export function LocationGate({ state, error, onRequestLocation, sessionId }: Loc
           onClose={() => setAuthModalOpen(false)}
           sessionId={sessionId}
           onSuccess={refetchIdentity}
+        />
+      )}
+
+      {/* Profile Modal */}
+      {flags.LNURL_AUTH && sessionId && (
+        <ProfileModal
+          isOpen={profileModalOpen}
+          onClose={() => setProfileModalOpen(false)}
+          sessionId={sessionId}
+          identity={lnurlIdentity}
+          onUpdate={refetchIdentity}
+          onUnlink={unlinkIdentity}
         />
       )}
     </div>

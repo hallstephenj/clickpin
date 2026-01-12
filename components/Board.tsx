@@ -12,7 +12,7 @@ import { ClaimButton, ClaimModal, VerifiedBadge, WelcomeBanner, TipJarButton, Ti
 import { BoardBanner, bitcoinMerchantGlowClass } from './BoardBanner';
 import { SeedCounter } from './SeedCounter';
 import { SeedPlantedButton } from './SeedPlantedButton';
-import { LnurlAuthModal } from './lnurl';
+import { LnurlAuthModal, ProfileModal } from './lnurl';
 import { useLnurlIdentity } from '@/lib/hooks/useLnurlIdentity';
 import { useFeatureFlags } from '@/lib/hooks/useFeatureFlags';
 import { isFancyBoardActive } from '@/lib/featureFlags';
@@ -79,12 +79,14 @@ export function Board({
   const [infoModalOpen, setInfoModalOpen] = useState(false);
   const [tipModalOpen, setTipModalOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
 
   // LNURL identity (if feature is enabled)
   const {
     identity: lnurlIdentity,
     isLinked: isLnurlLinked,
     refetch: refetchIdentity,
+    unlink: unlinkIdentity,
   } = useLnurlIdentity(sessionId, flags.LNURL_AUTH || false);
 
   // Determine if this is a merchant location (can be claimed)
@@ -549,7 +551,12 @@ export function Board({
                 <>
                   <Lightning size={14} weight="fill" className="text-[var(--accent)]" />
                   <span className="text-muted">signed in as</span>
-                  <span className="text-[var(--fg)]">@{lnurlIdentity?.display_name || lnurlIdentity?.anon_nym}</span>
+                  <button
+                    onClick={() => setProfileModalOpen(true)}
+                    className="text-[var(--fg)] hover:text-[var(--accent)] hover:underline"
+                  >
+                    @{lnurlIdentity?.display_name || lnurlIdentity?.anon_nym}
+                  </button>
                 </>
               ) : (
                 <>
@@ -656,6 +663,17 @@ export function Board({
           onClose={() => setAuthModalOpen(false)}
           sessionId={sessionId}
           onSuccess={refetchIdentity}
+        />
+      )}
+
+      {flags.LNURL_AUTH && sessionId && (
+        <ProfileModal
+          isOpen={profileModalOpen}
+          onClose={() => setProfileModalOpen(false)}
+          sessionId={sessionId}
+          identity={lnurlIdentity}
+          onUpdate={refetchIdentity}
+          onUnlink={unlinkIdentity}
         />
       )}
     </div>
