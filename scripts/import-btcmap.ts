@@ -141,7 +141,7 @@ async function importLocations(lat: number, lon: number, radiusKm: number, cityN
       slug,
       lat: place.lat,
       lng: place.lon,
-      radius_m: 100,
+      radius_m: 50,
       is_active: true,
       category,
       city: cityName,

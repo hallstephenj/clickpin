@@ -5,6 +5,7 @@ import { config } from '@/lib/config';
 import { v4 as uuidv4 } from 'uuid';
 import { isValidEnum } from '@/lib/validation';
 import { BADGE_OPTIONS } from '@/types';
+import { formatAuthorNym } from '@/lib/lnurl';
 
 // POST /api/pin - Create a new pin
 export async function POST(request: NextRequest) {
@@ -32,6 +33,31 @@ export async function POST(request: NextRequest) {
     }
 
     const { device_session_id, location_id } = tokenResult.token;
+
+    // Get device session's identity for attribution
+    let lnurlIdentityId: string | null = null;
+    let authorNym: string | null = null;
+
+    const { data: sessionWithIdentity } = await supabaseAdmin
+      .from('device_sessions')
+      .select('lnurl_identity_id')
+      .eq('id', device_session_id)
+      .single();
+
+    if (sessionWithIdentity?.lnurl_identity_id) {
+      lnurlIdentityId = sessionWithIdentity.lnurl_identity_id;
+
+      // Get identity to capture the nym at post time
+      const { data: identity } = await supabaseAdmin
+        .from('lnurl_identities')
+        .select('display_name, anon_nym')
+        .eq('id', lnurlIdentityId)
+        .single();
+
+      if (identity) {
+        authorNym = formatAuthorNym(identity);
+      }
+    }
 
     // Validate pin body
     if (!pinBody || typeof pinBody !== 'string') {
@@ -142,6 +168,9 @@ export async function POST(request: NextRequest) {
         body: pinBody.trim(),
         doodle_data: doodle_data || null,
         badge: badge || null,
+        // LNURL identity attribution
+        lnurl_identity_id: lnurlIdentityId,
+        author_nym: authorNym,
         // Fancy board fields (all nullable)
         x: x ?? null,
         y: y ?? null,

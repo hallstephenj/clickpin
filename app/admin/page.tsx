@@ -75,8 +75,35 @@ interface FeatureFlag {
   updated_at: string;
 }
 
-type Tab = 'stats' | 'requests' | 'locations' | 'flags' | 'controls';
+type Tab = 'stats' | 'requests' | 'locations' | 'flags' | 'controls' | 'sprouts';
 type View = 'list' | 'pins' | 'detail';
+
+interface SproutReport {
+  id: string;
+  location_id: string;
+  device_session_id: string;
+  lnurl_identity_id: string | null;
+  photo_url: string;
+  payment_type: string;
+  context: string | null;
+  status: string;
+  reviewer_notes: string | null;
+  reviewed_at: string | null;
+  created_at: string;
+  location: {
+    id: string;
+    name: string;
+    address: string | null;
+    lat: number;
+    lng: number;
+    location_type: string;
+  } | null;
+  identity: {
+    id: string;
+    display_name: string | null;
+    anon_nym: string;
+  } | null;
+}
 
 interface AdminStats {
   posts: { total: number; today: number; thisWeek: number; hidden: number };
@@ -110,6 +137,11 @@ export default function AdminPage() {
   // Locations state
   const [locations, setLocations] = useState<Location[]>([]);
   const [locationsLoading, setLocationsLoading] = useState(false);
+  const [locationsPage, setLocationsPage] = useState(1);
+  const [locationsTotalPages, setLocationsTotalPages] = useState(1);
+  const [locationsTotal, setLocationsTotal] = useState(0);
+  const [locationsSearch, setLocationsSearch] = useState('');
+  const [locationsSource, setLocationsSource] = useState<'all' | 'btcmap' | 'manual'>('all');
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const [locationPins, setLocationPins] = useState<Pin[]>([]);
   const [pinsLoading, setPinsLoading] = useState(false);
@@ -137,6 +169,13 @@ export default function AdminPage() {
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [statsLoading, setStatsLoading] = useState(false);
 
+  // Sprouts state
+  const [sproutReports, setSproutReports] = useState<SproutReport[]>([]);
+  const [sproutsLoading, setSproutsLoading] = useState(false);
+  const [sproutsFilter, setSproutsFilter] = useState<'pending' | 'all'>('pending');
+  const [selectedReport, setSelectedReport] = useState<SproutReport | null>(null);
+  const [reportActionLoading, setReportActionLoading] = useState<string | null>(null);
+
   const fetchStats = useCallback(async () => {
     setStatsLoading(true);
     try {
@@ -153,6 +192,43 @@ export default function AdminPage() {
       setStatsLoading(false);
     }
   }, []);
+
+  const fetchSprouts = useCallback(async (status: 'pending' | 'all' = 'pending') => {
+    setSproutsLoading(true);
+    try {
+      const response = await fetch(`/api/admin/sprout-reports?status=${status}`, {
+        headers: getAuthHeaders(),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setSproutReports(data.reports || []);
+      }
+    } catch (err) {
+      console.error('Failed to fetch sprout reports:', err);
+    } finally {
+      setSproutsLoading(false);
+    }
+  }, []);
+
+  const handleSproutAction = async (reportId: string, action: 'approve' | 'reject' | 'needs_info', notes?: string) => {
+    setReportActionLoading(reportId);
+    try {
+      const response = await fetch(`/api/admin/sprout-reports/${reportId}`, {
+        method: 'PATCH',
+        headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, notes }),
+      });
+      if (response.ok) {
+        // Refresh the list
+        fetchSprouts(sproutsFilter);
+        setSelectedReport(null);
+      }
+    } catch (err) {
+      console.error('Failed to update sprout report:', err);
+    } finally {
+      setReportActionLoading(null);
+    }
+  };
 
   const fetchRequests = useCallback(async () => {
     setRequestsLoading(true);
@@ -171,15 +247,21 @@ export default function AdminPage() {
     }
   }, []);
 
-  const fetchLocations = useCallback(async () => {
+  const fetchLocations = useCallback(async (page = 1, search = '', source: 'all' | 'btcmap' | 'manual' = 'all') => {
     setLocationsLoading(true);
     try {
-      const response = await fetch('/api/admin/locations', {
+      const params = new URLSearchParams({ page: String(page), limit: '50', source });
+      if (search) params.set('search', search);
+
+      const response = await fetch(`/api/admin/locations?${params}`, {
         headers: getAuthHeaders(),
       });
       if (response.ok) {
         const data = await response.json();
         setLocations(data.locations || []);
+        setLocationsPage(data.pagination?.page || 1);
+        setLocationsTotalPages(data.pagination?.totalPages || 1);
+        setLocationsTotal(data.pagination?.total || 0);
       }
     } catch (err) {
       console.error('Failed to fetch locations:', err);
@@ -301,12 +383,14 @@ export default function AdminPage() {
       } else if (activeTab === 'requests') {
         fetchRequests();
       } else if (activeTab === 'locations') {
-        fetchLocations();
+        fetchLocations(1, '', locationsSource);
       } else if (activeTab === 'flags') {
         fetchFlags();
+      } else if (activeTab === 'sprouts') {
+        fetchSprouts(sproutsFilter);
       }
     }
-  }, [user, activeTab, currentView, fetchRequests, fetchLocations, fetchFlags, fetchStats, fetchDesignTheme, featureFlags.length]);
+  }, [user, activeTab, currentView, fetchRequests, fetchLocations, fetchFlags, fetchStats, fetchDesignTheme, fetchSprouts, featureFlags.length, sproutsFilter]);
 
   // Helper to check if a feature flag is enabled
   const isFeatureEnabled = (key: string) => {
@@ -605,7 +689,7 @@ export default function AdminPage() {
       });
 
       if (response.ok) {
-        await fetchLocations();
+        await fetchLocations(locationsPage, locationsSearch, locationsSource);
       } else {
         const data = await response.json();
         alert(data.error || 'Failed to delete location');
@@ -630,7 +714,7 @@ export default function AdminPage() {
       if (response.ok) {
         const data = await response.json();
         alert(`Deleted ${data.deleted_count} posts from ${location.name}`);
-        await fetchLocations();
+        await fetchLocations(locationsPage, locationsSearch, locationsSource);
       } else {
         const data = await response.json();
         alert(data.error || 'Failed to clear posts');
@@ -1334,6 +1418,18 @@ export default function AdminPage() {
           >
             requests {groups.length > 0 && `(${groups.length})`}
           </button>
+          {isFeatureEnabled('SEED_SPROUTED') && (
+            <button
+              onClick={() => setActiveTab('sprouts')}
+              className={`px-4 py-2 font-mono text-sm border-b-2 -mb-px ${
+                activeTab === 'sprouts'
+                  ? 'border-[var(--accent)] text-[var(--accent)]'
+                  : 'border-transparent text-muted hover:text-[var(--fg)]'
+              }`}
+            >
+              sprouts {sproutReports.filter(r => r.status === 'pending').length > 0 && `(${sproutReports.filter(r => r.status === 'pending').length})`}
+            </button>
+          )}
           <button
             onClick={() => setActiveTab('flags')}
             className={`px-4 py-2 font-mono text-sm border-b-2 -mb-px ${
@@ -1535,20 +1631,130 @@ export default function AdminPage() {
         {/* Locations Tab */}
         {activeTab === 'locations' && (
           <>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-mono text-sm text-muted">all locations</h2>
-              <button
-                onClick={fetchLocations}
-                disabled={locationsLoading}
-                className="btn text-xs"
-              >
-                {locationsLoading ? 'loading...' : 'refresh'}
-              </button>
+            <div className="flex flex-col gap-3 mb-4">
+              <div className="flex items-center justify-between">
+                <h2 className="font-mono text-sm text-muted">
+                  locations ({locationsTotal.toLocaleString()})
+                </h2>
+                <button
+                  onClick={() => fetchLocations(locationsPage, locationsSearch, locationsSource)}
+                  disabled={locationsLoading}
+                  className="btn text-xs"
+                >
+                  {locationsLoading ? 'loading...' : 'refresh'}
+                </button>
+              </div>
+
+              {/* Search */}
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="search locations..."
+                  value={locationsSearch}
+                  onChange={(e) => setLocationsSearch(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      setLocationsPage(1);
+                      fetchLocations(1, locationsSearch, locationsSource);
+                    }
+                  }}
+                  className="flex-1 p-2 bg-[var(--bg-alt)] border border-[var(--border)] font-mono text-sm"
+                />
+                <button
+                  onClick={() => {
+                    setLocationsPage(1);
+                    fetchLocations(1, locationsSearch, locationsSource);
+                  }}
+                  className="btn text-xs"
+                >
+                  search
+                </button>
+                {locationsSearch && (
+                  <button
+                    onClick={() => {
+                      setLocationsSearch('');
+                      setLocationsPage(1);
+                      fetchLocations(1, '', locationsSource);
+                    }}
+                    className="btn text-xs"
+                  >
+                    clear
+                  </button>
+                )}
+              </div>
+
+              {/* Source Filter */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted font-mono">filter:</span>
+                <button
+                  onClick={() => {
+                    setLocationsSource('all');
+                    setLocationsPage(1);
+                    fetchLocations(1, locationsSearch, 'all');
+                  }}
+                  className={`btn text-xs ${locationsSource === 'all' ? 'btn-primary' : ''}`}
+                >
+                  all
+                </button>
+                <button
+                  onClick={() => {
+                    setLocationsSource('btcmap');
+                    setLocationsPage(1);
+                    fetchLocations(1, locationsSearch, 'btcmap');
+                  }}
+                  className={`btn text-xs ${locationsSource === 'btcmap' ? 'btn-primary' : ''}`}
+                >
+                  btcmap
+                </button>
+                <button
+                  onClick={() => {
+                    setLocationsSource('manual');
+                    setLocationsPage(1);
+                    fetchLocations(1, locationsSearch, 'manual');
+                  }}
+                  className={`btn text-xs ${locationsSource === 'manual' ? 'btn-primary' : ''}`}
+                >
+                  manual
+                </button>
+              </div>
+
+              {/* Pagination */}
+              {locationsTotalPages > 1 && (
+                <div className="flex items-center justify-center gap-2">
+                  <button
+                    onClick={() => {
+                      const newPage = locationsPage - 1;
+                      setLocationsPage(newPage);
+                      fetchLocations(newPage, locationsSearch, locationsSource);
+                    }}
+                    disabled={locationsPage <= 1 || locationsLoading}
+                    className="btn text-xs"
+                  >
+                    ← prev
+                  </button>
+                  <span className="font-mono text-xs text-muted">
+                    page {locationsPage} of {locationsTotalPages}
+                  </span>
+                  <button
+                    onClick={() => {
+                      const newPage = locationsPage + 1;
+                      setLocationsPage(newPage);
+                      fetchLocations(newPage, locationsSearch, locationsSource);
+                    }}
+                    disabled={locationsPage >= locationsTotalPages || locationsLoading}
+                    className="btn text-xs"
+                  >
+                    next →
+                  </button>
+                </div>
+              )}
             </div>
 
             {locations.length === 0 ? (
               <div className="border border-[var(--border)] p-8 text-center">
-                <p className="text-muted font-mono">no locations</p>
+                <p className="text-muted font-mono">
+                  {locationsSearch ? 'no matching locations' : 'no locations'}
+                </p>
               </div>
             ) : (
               <div className="space-y-2">
@@ -2405,7 +2611,7 @@ export default function AdminPage() {
                           const data = await res.json();
                           if (res.ok) {
                             alert(`Synced ${data.synced_count} locations from BTCMap`);
-                            fetchLocations();
+                            fetchLocations(1, '', locationsSource);
                           } else {
                             alert(data.error || 'Failed to sync BTCMap');
                           }
@@ -2439,7 +2645,7 @@ export default function AdminPage() {
                           const data = await res.json();
                           if (res.ok) {
                             alert(`Deleted ${data.deleted_count} BTCMap locations`);
-                            fetchLocations();
+                            fetchLocations(1, '', locationsSource);
                           } else {
                             alert(data.error || 'Failed to clear BTCMap locations');
                           }
@@ -2527,6 +2733,139 @@ export default function AdminPage() {
                 </div>
               </div>
             </div>
+          </>
+        )}
+
+        {/* Sprouts Tab */}
+        {activeTab === 'sprouts' && (
+          <>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-mono">sprout reports</h2>
+              <div className="flex items-center gap-2">
+                <select
+                  value={sproutsFilter}
+                  onChange={(e) => {
+                    setSproutsFilter(e.target.value as 'pending' | 'all');
+                    fetchSprouts(e.target.value as 'pending' | 'all');
+                  }}
+                  className="px-2 py-1 border border-[var(--border)] bg-[var(--bg-alt)] text-[var(--fg)] font-mono text-sm"
+                >
+                  <option value="pending">pending</option>
+                  <option value="all">all</option>
+                </select>
+                <button
+                  onClick={() => fetchSprouts(sproutsFilter)}
+                  disabled={sproutsLoading}
+                  className="btn text-xs"
+                >
+                  {sproutsLoading ? '...' : 'refresh'}
+                </button>
+              </div>
+            </div>
+
+            {sproutsLoading ? (
+              <p className="text-muted font-mono text-sm">loading...</p>
+            ) : sproutReports.length === 0 ? (
+              <p className="text-muted font-mono text-sm">no {sproutsFilter} reports</p>
+            ) : (
+              <div className="space-y-4">
+                {sproutReports.map((report) => (
+                  <div key={report.id} className="border border-[var(--border)] p-4">
+                    <div className="flex gap-4">
+                      {/* Photo thumbnail */}
+                      <div className="flex-shrink-0">
+                        <img
+                          src={report.photo_url}
+                          alt="Sprout evidence"
+                          className="w-24 h-24 object-cover border border-[var(--border)] cursor-pointer"
+                          onClick={() => window.open(report.photo_url, '_blank')}
+                        />
+                      </div>
+
+                      {/* Report details */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <h3 className="font-mono text-sm font-bold truncate">
+                              {report.location?.name || 'Unknown location'}
+                            </h3>
+                            <p className="text-xs text-muted truncate">
+                              {report.location?.address || 'No address'}
+                            </p>
+                          </div>
+                          <span className={`px-2 py-0.5 text-xs font-mono ${
+                            report.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' :
+                            report.status === 'approved' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' :
+                            report.status === 'rejected' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' :
+                            'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
+                          }`}>
+                            {report.status}
+                          </span>
+                        </div>
+
+                        <div className="mt-2 space-y-1">
+                          <p className="text-xs text-muted font-mono">
+                            payment: <span className="text-[var(--fg)]">{report.payment_type}</span>
+                          </p>
+                          {report.identity && (
+                            <p className="text-xs text-muted font-mono">
+                              reporter: <span className="text-[var(--fg)]">@{report.identity.display_name || report.identity.anon_nym}</span>
+                            </p>
+                          )}
+                          {report.context && (
+                            <p className="text-xs text-muted font-mono mt-2">
+                              &quot;{report.context}&quot;
+                            </p>
+                          )}
+                          <p className="text-xs text-faint font-mono">
+                            {new Date(report.created_at).toLocaleString()}
+                          </p>
+                        </div>
+
+                        {/* Actions for pending reports */}
+                        {report.status === 'pending' && (
+                          <div className="mt-3 flex gap-2">
+                            <button
+                              onClick={() => handleSproutAction(report.id, 'approve')}
+                              disabled={reportActionLoading === report.id}
+                              className="btn text-xs bg-green-100 border-green-500 text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-300"
+                            >
+                              {reportActionLoading === report.id ? '...' : 'approve'}
+                            </button>
+                            <button
+                              onClick={() => {
+                                const notes = prompt('Reason for rejection (optional):');
+                                handleSproutAction(report.id, 'reject', notes || undefined);
+                              }}
+                              disabled={reportActionLoading === report.id}
+                              className="btn text-xs bg-red-100 border-red-500 text-red-700 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-300"
+                            >
+                              reject
+                            </button>
+                            <button
+                              onClick={() => {
+                                const notes = prompt('What info is needed?');
+                                if (notes) handleSproutAction(report.id, 'needs_info', notes);
+                              }}
+                              disabled={reportActionLoading === report.id}
+                              className="btn text-xs"
+                            >
+                              needs info
+                            </button>
+                          </div>
+                        )}
+
+                        {report.reviewer_notes && (
+                          <p className="mt-2 text-xs text-muted font-mono italic">
+                            notes: {report.reviewer_notes}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </>
         )}
       </div>

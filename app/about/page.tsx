@@ -106,7 +106,9 @@ export default function AboutPage() {
           </h2>
           <div className="space-y-3 text-[var(--fg-muted)]">
             <p>
-              clickpin uses bitcoin lightning for optional paid features:
+              clickpin uses bitcoin lightning for optional paid features. there are no
+              ads, no data harvesting, and no VC money — just sats from users who want
+              to keep the lights on.
             </p>
             <ul className="space-y-2 ml-4">
               <li className="flex gap-2">
@@ -131,8 +133,8 @@ export default function AboutPage() {
               </li>
             </ul>
             <p className="text-sm">
-              payments are instant, private, and keep the service running without
-              ads or data harvesting.
+              every sat goes directly toward servers, development, and keeping clickpin
+              independent. instant payments, no middlemen.
             </p>
           </div>
         </section>

@@ -1182,6 +1182,12 @@
   letter-spacing: 0;
 }
 
+.neo2026-mode .paperweight-nym {
+  color: var(--neo-text-tertiary);
+  font-size: 10px;
+  opacity: 0.6;
+}
+
 .neo2026-mode .paperweight-mine {
   color: var(--neo-accent-primary);
   font-weight: var(--neo-weight-medium);

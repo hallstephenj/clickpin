@@ -18,6 +18,8 @@ export const DEFAULT_FLAGS: FeatureFlags = {
   PROXHOME_ADVANCED: false,
   MERCHANTS: false,
   SEED_PLANTED: false,
+  LNURL_AUTH: false,
+  SEED_SPROUTED: false,
 };
 
 // All feature flag keys
@@ -37,6 +39,8 @@ export const FEATURE_FLAG_KEYS = [
   'PROXHOME_ADVANCED',
   'MERCHANTS',
   'SEED_PLANTED',
+  'LNURL_AUTH',
+  'SEED_SPROUTED',
 ] as const;
 
 // Server-side: Fetch all flags from database

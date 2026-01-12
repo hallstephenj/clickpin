@@ -7,17 +7,21 @@ import type { SeedOutcome, LocationType } from '@/types';
 
 interface SeedPlantedButtonProps {
   locationId: string;
+  locationName: string;
   locationType: LocationType | undefined;
   presenceToken: string | null;
   seedPlantedEnabled: boolean;
+  sproutEnabled: boolean;
   onSeedPlanted?: () => void;
 }
 
 export function SeedPlantedButton({
   locationId,
+  locationName,
   locationType,
   presenceToken,
   seedPlantedEnabled,
+  sproutEnabled,
   onSeedPlanted,
 }: SeedPlantedButtonProps) {
   const [modalOpen, setModalOpen] = useState(false);
@@ -64,6 +68,35 @@ export function SeedPlantedButton({
     onSeedPlanted?.();
   };
 
+  const handleSproutSubmit = async (data: {
+    photo: string;
+    payment_type: 'lightning' | 'onchain' | 'both' | 'unknown';
+    context?: string;
+  }) => {
+    if (!presenceToken) {
+      throw new Error('Location not verified. Please refresh your location.');
+    }
+
+    const response = await fetch('/api/sprout/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        presence_token: presenceToken,
+        photo: data.photo,
+        payment_type: data.payment_type,
+        context: data.context,
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || 'Failed to submit sprout report');
+    }
+
+    onSeedPlanted?.();
+  };
+
   // Don't show if:
   // - Feature is disabled
   // - Location is not a merchant (bitcoin_merchant or community_space should not show)
@@ -104,6 +137,9 @@ export function SeedPlantedButton({
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         onPlant={handlePlant}
+        onSproutSubmit={sproutEnabled ? handleSproutSubmit : undefined}
+        locationName={locationName}
+        sproutEnabled={sproutEnabled}
       />
     </>
   );

@@ -12,6 +12,8 @@ import { ClaimButton, ClaimModal, VerifiedBadge, WelcomeBanner, TipJarButton, Ti
 import { BoardBanner, bitcoinMerchantGlowClass } from './BoardBanner';
 import { SeedCounter } from './SeedCounter';
 import { SeedPlantedButton } from './SeedPlantedButton';
+import { LnurlAuthModal } from './lnurl';
+import { useLnurlIdentity } from '@/lib/hooks/useLnurlIdentity';
 import { useFeatureFlags } from '@/lib/hooks/useFeatureFlags';
 import { isFancyBoardActive } from '@/lib/featureFlags';
 import { config } from '@/lib/config';
@@ -76,6 +78,14 @@ export function Board({
   const [claimModalOpen, setClaimModalOpen] = useState(false);
   const [infoModalOpen, setInfoModalOpen] = useState(false);
   const [tipModalOpen, setTipModalOpen] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+
+  // LNURL identity (if feature is enabled)
+  const {
+    identity: lnurlIdentity,
+    isLinked: isLnurlLinked,
+    refetch: refetchIdentity,
+  } = useLnurlIdentity(sessionId, flags.LNURL_AUTH || false);
 
   // Determine if this is a merchant location (can be claimed)
   // Any location that's not a community_space can be claimed
@@ -418,9 +428,11 @@ export function Board({
               {flags.SEED_PLANTED && (
                 <SeedPlantedButton
                   locationId={location.id}
+                  locationName={location.name}
                   locationType={locationType}
                   presenceToken={presenceToken}
                   seedPlantedEnabled={flags.SEED_PLANTED}
+                  sproutEnabled={flags.SEED_SPROUTED || false}
                   onSeedPlanted={onRefreshBoard}
                 />
               )}
@@ -528,8 +540,36 @@ export function Board({
         )}
       </main>
 
+      {/* Identity section */}
+      {flags.LNURL_AUTH && sessionId && (
+        <div className="mt-8 px-4">
+          <div className="max-w-2xl mx-auto border-t border-[var(--border)] pt-4">
+            <div className="flex items-center justify-center gap-2 text-xs font-mono">
+              {isLnurlLinked ? (
+                <>
+                  <Lightning size={14} weight="fill" className="text-[var(--accent)]" />
+                  <span className="text-muted">signed in as</span>
+                  <span className="text-[var(--fg)]">@{lnurlIdentity?.display_name || lnurlIdentity?.anon_nym}</span>
+                </>
+              ) : (
+                <>
+                  <span className="text-muted">browsing anonymously</span>
+                  <span className="text-faint">·</span>
+                  <button
+                    onClick={() => setAuthModalOpen(true)}
+                    className="text-[var(--accent)] hover:underline"
+                  >
+                    link wallet
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Footer */}
-      <footer className="mt-8 pb-6 px-8 flex flex-wrap justify-center gap-x-3 sm:gap-x-6 gap-y-2 text-xs text-faint">
+      <footer className="mt-4 pb-6 px-8 flex flex-wrap justify-center gap-x-3 sm:gap-x-6 gap-y-2 text-xs text-faint">
         <a href={flags.PROXHOME_ADVANCED ? '/?view=nearby' : '/map'} className="hover:text-[var(--fg-muted)] transition-colors">nearby</a>
         <a href="/map" className="hover:text-[var(--fg-muted)] transition-colors">map</a>
         {flags.MERCHANTS && (
@@ -607,6 +647,15 @@ export function Board({
           onClose={() => setTipModalOpen(false)}
           lightningAddress={location.merchant_settings.tip_jar_address}
           locationName={location.name}
+        />
+      )}
+
+      {flags.LNURL_AUTH && sessionId && (
+        <LnurlAuthModal
+          isOpen={authModalOpen}
+          onClose={() => setAuthModalOpen(false)}
+          sessionId={sessionId}
+          onSuccess={refetchIdentity}
         />
       )}
     </div>

@@ -172,6 +172,7 @@ export function PaperweightPin({
             )}
           </div>
           <div className="paperweight-time-group">
+            <span className="paperweight-nym">@{pin.author_nym || 'anon'}</span>
             {pin.is_mine && <span className="paperweight-mine">you</span>}
             <span className="paperweight-time">{fuzzyTime}</span>
           </div>
@@ -245,6 +246,7 @@ export function PaperweightPin({
             )}
           </div>
           <div className="paperweight-time-group">
+            <span className="paperweight-nym">@{pin.author_nym || 'anon'}</span>
             {pin.is_mine && <span className="paperweight-mine">you</span>}
             <span className="paperweight-time">{fuzzyTime}</span>
           </div>

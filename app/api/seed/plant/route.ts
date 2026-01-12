@@ -4,6 +4,7 @@ import { verifyPresenceToken } from '@/lib/presence';
 import { getFeatureFlags } from '@/lib/featureFlags';
 import { v4 as uuidv4 } from 'uuid';
 import type { SeedOutcome } from '@/types';
+import { formatAuthorNym } from '@/lib/lnurl';
 
 const SEED_OUTCOMES: SeedOutcome[] = ['positive', 'neutral', 'negative'];
 const MAX_COMMENTARY_LENGTH = 280;
@@ -27,6 +28,31 @@ export async function POST(request: NextRequest) {
     }
 
     const { device_session_id, location_id } = tokenResult.token;
+
+    // Get device session's identity for attribution
+    let lnurlIdentityId: string | null = null;
+    let authorNym: string | null = null;
+
+    const { data: sessionWithIdentity } = await supabaseAdmin
+      .from('device_sessions')
+      .select('lnurl_identity_id')
+      .eq('id', device_session_id)
+      .single();
+
+    if (sessionWithIdentity?.lnurl_identity_id) {
+      lnurlIdentityId = sessionWithIdentity.lnurl_identity_id;
+
+      // Get identity to capture the nym at post time
+      const { data: identity } = await supabaseAdmin
+        .from('lnurl_identities')
+        .select('display_name, anon_nym')
+        .eq('id', lnurlIdentityId)
+        .single();
+
+      if (identity) {
+        authorNym = formatAuthorNym(identity);
+      }
+    }
 
     // Validate outcome
     if (!outcome || !SEED_OUTCOMES.includes(outcome)) {
@@ -84,6 +110,9 @@ export async function POST(request: NextRequest) {
           device_session_id,
           body: commentary.trim(),
           badge: `Seed:${outcome}`,
+          // LNURL identity attribution
+          lnurl_identity_id: lnurlIdentityId,
+          author_nym: authorNym,
         });
 
       if (pinError) {
@@ -104,6 +133,8 @@ export async function POST(request: NextRequest) {
         outcome,
         commentary: commentary?.trim() || null,
         pin_id: pinId,
+        // LNURL identity attribution
+        lnurl_identity_id: lnurlIdentityId,
       });
 
     if (seedError) {

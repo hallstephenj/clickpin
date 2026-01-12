@@ -10,33 +10,55 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Fetch all locations with pin counts and merchant info
-    const { data: locations, error } = await supabaseAdmin
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '50');
+    const search = searchParams.get('search') || '';
+    const source = searchParams.get('source') || 'all'; // 'all', 'btcmap', 'manual'
+    const offset = (page - 1) * limit;
+
+    // Build query
+    let query = supabaseAdmin
       .from('locations')
-      .select('id, slug, name, city, address, lat, lng, radius_m, ghosts_enabled, created_at, is_claimed, is_bitcoin_merchant, btcmap_id, merchant_settings, location_type')
-      .order('name', { ascending: true });
+      .select('id, slug, name, city, address, lat, lng, radius_m, created_at, is_claimed, is_bitcoin_merchant, btcmap_id, merchant_settings, location_type', { count: 'exact' });
+
+    // Add source filter
+    if (source === 'btcmap') {
+      query = query.not('btcmap_id', 'is', null);
+    } else if (source === 'manual') {
+      query = query.is('btcmap_id', null);
+    }
+
+    // Add search filter if provided
+    if (search) {
+      query = query.or(`name.ilike.%${search}%,city.ilike.%${search}%,address.ilike.%${search}%`);
+    }
+
+    // Add pagination and ordering
+    const { data: locations, error, count: totalCount } = await query
+      .order('name', { ascending: true })
+      .range(offset, offset + limit - 1);
 
     if (error) {
       console.error('Error fetching locations:', error);
       return NextResponse.json({ error: 'Failed to fetch locations' }, { status: 500 });
     }
 
-    // Get pin counts for each location
-    const locationsWithCounts = await Promise.all(
-      (locations || []).map(async (loc) => {
-        const { count } = await supabaseAdmin
-          .from('pins')
-          .select('*', { count: 'exact', head: true })
-          .eq('location_id', loc.id);
+    // Skip pin counts on list view for performance - show on detail view instead
+    const locationsWithCounts = (locations || []).map(loc => ({
+      ...loc,
+      pin_count: null, // Loaded on demand when viewing location details
+    }));
 
-        return {
-          ...loc,
-          pin_count: count || 0,
-        };
-      })
-    );
-
-    return NextResponse.json({ locations: locationsWithCounts });
+    return NextResponse.json({
+      locations: locationsWithCounts,
+      pagination: {
+        page,
+        limit,
+        total: totalCount || 0,
+        totalPages: Math.ceil((totalCount || 0) / limit),
+      }
+    });
   } catch (error) {
     console.error('Admin locations error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

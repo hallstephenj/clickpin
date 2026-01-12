@@ -81,6 +81,12 @@ export function PinCard({
 
             {/* Metadata row */}
             <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
+              {/* Author nym */}
+              <span className="font-mono text-faint">
+                @{pin.author_nym || 'anon'}
+              </span>
+
+              <span>•</span>
               <span className="font-mono">{timeAgo}</span>
 
               {pin.is_mine && (

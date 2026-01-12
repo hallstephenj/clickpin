@@ -1,13 +1,21 @@
 'use client';
 
 import { useState } from 'react';
-import { X, Smiley, SmileyMeh, SmileySad, Plant, Spinner } from '@phosphor-icons/react';
+import { X, Smiley, SmileyMeh, SmileySad, Lightning } from '@phosphor-icons/react';
 import type { SeedOutcome } from '@/types';
+import { SproutReportModal } from './sprout/SproutReportModal';
 
 interface SeedPlantedModalProps {
   isOpen: boolean;
   onClose: () => void;
   onPlant: (outcome: SeedOutcome, commentary?: string) => Promise<void>;
+  onSproutSubmit?: (data: {
+    photo: string;
+    payment_type: 'lightning' | 'onchain' | 'both' | 'unknown';
+    context?: string;
+  }) => Promise<void>;
+  locationName?: string;
+  sproutEnabled?: boolean;
 }
 
 const OUTCOME_OPTIONS: {
@@ -40,18 +48,28 @@ const OUTCOME_OPTIONS: {
   },
 ];
 
-export function SeedPlantedModal({ isOpen, onClose, onPlant }: SeedPlantedModalProps) {
-  const [step, setStep] = useState<1 | 2>(1);
+type Step = 'outcome' | 'commentary';
+
+export function SeedPlantedModal({
+  isOpen,
+  onClose,
+  onPlant,
+  onSproutSubmit,
+  locationName = 'this location',
+  sproutEnabled = false,
+}: SeedPlantedModalProps) {
+  const [step, setStep] = useState<Step>('outcome');
   const [selectedOutcome, setSelectedOutcome] = useState<SeedOutcome | null>(null);
   const [commentary, setCommentary] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showSproutModal, setShowSproutModal] = useState(false);
 
   const MAX_COMMENTARY = 280;
 
   const handleOutcomeSelect = (outcome: SeedOutcome) => {
     setSelectedOutcome(outcome);
-    setStep(2);
+    setStep('commentary');
   };
 
   const handleSubmit = async () => {
@@ -71,18 +89,52 @@ export function SeedPlantedModal({ isOpen, onClose, onPlant }: SeedPlantedModalP
   };
 
   const handleClose = () => {
-    setStep(1);
+    setStep('outcome');
     setSelectedOutcome(null);
     setCommentary('');
     setError(null);
+    setShowSproutModal(false);
     onClose();
   };
 
   const handleBack = () => {
-    setStep(1);
+    if (step === 'commentary') {
+      setStep('outcome');
+    }
+  };
+
+  const handleSproutSelect = () => {
+    setShowSproutModal(true);
+  };
+
+  const handleSproutClose = () => {
+    setShowSproutModal(false);
+  };
+
+  const handleSproutSubmit = async (data: {
+    photo: string;
+    payment_type: 'lightning' | 'onchain' | 'both' | 'unknown';
+    context?: string;
+  }) => {
+    if (onSproutSubmit) {
+      await onSproutSubmit(data);
+    }
+    handleClose();
   };
 
   if (!isOpen) return null;
+
+  // Show sprout modal if selected
+  if (showSproutModal && onSproutSubmit) {
+    return (
+      <SproutReportModal
+        isOpen={true}
+        onClose={handleSproutClose}
+        onSubmit={handleSproutSubmit}
+        locationName={locationName}
+      />
+    );
+  }
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-start justify-center z-50 p-4 pt-20">
@@ -97,7 +149,8 @@ export function SeedPlantedModal({ isOpen, onClose, onPlant }: SeedPlantedModalP
 
         {/* Content */}
         <div className="p-4">
-          {step === 1 ? (
+          {/* Step: Outcome selection */}
+          {step === 'outcome' && (
             <>
               <p className="text-xs text-muted font-mono mb-3">how did the conversation go?</p>
               <div className="space-y-2">
@@ -118,8 +171,32 @@ export function SeedPlantedModal({ isOpen, onClose, onPlant }: SeedPlantedModalP
                   );
                 })}
               </div>
+
+              {/* Sprout section */}
+              {sproutEnabled && onSproutSubmit && (
+                <div className="mt-4 pt-4 border-t border-[var(--border)]">
+                  <button
+                    onClick={handleSproutSelect}
+                    className="w-full p-3 border border-orange-400/50 hover:border-orange-400 bg-orange-50/50 dark:bg-orange-900/10 flex items-center gap-3 text-left transition-colors"
+                  >
+                    <Lightning size={20} weight="fill" className="text-orange-500 flex-shrink-0" />
+                    <div className="flex-1">
+                      <div className="font-mono text-sm text-[var(--fg)] flex items-center gap-2">
+                        report seed sprout
+                        <span className="text-[10px] px-1.5 py-0.5 bg-orange-500/20 text-orange-600 dark:text-orange-400 rounded">
+                          NEW
+                        </span>
+                      </div>
+                      <div className="text-xs text-muted">this place now accepts Bitcoin!</div>
+                    </div>
+                  </button>
+                </div>
+              )}
             </>
-          ) : (
+          )}
+
+          {/* Step: Commentary */}
+          {step === 'commentary' && (
             <>
               <button
                 onClick={handleBack}

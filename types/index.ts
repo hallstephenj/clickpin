@@ -31,6 +31,11 @@ export interface Location {
   btcmap_icon?: string | null;
   btcmap_verified_at?: string | null;
   btcmap_updated_at?: string | null;
+  // Sprout tracking (merchant conversion)
+  sprouted_at?: string | null;
+  sprouted_by_identity_id?: string | null;
+  sprout_photo_url?: string | null;
+  sprout_report_id?: string | null;
 }
 
 export interface DeviceSession {
@@ -38,6 +43,7 @@ export interface DeviceSession {
   created_at: string;
   last_seen_at: string;
   user_agent: string | null;
+  lnurl_identity_id?: string | null;
 }
 
 export interface Pin {
@@ -62,6 +68,11 @@ export interface Pin {
   is_merchant_post?: boolean;
   is_daily_special?: boolean;
   special_expires_at?: string | null;
+  // LNURL identity attribution
+  lnurl_identity_id?: string | null;
+  author_nym?: string | null;
+  // Sprouted pin (celebratory post)
+  is_sprouted_pin?: boolean;
 }
 
 export interface PinFlag {
@@ -207,6 +218,8 @@ export interface FeatureFlags {
   PROXHOME_ADVANCED: boolean;
   MERCHANTS: boolean;
   SEED_PLANTED: boolean;
+  LNURL_AUTH: boolean;
+  SEED_SPROUTED: boolean;
 }
 
 // App Settings
@@ -292,6 +305,7 @@ export interface SeedPlanting {
   commentary?: string;
   pin_id?: string;
   created_at: string;
+  lnurl_identity_id?: string | null;
 }
 
 export interface SeedCount {
@@ -314,4 +328,139 @@ export interface PlantSeedResponse {
   seed_id: string;
   pin_id?: string;
   total_seeds: number;
+}
+
+// =============================================================================
+// LNURL-auth Identity Types
+// =============================================================================
+
+export interface LnurlIdentity {
+  id: string;
+  linking_key: string;
+  display_name: string | null;
+  anon_nym: string;
+  created_at: string;
+  last_auth_at: string;
+}
+
+export interface LnurlDeviceLink {
+  id: string;
+  identity_id: string;
+  device_session_id: string;
+  device_name: string | null;
+  linked_at: string;
+  last_used_at: string;
+}
+
+export type LnurlChallengeAction = 'login' | 'link' | 'auth';
+export type LnurlChallengeStatus = 'pending' | 'verified' | 'expired';
+
+export interface LnurlChallenge {
+  id: string;
+  k1: string;
+  device_session_id: string;
+  action: LnurlChallengeAction;
+  status: LnurlChallengeStatus;
+  linking_key: string | null;
+  created_at: string;
+  expires_at: string;
+  verified_at: string | null;
+}
+
+// API Request/Response types for LNURL-auth
+export interface LnurlAuthChallengeRequest {
+  device_session_id: string;
+  action?: LnurlChallengeAction;
+}
+
+export interface LnurlAuthChallengeResponse {
+  lnurl: string;           // Bech32-encoded LNURL for QR code
+  k1: string;              // Challenge ID for polling
+  expires_at: string;
+}
+
+export interface LnurlAuthStatusResponse {
+  status: LnurlChallengeStatus;
+  identity?: LnurlIdentity;
+}
+
+export interface LnurlProfileUpdateRequest {
+  display_name: string | null;
+}
+
+// Leaderboard types
+export type LeaderboardType = 'seeds' | 'sprouts' | 'locations';
+export type LeaderboardPeriod = 'all_time' | 'month' | 'week';
+
+export interface LeaderboardEntry {
+  rank: number;
+  identity_id: string;
+  display_name: string | null;
+  anon_nym: string;
+  count: number;
+  is_current_user?: boolean;
+}
+
+export interface LeaderboardResponse {
+  type: LeaderboardType;
+  period: LeaderboardPeriod;
+  entries: LeaderboardEntry[];
+  current_user_rank?: number;
+  current_user_count?: number;
+}
+
+// =============================================================================
+// SEED_SPROUTED Types (Merchant Conversion Reporting)
+// =============================================================================
+
+export type BitcoinPaymentType = 'lightning' | 'onchain' | 'both' | 'unknown';
+export type SproutReportStatus = 'pending' | 'approved' | 'rejected' | 'needs_info';
+
+export interface SproutReport {
+  id: string;
+  location_id: string;
+  device_session_id: string;
+  lnurl_identity_id: string | null;
+  photo_url: string;
+  payment_type: BitcoinPaymentType;
+  context: string | null;
+  status: SproutReportStatus;
+  reviewer_notes: string | null;
+  reviewed_at: string | null;
+  reviewed_by: string | null;
+  celebratory_pin_id: string | null;
+  created_at: string;
+  // Joined data for display
+  location?: Location;
+  reporter_nym?: string;
+}
+
+export interface SubmitSproutRequest {
+  presence_token: string;
+  photo_data: string;      // Base64-encoded image
+  payment_type: BitcoinPaymentType;
+  context?: string;
+}
+
+export interface SubmitSproutResponse {
+  success: boolean;
+  report_id: string;
+  message: string;
+}
+
+export interface AdminSproutReportListResponse {
+  reports: SproutReport[];
+  total: number;
+  pending_count: number;
+}
+
+export interface AdminSproutReviewRequest {
+  action: 'approve' | 'reject' | 'needs_info';
+  notes?: string;
+}
+
+export interface AdminSproutReviewResponse {
+  success: boolean;
+  celebratory_pin_id?: string;
+  error?: string;
 }
