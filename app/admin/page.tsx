@@ -2737,6 +2737,63 @@ export default function AdminPage() {
                   </div>
                 </div>
               </div>
+
+              {/* Nuclear Reset - All UGC */}
+              <div className="border-2 border-red-500 bg-red-500/5">
+                <div className="px-4 py-2 border-b border-red-500 bg-red-500/10">
+                  <h3 className="font-mono text-sm font-bold text-red-600 dark:text-red-400">
+                    nuclear reset
+                  </h3>
+                </div>
+                <div className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="font-mono text-sm text-red-600 dark:text-red-400">reset all user-generated content</div>
+                      <div className="text-xs text-muted mt-1">
+                        deletes ALL: posts, seeds, sessions, identities, merchant claims, sprout reports.
+                        <br />
+                        <strong>preserves:</strong> locations and their settings (name, address, radius, etc.)
+                      </div>
+                    </div>
+                    <button
+                      onClick={async () => {
+                        if (!confirm('NUCLEAR RESET: Delete ALL user-generated content?\n\nThis will delete:\n- All posts\n- All seeds\n- All sessions\n- All identities\n- All merchant claims\n- All sprout reports\n\nLocations will be preserved.\n\nThis CANNOT be undone!')) return;
+                        if (!confirm('Are you ABSOLUTELY SURE? Type the word "RESET" in the next prompt to confirm.')) return;
+                        const confirmation = prompt('Type RESET to confirm nuclear reset:');
+                        if (confirmation !== 'RESET') {
+                          alert('Reset cancelled - confirmation did not match.');
+                          return;
+                        }
+                        setActionLoading('reset-ugc');
+                        try {
+                          const res = await fetch('/api/admin/global/reset-ugc', {
+                            method: 'DELETE',
+                            headers: getAuthHeaders(),
+                          });
+                          const data = await res.json();
+                          if (res.ok) {
+                            alert(`Nuclear reset complete!\n\nDeleted:\n- ${data.deleted.pins} posts\n- ${data.deleted.seeds} seeds\n- ${data.deleted.sessions} sessions\n- ${data.deleted.identities} identities\n- ${data.deleted.merchant_claims} merchant claims\n- ${data.deleted.sprout_reports} sprout reports\n\nTotal: ${data.total_deleted} records`);
+                            // Clear local session
+                            document.cookie = 'device_session_id=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+                            localStorage.clear();
+                            window.location.reload();
+                          } else {
+                            alert(data.error || 'Failed to reset UGC');
+                          }
+                        } catch {
+                          alert('Failed to reset UGC');
+                        } finally {
+                          setActionLoading(null);
+                        }
+                      }}
+                      disabled={actionLoading === 'reset-ugc'}
+                      className="btn text-xs bg-red-600 text-white border-red-600 hover:bg-red-700"
+                    >
+                      {actionLoading === 'reset-ugc' ? 'resetting...' : 'NUCLEAR RESET'}
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </>
         )}
