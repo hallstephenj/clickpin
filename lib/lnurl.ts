@@ -7,14 +7,21 @@
 import crypto from 'crypto';
 import { bech32 } from 'bech32';
 import * as secp256k1 from '@noble/secp256k1';
-import { sha256 } from '@noble/hashes/sha256';
 import { LnurlIdentity } from '@/types';
 
-// Configure sha256 for @noble/secp256k1 v3
-// This is required for signature verification
-secp256k1.etc.sha256Sync = (...msgs: Uint8Array[]) => {
-  const combined = secp256k1.etc.concatBytes(...msgs);
-  return sha256(combined);
+// Configure sha256 for @noble/secp256k1 v3 using Node's built-in crypto
+// This is required for sync signature verification
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(secp256k1.hashes as any).sha256 = (message: Uint8Array): Uint8Array => {
+  return new Uint8Array(crypto.createHash('sha256').update(message).digest());
+};
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(secp256k1.hashes as any).hmacSha256 = (key: Uint8Array, ...messages: Uint8Array[]): Uint8Array => {
+  const hmac = crypto.createHmac('sha256', key);
+  for (const msg of messages) {
+    hmac.update(msg);
+  }
+  return new Uint8Array(hmac.digest());
 };
 
 /**
