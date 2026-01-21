@@ -1,4 +1,4 @@
-# Clickpin
+# clickpin
 
 **Location-anchored bulletin boards for the physical world.**
 
