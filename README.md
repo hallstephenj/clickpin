@@ -1,57 +1,58 @@
 # Clickpin
 
-**Galvanizing grassroots bitcoin merchant adoption.**
+**Location-anchored bulletin boards for the physical world.**
 
-## The Mission
+## The Concept
 
-Every retailer in the United States should accept bitcoin. Every bitcoin holder knows this. Clickpin is the coordination layer that makes it happen.
+Clickpin explores what happens when digital message boards are anchored to physical locations. You can only post to a board when you're actually there. No remote participation—just people who showed up.
 
-This is not a passive app. This is infrastructure for bitcoin warriors. Show up. Plant seeds. Flip merchants. Track progress. Win.
+This creates an interesting design space: anonymous coordination tied to physical presence. The constraint of "you must be here" changes everything about how people interact.
 
-## What is Clickpin?
+## How It Works
 
-Clickpin is a location-based coordination tool for grassroots bitcoin adoption. Anonymous message boards are locked to physical locations - you can only post when you're actually there. No accounts. No surveillance. Just boots on the ground.
+Every physical location can have a board—a collection of anonymous posts from people who have visited. Boards are unlocked by GPS proximity. Post something, and it stays pinned to that spot for others who visit later.
 
-**The playbook is simple:**
-1. Walk into any business
-2. Have the conversation about accepting bitcoin
-3. Log the outcome (seed planted)
-4. Coordinate with others who visit the same location
-5. Flip the merchant
+**Core mechanics:**
+- **Proximity-gated posting**: GPS verification required to contribute
+- **Device-based identity**: No accounts, no email, no phone numbers
+- **Ephemeral presence**: Your session exists only while you're there
+- **Persistent content**: Posts remain for future visitors
 
-Every seed planted is tracked. Every merchant flipped is a victory. BTCMap integration means wins are visible globally.
+## Use Cases
 
-### Core Features
+The location-locked bulletin board pattern enables several applications:
 
-- **Location-locked boards**: Post only when physically present - no armchair activism
-- **Seed planting**: Log bitcoin conversations with merchants, track outcomes (positive/neutral/negative)
-- **Anonymous coordination**: No accounts, device-based identity, plausible deniability
-- **BTCMap sync**: Import existing bitcoin merchants, export new wins back to the ecosystem
-- **Merchant claiming**: Flipped merchants can claim their board and join the network
-- **Lightning-native**: Boosts, sponsorships, and donations keep the servers running
+### Grassroots Coordination
+Track conversations and outcomes at specific locations over time. Multiple people visiting the same place can coordinate asynchronously without ever meeting.
 
-## Key Concepts
+### Bitcoin Merchant Adoption
+One application: coordinating grassroots bitcoin adoption. Visit a business, have a conversation about accepting bitcoin, log the outcome. Others who visit later can see the history and continue the conversation. Integrates with BTCMap for tracking merchants who accept bitcoin.
 
-### Boards
-Each physical location has a "board" - a collection of anonymous posts from people who have visited. Boards can be for bitcoin merchants, regular businesses, or community spaces.
+### Local Discovery
+Anonymous tips and notes about places—what's good, what to avoid, insider knowledge that only locals would know.
 
-### Seeds
-The "Seed Planted" feature lets users record when they've had a conversation about bitcoin with a merchant. Track outcomes (positive, neutral, negative) and add optional commentary. This helps the community identify receptive businesses.
+### Community Spaces
+Boards for parks, venues, and gathering places. Temporary coordination for events, or persistent community knowledge.
 
-### Merchant Claims
-Business owners can claim their location by paying a Lightning invoice. Once claimed, they can:
-- Customize their board appearance
-- Moderate posts
-- Add business information
-- Display a verified badge
+## Architecture
 
-## Tech Stack
+### Tech Stack
 
 - **Frontend**: Next.js 15 (App Router) + TypeScript + Tailwind CSS
 - **Backend**: Next.js API Routes + Supabase (PostgreSQL + PostGIS)
 - **Payments**: Lightning Network (Strike, LNbits, or test mode)
 - **Icons**: Phosphor Icons
 - **Data**: BTCMap API integration
+
+### Key Design Decisions
+
+**PostGIS for spatial queries**: Efficient geographic distance calculations, nearest-location lookups, and radius-based filtering.
+
+**Device sessions over accounts**: Privacy-preserving identity using device fingerprinting. No PII collected.
+
+**Lightning-native monetization**: Boosts, sponsorships, and paid pins keep infrastructure running without ads or data harvesting.
+
+**Feature flags**: Modular functionality that can be enabled/disabled per deployment.
 
 ## Quick Start
 
@@ -87,7 +88,7 @@ Business owners can claim their location by paying a Lightning invoice. Once cla
    - `SUPABASE_SERVICE_ROLE_KEY`
    - `PRESENCE_TOKEN_SECRET` (generate with `openssl rand -hex 32`)
 
-4. **Import BTCMap locations** (optional)
+4. **Import seed locations** (optional)
    ```bash
    npx tsx scripts/import-btcmap.ts import --lat=30.2672 --lon=-97.7431 --radius=50
    ```
@@ -99,15 +100,13 @@ Business owners can claim their location by paying a Lightning invoice. Once cla
 
 ## Feature Flags
 
-Clickpin uses feature flags to enable/disable functionality:
-
 | Flag | Description |
 |------|-------------|
 | `MERCHANTS` | Merchant claiming and management |
 | `PAID_PINS` | Lightning payments for posts |
 | `BOOSTS` | Pin boosting with Lightning |
 | `SPONSORSHIPS` | Location sponsorship |
-| `SEED_PLANTED` | Seed planting feature |
+| `SEED_PLANTED` | Conversation tracking feature |
 | `SHARENOTES` | Shareable pin links |
 | `DOODLES` | Drawing on posts |
 | `REPLIES` | Reply threads |
@@ -116,17 +115,17 @@ Clickpin uses feature flags to enable/disable functionality:
 
 ## Admin Panel
 
-Access the admin panel at `/admin` to:
+Access `/admin` to manage:
 
-- **Stats**: View posts, seeds, sessions, and merchant metrics
-- **Locations**: Manage all locations, edit details, view posts
-- **Requests**: Approve/reject new location requests
+- **Stats**: Posts, sessions, locations, activity metrics
+- **Locations**: Create, edit, and manage all locations
+- **Requests**: Approve/reject user-submitted location requests
 - **Flags**: Toggle feature flags
-- **Controls**: Global actions (reset seeds, clear sessions, BTCMap sync)
+- **Controls**: Global actions and data management
 
-## API Endpoints
+## API Overview
 
-### Core
+### Core Endpoints
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/api/session` | POST | Create device session |
@@ -135,20 +134,7 @@ Access the admin panel at `/admin` to:
 | `/api/pin` | POST/DELETE | Create or delete pins |
 | `/api/reply` | POST | Reply to a pin |
 
-### Seeds
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/seed/plant` | POST | Plant a seed at location |
-| `/api/seed/count` | GET | Get seed counts |
-
-### Merchants
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/merchant/claim/start` | POST | Start claim process |
-| `/api/merchant/claim/lightning` | POST | Generate claim invoice |
-| `/api/merchant/settings` | GET/POST | Manage merchant settings |
-
-### Lightning
+### Lightning Endpoints
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/api/boost/create-invoice` | POST | Boost a pin |
@@ -160,20 +146,20 @@ Access the admin panel at `/admin` to:
 ### Payments (satoshis)
 - `POST_PRICE_SATS` - Price for paid posts (default: 100)
 - `BOOST_PRICE_SATS` - Price to boost a pin (default: 500)
-- `CLAIM_PRICE_SATS` - Merchant claim fee (default: 10000)
+- `CLAIM_PRICE_SATS` - Location claim fee (default: 10000)
 - `SPONSOR_PRICE_SATS` - Location sponsorship (default: 10000)
+
+### Geolocation
+- `MAX_ACCURACY_M` - Maximum GPS accuracy required (default: 100)
+- `MAX_DISTANCE_M` - Maximum distance to board for posting (default: 200)
 
 ### Rate Limiting
 - `FREE_POSTS_PER_DAY` - Free posts per location (default: 3)
 - `POST_COOLDOWN_MS` - Cooldown between posts (default: 120000)
 
-### Geolocation
-- `MAX_ACCURACY_M` - Maximum GPS accuracy (default: 100)
-- `MAX_DISTANCE_M` - Maximum distance to board (default: 200)
-
 ## Lightning Integration
 
-### Test Mode (Development)
+### Test Mode
 ```bash
 DEV_MODE=true
 LIGHTNING_TEST_MODE=true
@@ -192,6 +178,16 @@ LNBITS_URL=https://your-instance
 LNBITS_API_KEY=your-api-key
 ```
 
+## Database Schema
+
+### Key Tables
+- `locations` - Physical locations with PostGIS geography
+- `device_sessions` - Anonymous device identities
+- `pins` - User posts with optional attachments
+- `seed_plantings` - Conversation outcome tracking
+- `merchant_claims` - Verified business claims
+- `location_requests` - User-submitted location requests
+
 ## Deployment
 
 ### Vercel (Recommended)
@@ -202,26 +198,10 @@ LNBITS_API_KEY=your-api-key
 
 ### Production Checklist
 - Set `DEV_MODE=false`
-- Configure real Lightning provider
+- Configure Lightning provider
 - Set strong `PRESENCE_TOKEN_SECRET`
 - Configure `LIGHTNING_WEBHOOK_SECRET`
 - Enable appropriate feature flags
-
-## Database
-
-### Key Tables
-- `locations` - Physical locations with PostGIS geography
-- `device_sessions` - Anonymous device identities
-- `pins` - User posts with optional doodles
-- `seed_plantings` - bitcoin advocacy tracking
-- `merchant_claims` - Verified business claims
-- `location_requests` - User-submitted location requests
-
-### PostGIS
-Uses PostGIS for efficient spatial queries:
-- Geographic distance calculations
-- Nearest location lookups
-- Radius-based filtering
 
 ## Contributing
 
