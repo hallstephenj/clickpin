@@ -18,6 +18,32 @@ Every physical location can have a board—a collection of anonymous posts from 
 - **Ephemeral presence**: Your session exists only while you're there
 - **Persistent content**: Posts remain for future visitors
 
+## Core Features
+
+### Boards & Pins
+Location-locked message boards where users can post text, drawings, and media. Pins can receive replies, creating threaded conversations anchored to physical places.
+
+### Seed Planting
+Track conversations and outcomes at locations over time. Record whether an interaction was positive, neutral, or negative. Build a history that helps others who visit later.
+
+### Doodles
+Freehand drawing tool for visual posts. Sketch maps, diagrams, or just leave your mark.
+
+### Boosts & Sponsorships
+Lightning-powered promotion. Boost individual pins to increase visibility, or sponsor entire locations to support the network.
+
+### Merchant Claims
+Business owners can claim their location by paying a Lightning invoice. Claimed locations get verified badges, moderation controls, and customization options.
+
+### BTCMap Integration
+Import bitcoin-accepting merchants from BTCMap. Export new merchants back to the ecosystem when they start accepting bitcoin.
+
+### Nearby Discovery
+Browse boards in your vicinity. See what's happening at locations around you without walking to each one.
+
+### Shareable Links
+Generate links to specific pins that can be shared outside the app. Recipients still need proximity to interact, but can preview content.
+
 ## Use Cases
 
 The location-locked bulletin board pattern enables several applications:
