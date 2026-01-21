@@ -8,9 +8,17 @@ Clickpin explores what happens when digital message boards are anchored to physi
 
 This creates an interesting design space: anonymous coordination tied to physical presence. The constraint of "you must be here" changes everything about how people interact.
 
+<p align="center">
+  <img src="docs/screenshots/map.png" alt="Map view showing nearby boards" width="300">
+</p>
+
 ## How It Works
 
 Every physical location can have a board—a collection of anonymous posts from people who have visited. Boards are unlocked by GPS proximity. Post something, and it stays pinned to that spot for others who visit later.
+
+<p align="center">
+  <img src="docs/screenshots/proximity-gate.png" alt="Proximity gate - must be at location to post" width="300">
+</p>
 
 **Core mechanics:**
 - **Proximity-gated posting**: GPS verification required to contribute
@@ -23,17 +31,37 @@ Every physical location can have a board—a collection of anonymous posts from 
 ### Boards & Pins
 Location-locked message boards where users can post text, drawings, and media. Pins can receive replies, creating threaded conversations anchored to physical places.
 
+<p align="center">
+  <img src="docs/screenshots/board-post.png" alt="Board with pins" width="300">
+</p>
+
 ### Seed Planting
 Track conversations and outcomes at locations over time. Record whether an interaction was positive, neutral, or negative. Build a history that helps others who visit later.
+
+<p align="center">
+  <img src="docs/screenshots/plant-seed.png" alt="Plant seed interface" width="300">
+</p>
 
 ### Doodles
 Freehand drawing tool for visual posts. Sketch maps, diagrams, or just leave your mark.
 
+<p align="center">
+  <img src="docs/screenshots/doodle.png" alt="Doodle drawing interface" width="300">
+</p>
+
 ### Boosts & Sponsorships
 Lightning-powered promotion. Boost individual pins to increase visibility, or sponsor entire locations to support the network.
 
+<p align="center">
+  <img src="docs/screenshots/boost-post.png" alt="Boost a pin with Lightning" width="300">
+</p>
+
 ### Merchant Claims
 Business owners can claim their location by paying a Lightning invoice. Claimed locations get verified badges, moderation controls, and customization options.
+
+<p align="center">
+  <img src="docs/screenshots/claim-merchant.png" alt="Merchant claim interface" width="300">
+</p>
 
 ### BTCMap Integration
 Import bitcoin-accepting merchants from BTCMap. Export new merchants back to the ecosystem when they start accepting bitcoin.
@@ -54,11 +82,19 @@ Track conversations and outcomes at specific locations over time. Multiple peopl
 ### Bitcoin Merchant Adoption
 One application: coordinating grassroots bitcoin adoption. Visit a business, have a conversation about accepting bitcoin, log the outcome. Others who visit later can see the history and continue the conversation. Integrates with BTCMap for tracking merchants who accept bitcoin.
 
+<p align="center">
+  <img src="docs/screenshots/merchant-board.png" alt="Merchant board" width="300">
+</p>
+
 ### Local Discovery
 Anonymous tips and notes about places—what's good, what to avoid, insider knowledge that only locals would know.
 
 ### Community Spaces
 Boards for parks, venues, and gathering places. Temporary coordination for events, or persistent community knowledge.
+
+<p align="center">
+  <img src="docs/screenshots/community-space.png" alt="Community space board" width="300">
+</p>
 
 ## Architecture
 
