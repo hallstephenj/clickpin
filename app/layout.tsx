@@ -5,7 +5,6 @@ import "./forstall.css";
 import "./neo2026.css";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { ForstallModeProvider } from "@/components/ForstallModeProvider";
-import { PasswordGate } from "@/components/PasswordGate";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -91,11 +90,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <PasswordGate>
-          <AuthProvider>
-            <ForstallModeProvider>{children}</ForstallModeProvider>
-          </AuthProvider>
-        </PasswordGate>
+        <AuthProvider>
+          <ForstallModeProvider>{children}</ForstallModeProvider>
+        </AuthProvider>
       </body>
     </html>
   );
