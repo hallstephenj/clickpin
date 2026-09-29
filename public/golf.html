@@ -124,10 +124,11 @@ a:visited { color: #ff66ff; }
 <br><br>
 You are visitor number <span class="counter">004318</span>
 <br><br>
-<a href="#" onclick="alert('guestbook is down right now sorry!!!');return false;">Sign my Guestbook</a>
+<a href="#" onclick="document.getElementById('linkMsg').innerHTML='guestbook is down right now sorry!!!';return false;">Sign my Guestbook</a>
 &nbsp;|&nbsp;
-<a href="#" onclick="alert('more games coming soon!!!');return false;">My Other Games</a>
-<br><br>
+<a href="#" onclick="document.getElementById('linkMsg').innerHTML='more games coming soon!!!';return false;">My Other Games</a>
+<br><span id="linkMsg" style="color:#ff66ff"></span>
+<br>
 <div class="tiny">
   made by xX_GolfMaster_Xx for my Comp Sci 1 final project<br>
   (c) 2009 all rights reserved. do not steal my code<br>
