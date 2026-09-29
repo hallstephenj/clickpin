@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SUPER CLICK GOLF 3000</title>
+<style>
+/* my css. i learned this from w3schools */
+body {
+  background-color: #000066;
+  background-image: radial-gradient(#ffffff 1px, transparent 1px);
+  background-size: 40px 40px;
+  color: #ffff00;
+  font-family: "Comic Sans MS", "Comic Sans", "Chalkboard SE", cursive;
+  margin: 0;
+  padding: 10px 16px;
+}
+h1 {
+  color: #ff0000;
+  font-size: 44px;
+  text-shadow: 3px 3px 0px #ffff00, 6px 6px 0px #000000;
+  margin: 10px 0 4px 0;
+}
+.sub { color: #00ffff; font-size: 14px; }
+marquee {
+  background-color: #ff00ff;
+  color: #ffffff;
+  font-weight: bold;
+  border: 2px dashed #ffff00;
+  padding: 3px;
+  max-width: 660px;
+}
+#mainTable {
+  background-color: #c0c0c0;
+  border: 4px outset #ffffff;
+  max-width: 100%;
+}
+#gameArea {
+  border: 2px inset #808080;
+  display: block;
+  width: 640px;
+  max-width: 100%;
+  cursor: crosshair;
+  touch-action: manipulation;
+}
+.applet {
+  color: #000000;
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  text-align: left;
+  background-color: #d4d0c8;
+  border-top: 1px solid #808080;
+  padding: 2px 4px;
+}
+.buttonz { color: #000000; font-family: Arial, sans-serif; font-size: 13px; }
+button { font-family: Arial, sans-serif; font-size: 13px; }
+.box {
+  background-color: #ffffcc;
+  color: #000000;
+  border: 3px ridge #ff9900;
+  max-width: 620px;
+  padding: 8px 12px;
+  text-align: left;
+  font-size: 14px;
+}
+.box b { color: #cc0000; }
+a { color: #00ff00; }
+a:visited { color: #ff66ff; }
+.counter {
+  background-color: #000000;
+  color: #00ff00;
+  font-family: "Courier New", monospace;
+  border: 2px inset #808080;
+  padding: 1px 6px;
+  letter-spacing: 2px;
+}
+.blink { animation: blinky 1s step-start infinite; }
+@keyframes blinky { 50% { visibility: hidden; } }
+.tiny { font-size: 11px; color: #cccccc; }
+</style>
+</head>
+<body>
+<center>
+
+<h1>SUPER CLICK GOLF 3000</h1>
+<div class="sub">~*~ the most EPIC golf game on the internet ~*~</div>
+<br>
+<marquee scrollamount="6">WELCOME TO MY GOLF GAME!!! click anywhere and balls come out EVERYWHERE!!! get one in the hole 2 win!!! 10 levels of pure golf madness!!! sorry if its buggy lol</marquee>
+<br><br>
+
+<table id="mainTable" cellpadding="0" cellspacing="0">
+  <tr>
+    <td>
+      <canvas id="gameArea" width="640" height="480">ur browser doesnt support canvas. get firefox</canvas>
+      <div class="applet" id="statusBar">Applet GolfGame started</div>
+    </td>
+  </tr>
+  <tr>
+    <td class="buttonz" align="center" style="padding:6px">
+      <button onclick="restartLevel()">Restart Level</button>
+      <button onclick="restartGame()">Start Over</button>
+      <button onclick="toggleSound()" id="soundBtn">Sound: ON</button>
+    </td>
+  </tr>
+</table>
+
+<br>
+
+<div class="box">
+  <b>HOW 2 PLAY:</b><br>
+  1. click ANYWHERE on the grass<br>
+  2. a bunch of golf balls shoot out in every direction at once<br>
+  3. they bounce off the walls. if ANY ball goes in the hole U WIN!!!<br>
+  4. u cant click in the red circle by the hole. thats cheating<br>
+  5. if a ball touches the water it DIES :(<br>
+  6. balls going too fast will skip over the hole so be careful<br>
+  <br>
+  there are 10 levels. level 10 is basicly impossible. good luck!!!
+</div>
+
+<br>
+<span class="blink" style="color:#ff0000;font-weight:bold">NEW!!!</span>
+<span style="color:#ffffff">v1.3 - added water and a moving wall. fixed the bug where balls went thru walls (mostly)</span>
+<br><br>
+You are visitor number <span class="counter">004318</span>
+<br><br>
+<a href="#" onclick="alert('guestbook is down right now sorry!!!');return false;">Sign my Guestbook</a>
+&nbsp;|&nbsp;
+<a href="#" onclick="alert('more games coming soon!!!');return false;">My Other Games</a>
+<br><br>
+<div class="tiny">
+  made by xX_GolfMaster_Xx for my Comp Sci 1 final project<br>
+  (c) 2009 all rights reserved. do not steal my code<br>
+  Best viewed in Firefox 3.5 at 1024x768
+</div>
+<br>
+
+</center>
+
+<script>
+// SUPER CLICK GOLF 3000
+// by xX_GolfMaster_Xx
+// period 3 comp sci
+
+// ===== VARIABLES =====
+var canvas = document.getElementById("gameArea");
+var g = canvas.getContext("2d"); // g is for graphics like in java
+var WIDTH = 640;
+var HEIGHT = 480;
+
+var BALL_RADIUS = 5;
+var BALL_SPEED = 7;
+var MAX_HOLE_SPEED = 5.5; // if ball is faster than this it skips over the hole
+
+var level = 0; // starts at 0 cuz arrays
+var balls = new Array();
+var totalClicks = 0;
+var levelClicks = 0;
+var gameState = "aim"; // aim, rolling, win, lose, beatgame
+var message = "";
+var messageTimer = 0;
+var soundOn = true;
+var frameCount = 0;
+var winBall = null;
+
+// ===== LEVELS =====
+// each level has:
+//   name, balls (how many come out), holeX, holeY, holeR, noClick (radius of red circle),
+//   friction, walls [x,y,w,h], water [x,y,w,h], movers (walls that move)
+var levels = new Array();
+
+levels[0] = {
+  name: "Baby Mode",
+  balls: 24, holeX: 500, holeY: 240, holeR: 18, noClick: 80, friction: 0.99,
+  walls: [], water: [], movers: []
+};
+
+levels[1] = {
+  name: "A Wall Appears",
+  balls: 16, holeX: 560, holeY: 240, holeR: 14, noClick: 110, friction: 0.99,
+  walls: [[300, 70, 20, 340]], water: [], movers: []
+};
+
+levels[2] = {
+  name: "Zig Zag",
+  balls: 12, holeX: 580, holeY: 420, holeR: 12, noClick: 110, friction: 0.99,
+  walls: [[150, 0, 20, 360], [320, 120, 20, 360], [490, 0, 20, 360]], water: [], movers: []
+};
+
+levels[3] = {
+  name: "The Box",
+  balls: 16, holeX: 570, holeY: 90, holeR: 13, noClick: 130, friction: 0.99,
+  walls: [[470, 0, 20, 105], [470, 180, 170, 20]], water: [], movers: []
+};
+
+levels[4] = {
+  name: "Door Thing",
+  balls: 12, holeX: 570, holeY: 240, holeR: 10, noClick: 120, friction: 0.988,
+  walls: [[420, 0, 20, 190], [420, 290, 20, 190]],
+  water: [],
+  movers: [{x: 420, y: 190, w: 20, h: 50, minY: 190, maxY: 240, speed: 1.2}]
+};
+
+levels[5] = {
+  name: "Water World",
+  balls: 9, holeX: 560, holeY: 400, holeR: 10, noClick: 120, friction: 0.987,
+  walls: [[440, 290, 20, 190]],
+  water: [[0, 0, 640, 40], [0, 440, 440, 40], [150, 120, 60, 240], [300, 40, 60, 200], [300, 320, 140, 40]],
+  movers: []
+};
+
+levels[6] = {
+  name: "Pond Life",
+  balls: 14, holeX: 320, holeY: 240, holeR: 12, noClick: 110, friction: 0.99,
+  walls: [],
+  water: [[180, 140, 280, 30], [180, 310, 280, 30], [180, 170, 30, 40], [430, 270, 30, 40]],
+  movers: []
+};
+
+levels[7] = {
+  name: "The Fortress",
+  balls: 9, holeX: 320, holeY: 240, holeR: 10, noClick: 140, friction: 0.987,
+  walls: [[240, 160, 160, 20], [240, 300, 160, 20], [240, 180, 20, 120], [380, 180, 20, 40]],
+  water: [[60, 60, 100, 60], [480, 360, 100, 60], [480, 60, 100, 60], [60, 360, 100, 60]],
+  movers: []
+};
+
+levels[8] = {
+  name: "Tiny Hole",
+  balls: 12, holeX: 100, holeY: 90, holeR: 9, noClick: 120, friction: 0.988,
+  walls: [[0, 200, 250, 20], [230, 60, 20, 140], [380, 150, 20, 330], [380, 150, 160, 20]],
+  water: [[500, 330, 140, 150]],
+  movers: []
+};
+
+levels[9] = {
+  name: "IMPOSSIBLE",
+  balls: 7, holeX: 590, holeY: 50, holeR: 8, noClick: 150, friction: 0.986,
+  walls: [[500, 0, 20, 110], [500, 150, 140, 20], [120, 0, 20, 320], [260, 160, 20, 320]],
+  water: [[0, 400, 120, 80], [380, 300, 260, 40], [140, 0, 120, 40]],
+  movers: [{x: 380, y: 120, w: 20, h: 60, minY: 60, maxY: 240, speed: 2}]
+};
+
+// ===== SOUND =====
+// i found out how to make beeps!!!
+var audioCtx = null;
+function beep(freq, len) {
+  if (!soundOn) return;
+  try {
+    if (audioCtx == null) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    var osc = audioCtx.createOscillator();
+    var vol = audioCtx.createGain();
+    osc.type = "square";
+    osc.frequency.value = freq;
+    vol.gain.value = 0.05;
+    osc.connect(vol);
+    vol.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + len);
+  } catch (e) {
+    // no sound i guess
+  }
+}
+
+function toggleSound() {
+  soundOn = !soundOn;
+  if (soundOn) {
+    document.getElementById("soundBtn").innerHTML = "Sound: ON";
+  } else {
+    document.getElementById("soundBtn").innerHTML = "Sound: OFF";
+  }
+}
+
+// ===== GAME STUFF =====
+function status(txt) {
+  document.getElementById("statusBar").innerHTML = txt;
+}
+
+function restartLevel() {
+  balls = new Array();
+  gameState = "aim";
+  winBall = null;
+  levelClicks = 0;
+  var lv = levels[level];
+  for (var i = 0; i < lv.movers.length; i++) {
+    lv.movers[i].y = lv.movers[i].minY;
+    lv.movers[i].dir = 1;
+  }
+  status("Applet GolfGame started - Level " + (level + 1));
+}
+
+function restartGame() {
+  level = 0;
+  totalClicks = 0;
+  restartLevel();
+}
+
+function isInRect(x, y, r) {
+  if (x >= r[0] && x <= r[0] + r[2] && y >= r[1] && y <= r[1] + r[3]) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+function shoot(x, y) {
+  var lv = levels[level];
+  balls = new Array();
+  for (var i = 0; i < lv.balls; i++) {
+    var angle = (Math.PI * 2 / lv.balls) * i;
+    var b = new Object();
+    b.x = x;
+    b.y = y;
+    b.vx = Math.cos(angle) * BALL_SPEED;
+    b.vy = Math.sin(angle) * BALL_SPEED;
+    b.alive = true;
+    balls.push(b);
+  }
+  gameState = "rolling";
+}
+
+function handleClick(x, y) {
+  var lv = levels[level];
+
+  if (gameState == "win") {
+    level++;
+    if (level >= levels.length) {
+      gameState = "beatgame";
+      beep(523, 0.15); setTimeout(function(){ beep(659, 0.15); }, 150);
+      setTimeout(function(){ beep(784, 0.15); }, 300); setTimeout(function(){ beep(1046, 0.4); }, 450);
+    } else {
+      restartLevel();
+    }
+    return;
+  }
+  if (gameState == "lose") {
+    restartLevel();
+    return;
+  }
+  if (gameState == "beatgame") {
+    restartGame();
+    return;
+  }
+  if (gameState == "rolling") {
+    return; // wait for balls to stop
+  }
+
+  // check the no click zone
+  var dx = x - lv.holeX;
+  var dy = y - lv.holeY;
+  if (Math.sqrt(dx * dx + dy * dy) < lv.noClick) {
+    message = "NO CLICKING BY THE HOLE!!! thats cheating";
+    messageTimer = 90;
+    beep(120, 0.2);
+    return;
+  }
+  // cant click on walls
+  for (var i = 0; i < lv.walls.length; i++) {
+    if (isInRect(x, y, lv.walls[i])) {
+      message = "u cant click on a wall dummy";
+      messageTimer = 90;
+      beep(120, 0.2);
+      return;
+    }
+  }
+  for (var i = 0; i < lv.movers.length; i++) {
+    var m = lv.movers[i];
+    if (isInRect(x, y, [m.x, m.y, m.w, m.h])) {
+      message = "u cant click on a wall dummy";
+      messageTimer = 90;
+      beep(120, 0.2);
+      return;
+    }
+  }
+  for (var i = 0; i < lv.water.length; i++) {
+    if (isInRect(x, y, lv.water[i])) {
+      message = "thats water. balls cant swim";
+      messageTimer = 90;
+      beep(120, 0.2);
+      return;
+    }
+  }
+
+  totalClicks++;
+  levelClicks++;
+  beep(440, 0.08);
+  shoot(x, y);
+  status("Applet GolfGame running - " + balls.length + " balls shot");
+}
+
+// bounce a ball off a rectangle
+// this took me like 3 days to figure out
+function bounceRect(b, rx, ry, rw, rh) {
+  var cx = b.x;
+  var cy = b.y;
+  if (cx < rx) cx = rx;
+  if (cx > rx + rw) cx = rx + rw;
+  if (cy < ry) cy = ry;
+  if (cy > ry + rh) cy = ry + rh;
+  var dx = b.x - cx;
+  var dy = b.y - cy;
+  var dist = Math.sqrt(dx * dx + dy * dy);
+
+  if (dist >= BALL_RADIUS) return false;
+
+  if (dist == 0) {
+    // ball is INSIDE the wall. push it out the closest side
+    var left = b.x - rx;
+    var right = rx + rw - b.x;
+    var top = b.y - ry;
+    var bottom = ry + rh - b.y;
+    var smallest = Math.min(left, right, top, bottom);
+    if (smallest == left) { b.x = rx - BALL_RADIUS; b.vx = -Math.abs(b.vx); }
+    else if (smallest == right) { b.x = rx + rw + BALL_RADIUS; b.vx = Math.abs(b.vx); }
+    else if (smallest == top) { b.y = ry - BALL_RADIUS; b.vy = -Math.abs(b.vy); }
+    else { b.y = ry + rh + BALL_RADIUS; b.vy = Math.abs(b.vy); }
+    return true;
+  }
+
+  var nx = dx / dist;
+  var ny = dy / dist;
+  b.x = cx + nx * BALL_RADIUS;
+  b.y = cy + ny * BALL_RADIUS;
+  var dot = b.vx * nx + b.vy * ny;
+  if (dot < 0) {
+    b.vx = b.vx - 2 * dot * nx;
+    b.vy = b.vy - 2 * dot * ny;
+  }
+  return true;
+}
+
+function update() {
+  var lv = levels[level];
+  frameCount++;
+
+  // move the moving walls
+  for (var i = 0; i < lv.movers.length; i++) {
+    var m = lv.movers[i];
+    if (m.dir == undefined) m.dir = 1;
+    m.y = m.y + m.speed * m.dir;
+    if (m.y > m.maxY) { m.y = m.maxY; m.dir = -1; }
+    if (m.y < m.minY) { m.y = m.minY; m.dir = 1; }
+  }
+
+  if (gameState != "rolling") return;
+
+  var stillMoving = 0;
+  var bonked = false;
+
+  for (var i = 0; i < balls.length; i++) {
+    var b = balls[i];
+    if (!b.alive) continue;
+
+    // move in 2 steps so it doesnt go thru walls
+    for (var step = 0; step < 2; step++) {
+      b.x = b.x + b.vx / 2;
+      b.y = b.y + b.vy / 2;
+
+      // screen edges
+      if (b.x < BALL_RADIUS) { b.x = BALL_RADIUS; b.vx = -b.vx; bonked = true; }
+      if (b.x > WIDTH - BALL_RADIUS) { b.x = WIDTH - BALL_RADIUS; b.vx = -b.vx; bonked = true; }
+      if (b.y < BALL_RADIUS) { b.y = BALL_RADIUS; b.vy = -b.vy; bonked = true; }
+      if (b.y > HEIGHT - BALL_RADIUS) { b.y = HEIGHT - BALL_RADIUS; b.vy = -b.vy; bonked = true; }
+
+      for (var w = 0; w < lv.walls.length; w++) {
+        var wall = lv.walls[w];
+        if (bounceRect(b, wall[0], wall[1], wall[2], wall[3])) bonked = true;
+      }
+      for (var w = 0; w < lv.movers.length; w++) {
+        var m = lv.movers[w];
+        if (bounceRect(b, m.x, m.y, m.w, m.h)) bonked = true;
+      }
+    }
+
+    // friction
+    b.vx = b.vx * lv.friction;
+    b.vy = b.vy * lv.friction;
+    var speed = Math.sqrt(b.vx * b.vx + b.vy * b.vy);
+
+    // water = dead
+    for (var w = 0; w < lv.water.length; w++) {
+      if (isInRect(b.x, b.y, lv.water[w])) {
+        b.alive = false;
+        b.splash = 12;
+      }
+    }
+    if (!b.alive) continue;
+
+    // did it go in the hole???
+    var hx = b.x - lv.holeX;
+    var hy = b.y - lv.holeY;
+    if (Math.sqrt(hx * hx + hy * hy) < lv.holeR && speed < MAX_HOLE_SPEED) {
+      winBall = b;
+      b.x = lv.holeX;
+      b.y = lv.holeY;
+      gameState = "win";
+      beep(784, 0.1);
+      setTimeout(function(){ beep(1046, 0.25); }, 100);
+      status("Applet GolfGame - LEVEL " + (level + 1) + " COMPLETE");
+      return;
+    }
+
+    if (speed < 0.08) {
+      b.vx = 0;
+      b.vy = 0;
+    } else {
+      stillMoving++;
+    }
+  }
+
+  if (bonked && frameCount % 4 == 0) beep(200 + Math.random() * 100, 0.02);
+
+  if (stillMoving == 0) {
+    gameState = "lose";
+    beep(150, 0.3);
+    status("Applet GolfGame - u missed");
+  }
+}
+
+// ===== DRAWING =====
+function drawText(txt, x, y, size, color) {
+  g.font = "bold " + size + "px 'Comic Sans MS', 'Comic Sans', 'Chalkboard SE', cursive";
+  g.textAlign = "center";
+  g.fillStyle = "#000000";
+  g.fillText(txt, x + 2, y + 2);
+  g.fillStyle = color;
+  g.fillText(txt, x, y);
+}
+
+function draw() {
+  var lv = levels[Math.min(level, levels.length - 1)];
+
+  // grass
+  g.fillStyle = "#33cc33";
+  g.fillRect(0, 0, WIDTH, HEIGHT);
+  // stripes cuz real golf courses have them
+  g.fillStyle = "#2eb82e";
+  for (var i = 0; i < WIDTH; i += 80) {
+    g.fillRect(i, 0, 40, HEIGHT);
+  }
+
+  if (gameState == "beatgame") {
+    g.fillStyle = "#000000";
+    g.fillRect(0, 0, WIDTH, HEIGHT);
+    var colors = ["#ff0000", "#ffff00", "#00ff00", "#00ffff", "#ff00ff"];
+    drawText("U BEAT THE WHOLE GAME!!!", WIDTH / 2, 150, 40, colors[Math.floor(frameCount / 8) % colors.length]);
+    drawText("total clicks: " + totalClicks, WIDTH / 2, 220, 26, "#ffffff");
+    var rank = "GOLF GOD";
+    if (totalClicks > 15) rank = "pretty good";
+    if (totalClicks > 25) rank = "ok i guess";
+    if (totalClicks > 40) rank = "n00b";
+    drawText("ur rank: " + rank, WIDTH / 2, 265, 26, "#ffff00");
+    drawText("thx 4 playing!!!", WIDTH / 2, 330, 22, "#00ffff");
+    drawText("click to play again", WIDTH / 2, 420, 18, "#aaaaaa");
+    return;
+  }
+
+  // water
+  for (var i = 0; i < lv.water.length; i++) {
+    var wt = lv.water[i];
+    g.fillStyle = "#0066ff";
+    g.fillRect(wt[0], wt[1], wt[2], wt[3]);
+    g.strokeStyle = "#003399";
+    g.lineWidth = 2;
+    g.strokeRect(wt[0], wt[1], wt[2], wt[3]);
+    // little waves
+    g.strokeStyle = "#66aaff";
+    g.lineWidth = 1;
+    for (var wy = wt[1] + 10; wy < wt[1] + wt[3] - 4; wy += 14) {
+      for (var wx = wt[0] + 6; wx < wt[0] + wt[2] - 10; wx += 20) {
+        var off = ((frameCount / 10) + wy) % 2 < 1 ? 0 : 3;
+        g.beginPath();
+        g.moveTo(wx + off, wy);
+        g.lineTo(wx + off + 4, wy - 3);
+        g.lineTo(wx + off + 8, wy);
+        g.stroke();
+      }
+    }
+  }
+
+  // no click zone
+  if (gameState == "aim") {
+    g.fillStyle = "rgba(255, 0, 0, 0.15)";
+    g.beginPath();
+    g.arc(lv.holeX, lv.holeY, lv.noClick, 0, Math.PI * 2);
+    g.fill();
+    g.strokeStyle = "#ff0000";
+    g.lineWidth = 2;
+    g.setLineDash([8, 6]);
+    g.beginPath();
+    g.arc(lv.holeX, lv.holeY, lv.noClick, 0, Math.PI * 2);
+    g.stroke();
+    g.setLineDash([]);
+  }
+
+  // hole
+  g.fillStyle = "#000000";
+  g.beginPath();
+  g.arc(lv.holeX, lv.holeY, lv.holeR, 0, Math.PI * 2);
+  g.fill();
+  // flag
+  g.strokeStyle = "#ffffff";
+  g.lineWidth = 2;
+  g.beginPath();
+  g.moveTo(lv.holeX, lv.holeY);
+  g.lineTo(lv.holeX, lv.holeY - 40);
+  g.stroke();
+  g.fillStyle = "#ff0000";
+  g.beginPath();
+  var wave = Math.sin(frameCount / 6) * 3;
+  g.moveTo(lv.holeX, lv.holeY - 40);
+  g.lineTo(lv.holeX + 22, lv.holeY - 33 + wave);
+  g.lineTo(lv.holeX, lv.holeY - 26);
+  g.fill();
+
+  // walls
+  for (var i = 0; i < lv.walls.length; i++) {
+    var w = lv.walls[i];
+    g.fillStyle = "#8b4513";
+    g.fillRect(w[0], w[1], w[2], w[3]);
+    g.strokeStyle = "#000000";
+    g.lineWidth = 2;
+    g.strokeRect(w[0], w[1], w[2], w[3]);
+  }
+  for (var i = 0; i < lv.movers.length; i++) {
+    var m = lv.movers[i];
+    g.fillStyle = "#999999";
+    g.fillRect(m.x, m.y, m.w, m.h);
+    g.strokeStyle = "#000000";
+    g.lineWidth = 2;
+    g.strokeRect(m.x, m.y, m.w, m.h);
+  }
+
+  // balls
+  for (var i = 0; i < balls.length; i++) {
+    var b = balls[i];
+    if (!b.alive) {
+      if (b.splash > 0) {
+        g.strokeStyle = "#ffffff";
+        g.lineWidth = 1;
+        g.beginPath();
+        g.arc(b.x, b.y, 14 - b.splash, 0, Math.PI * 2);
+        g.stroke();
+        b.splash--;
+      }
+      continue;
+    }
+    g.fillStyle = "#ffffff";
+    g.beginPath();
+    g.arc(b.x, b.y, BALL_RADIUS, 0, Math.PI * 2);
+    g.fill();
+    g.strokeStyle = "#000000";
+    g.lineWidth = 1;
+    g.stroke();
+  }
+
+  // text on top
+  g.font = "bold 16px Arial";
+  g.textAlign = "left";
+  g.fillStyle = "#000000";
+  g.fillText("LEVEL " + (level + 1) + "/10: " + lv.name, 9, 21);
+  g.fillStyle = "#ffffff";
+  g.fillText("LEVEL " + (level + 1) + "/10: " + lv.name, 8, 20);
+  g.textAlign = "right";
+  g.fillStyle = "#000000";
+  g.fillText("Clicks: " + totalClicks, WIDTH - 7, 21);
+  g.fillStyle = "#ffffff";
+  g.fillText("Clicks: " + totalClicks, WIDTH - 8, 20);
+
+  if (gameState == "aim" && levelClicks == 0) {
+    drawText("click anywhere!!! (" + lv.balls + " balls)", WIDTH / 2, HEIGHT - 20, 18, "#ffff00");
+  }
+
+  if (gameState == "win") {
+    g.fillStyle = "rgba(0, 0, 0, 0.5)";
+    g.fillRect(0, 170, WIDTH, 140);
+    var txt = "NICE SHOT!!!";
+    if (levelClicks == 1) txt = "HOLE IN ONE!!!1!";
+    drawText(txt, WIDTH / 2, 235, 44, frameCount % 20 < 10 ? "#ffff00" : "#ff9900");
+    drawText("click 4 next level", WIDTH / 2, 280, 20, "#ffffff");
+  }
+  if (gameState == "lose") {
+    g.fillStyle = "rgba(0, 0, 0, 0.5)";
+    g.fillRect(0, 170, WIDTH, 140);
+    drawText("U MISSED!!!", WIDTH / 2, 235, 44, "#ff3333");
+    drawText("click 2 try again", WIDTH / 2, 280, 20, "#ffffff");
+  }
+
+  if (messageTimer > 0) {
+    drawText(message, WIDTH / 2, 60, 20, "#ff0000");
+    messageTimer--;
+  }
+}
+
+// main game loop (like a while(true) but doesnt freeze)
+function gameLoop() {
+  update();
+  draw();
+}
+
+canvas.addEventListener("mousedown", function(e) {
+  var rect = canvas.getBoundingClientRect();
+  // the canvas might be squished on small screens so fix the coords
+  var x = (e.clientX - rect.left) * (WIDTH / rect.width);
+  var y = (e.clientY - rect.top) * (HEIGHT / rect.height);
+  handleClick(x, y);
+});
+
+restartGame();
+setInterval(gameLoop, 16); // about 60 fps
+</script>
+</body>
+</html>
